@@ -67,16 +67,11 @@ class _CameraViewState extends State<CameraView> {
 
   @override
   Widget build(BuildContext context) {
-    if (!(_controller?.value.isInitialized ?? false)) {
-      return const Center(child: CircularProgressIndicator());
-    }
+  if (!(_controller?.value.isInitialized ?? false)) {
+    return const Center(child: CircularProgressIndicator());
+  }
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: AspectRatio(
-        aspectRatio: _controller!.value.aspectRatio,
-        child: CameraPreview(_controller!),
-      ),
-    );
+  // ✅ 전체화면 카메라 (ClipRRect, AspectRatio 제거)
+  return CameraPreview(_controller!);
   }
 }
