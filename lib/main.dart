@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'camera_view.dart';
 import 'fail_dialog.dart';
+import 'success_dialog.dart';
 
 void main() {
   runApp(const MusaiApp());
@@ -32,10 +33,13 @@ class MusaiHomePage extends StatefulWidget {
 }
 
 class _MusaiHomePageState extends State<MusaiHomePage> {
+  bool isRecognizing = false;  // 인식 중인지 상태 관리
+
   @override
   void initState() {
     super.initState();
 
+    // 10초 후 실패 다이얼로그 표시
     Future.delayed(const Duration(seconds: 10), () {
       showDialog(
         context: context,
@@ -142,7 +146,19 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                color: const Color(0xFF5E5955), // 하단바 색상 그대로
             ),
           ),
+
+          // 작품 인식 중일 때만 보여줄 로딩 화면
+          if (isRecognizing) const SuccessDialog(),
         ],
+      ),
+      // 테스트용 버튼
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            isRecognizing = true;  // 인식 시작
+          });
+        },
+        child: const Icon(Icons.check),
       ),
     );
   }
@@ -283,3 +299,4 @@ class HolePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+
