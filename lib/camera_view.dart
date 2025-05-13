@@ -69,8 +69,13 @@ class CameraViewState extends State<CameraView> {
   // 사진 촬영 메서드
   Future<XFile?> takePicture() async {
     if (_controller != null && _controller!.value.isInitialized) {
+      await _controller!.setFlashMode(FlashMode.off);   //촬영 전 플래시 끄기
       await _controller!.stopImageStream(); // 스트리밍 중지
-      return await _controller!.takePicture();
+      final picture = await _controller!.takePicture();
+
+      await _controller!.setFlashMode(FlashMode.off);   //촬영 후 다시 플래시 끄기
+
+      return picture;
     }
     return null;
   }
