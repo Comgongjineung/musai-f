@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'camera_view.dart';
 import 'fail_dialog.dart';
 import 'success_dialog.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(const MusaiApp());
@@ -33,7 +35,9 @@ class MusaiHomePage extends StatefulWidget {
 }
 
 class _MusaiHomePageState extends State<MusaiHomePage> {
-  bool isRecognizing = false;  // 인식 중인지 상태 관리
+  bool isRecognizing = false; // 인식 중인지 상태 관리
+  final GlobalKey<CameraViewState> _cameraViewKey =
+      GlobalKey<CameraViewState>();
 
   @override
   void initState() {
@@ -41,10 +45,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
 
     // 10초 후 실패 다이얼로그 표시
     Future.delayed(const Duration(seconds: 10), () {
-      showDialog(
-        context: context,
-        builder: (_) => const FailDialog(),
-      );
+      showDialog(context: context, builder: (_) => const FailDialog());
     });
   }
 
@@ -54,18 +55,14 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
       body: Stack(
         children: [
           // 카메라 전체 화면
-          const Positioned.fill(child: CameraView()),
+          Positioned.fill(child: CameraView(key: _cameraViewKey)),
 
-          // 마스크 
-          Positioned.fill(
-            child: CustomPaint(
-              painter: HolePainter(),
-            ),
-          ),
+          // 마스크
+          Positioned.fill(child: CustomPaint(painter: HolePainter())),
 
           // 점선 사각형
           Positioned(
-            top: 180, 
+            top: 180,
             left: 24,
             right: 24,
             child: AspectRatio(
@@ -91,7 +88,10 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                 ),
                 const SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 20,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEAE1DC),
                     borderRadius: BorderRadius.circular(20),
@@ -99,7 +99,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                   child: const Text(
                     '사각형 영역 안에 작품을 위치시켜주세요',
                     style: TextStyle(
-                      color: Color(0xFF706B66), 
+                      color: Color(0xFF706B66),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -127,7 +127,11 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                       children: const [
                         Icon(Icons.home, color: Colors.white, size: 28),
                         Icon(Icons.camera_alt, color: Colors.white, size: 28),
-                        Icon(Icons.calendar_today, color: Colors.white, size: 28),
+                        Icon(
+                          Icons.calendar_today,
+                          color: Colors.white,
+                          size: 28,
+                        ),
                         Icon(Icons.person, color: Colors.white, size: 28),
                       ],
                     ),
@@ -143,7 +147,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             bottom: 0,
             height: 30,
             child: Container(
-               color: const Color(0xFF5E5955), // 하단바 색상 그대로
+              color: const Color(0xFF5E5955), // 하단바 색상 그대로
             ),
           ),
 
@@ -153,12 +157,25 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
       ),
       // 테스트용 버튼
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            isRecognizing = true;  // 인식 시작
-          });
+        onPressed: () async {
+          final picture = await _cameraViewKey.currentState?.takePicture();
+
+          if (picture != null) {
+            final bytes = await picture.readAsBytes();
+            final dir = await getTemporaryDirectory();
+            final file = File('${dir.path}/captured.jpg');
+            await file.writeAsBytes(bytes);
+
+            print('✅ 사진 파일 생성됨: ${file.path}');
+
+            setState(() {
+              isRecognizing = true;
+            });
+          } else {
+            print('❌ 사진 촬영 실패');
+          }
         },
-        child: const Icon(Icons.check),
+        child: const Icon(Icons.camera_alt),
       ),
     );
   }
@@ -231,15 +248,19 @@ class DarkMask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final size = constraints.biggest;
-      final rect = padding.resolve(TextDirection.ltr).deflateRect(Offset.zero & size);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.biggest;
+        final rect = padding
+            .resolve(TextDirection.ltr)
+            .deflateRect(Offset.zero & size);
 
-      return CustomPaint(
-        size: size,
-        painter: _DarkMaskPainter(rect, borderRadius),
-      );
-    });
+        return CustomPaint(
+          size: size,
+          painter: _DarkMaskPainter(rect, borderRadius),
+        );
+      },
+    );
   }
 }
 
@@ -254,12 +275,16 @@ class _DarkMaskPainter extends CustomPainter {
     final paint = Paint()..color = Colors.black.withOpacity(0.5);
 
     final outer = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-    final inner = Path()
-      ..addRRect(RRect.fromRectAndRadius(holeRect, Radius.circular(radius)))
-      ..close();
+    final inner =
+        Path()
+          ..addRRect(RRect.fromRectAndRadius(holeRect, Radius.circular(radius)))
+          ..close();
 
     // combine paths with difference: outer - inner
-    canvas.drawPath(Path.combine(PathOperation.difference, outer, inner), paint);
+    canvas.drawPath(
+      Path.combine(PathOperation.difference, outer, inner),
+      paint,
+    );
   }
 
   @override
@@ -269,9 +294,10 @@ class _DarkMaskPainter extends CustomPainter {
 class HolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = Colors.black.withOpacity(0.5)
+          ..style = PaintingStyle.fill;
 
     final holeTop = 180.0;
     final horizontalPadding = 24.0;
@@ -279,19 +305,15 @@ class HolePainter extends CustomPainter {
     final holeHeight = holeWidth * (4.7 / 3); // 3:4.5 비율
 
     final holeRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(
-        horizontalPadding,
-        holeTop,
-        holeWidth,
-        holeHeight,
-      ),
+      Rect.fromLTWH(horizontalPadding, holeTop, holeWidth, holeHeight),
       const Radius.circular(20),
     );
 
-    final path = Path()
-      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..addRRect(holeRect)
-      ..fillType = PathFillType.evenOdd;
+    final path =
+        Path()
+          ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+          ..addRRect(holeRect)
+          ..fillType = PathFillType.evenOdd;
 
     canvas.drawPath(path, paint);
   }
@@ -299,4 +321,3 @@ class HolePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-

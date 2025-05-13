@@ -7,10 +7,10 @@ class CameraView extends StatefulWidget {
   const CameraView({super.key});
 
   @override
-  State<CameraView> createState() => _CameraViewState();
+  State<CameraView> createState() => CameraViewState();
 }
 
-class _CameraViewState extends State<CameraView> {
+class CameraViewState extends State<CameraView> {
   CameraController? _controller;
   Timer? _timer;
   bool _isProcessing = false;
@@ -24,7 +24,8 @@ class _CameraViewState extends State<CameraView> {
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
     final backCamera = cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.back);
+      (camera) => camera.lensDirection == CameraLensDirection.back,
+    );
 
     _controller = CameraController(
       backCamera,
@@ -65,13 +66,22 @@ class _CameraViewState extends State<CameraView> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-  if (!(_controller?.value.isInitialized ?? false)) {
-    return const Center(child: CircularProgressIndicator());
+  // 사진 촬영 메서드
+  Future<XFile?> takePicture() async {
+    if (_controller != null && _controller!.value.isInitialized) {
+      await _controller!.stopImageStream(); // 스트리밍 중지
+      return await _controller!.takePicture();
+    }
+    return null;
   }
 
-  // ✅ 전체화면 카메라 (ClipRRect, AspectRatio 제거)
-  return CameraPreview(_controller!);
+  @override
+  Widget build(BuildContext context) {
+    if (!(_controller?.value.isInitialized ?? false)) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // ✅ 전체화면 카메라 (ClipRRect, AspectRatio 제거)
+    return CameraPreview(_controller!);
   }
 }
