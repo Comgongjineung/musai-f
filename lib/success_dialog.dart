@@ -1,8 +1,35 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class SuccessDialog extends StatelessWidget {
+class SuccessDialog extends StatefulWidget {
   const SuccessDialog({super.key});
+
+  @override
+  State<SuccessDialog> createState() => _SuccessDialogState();
+}
+
+class _SuccessDialogState extends State<SuccessDialog> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..forward();
+
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +46,7 @@ class SuccessDialog extends StatelessWidget {
                   const Text(
                     '작품 분석 중 입니다.',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFFEFDFC),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -27,28 +54,34 @@ class SuccessDialog extends StatelessWidget {
                   const Text(
                     '잠시만 기다려 주세요.',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFFEFDFC),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Container(
+                  SizedBox(
                     width: 180,
                     height: 12,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white.withOpacity(0.3),
-                    ),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: FractionallySizedBox(
-                        widthFactor: 0.6,
-                        child: DecoratedBox(
+                    child: Stack(
+                      children: [
+                        Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white.withOpacity(0.3),
                           ),
                         ),
-                      ),
+                        AnimatedBuilder(
+                          animation: _animation,
+                          builder: (context, child) {
+                            return Container(
+                              width: 180 * _animation.value,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Color(0xFFFEFDFC),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ],

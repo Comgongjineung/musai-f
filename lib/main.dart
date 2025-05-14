@@ -36,6 +36,8 @@ class MusaiHomePage extends StatefulWidget {
 
 class _MusaiHomePageState extends State<MusaiHomePage> {
   bool isRecognizing = false; // 인식 중인지 상태 관리
+  bool isPhotoCaptured = false; // 사진 촬영 성공 여부
+  bool hasShownFailDialog = false; // 실패 다이얼로그 표시 여부
   final GlobalKey<CameraViewState> _cameraViewKey =
       GlobalKey<CameraViewState>();
 
@@ -43,121 +45,37 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
   void initState() {
     super.initState();
 
-    // 10초 후 실패 다이얼로그 표시
+    // 10초 후 실패 다이얼로그 표시 (사진이 찍히지 않았을 때만)
     Future.delayed(const Duration(seconds: 10), () {
-      showDialog(context: context, builder: (_) => const FailDialog());
+      if (!isPhotoCaptured && !hasShownFailDialog) {
+        showDialog(
+          context: context,
+          builder: (_) => const FailDialog(),
+        ).then((_) {
+          // 팝업 닫음 표시
+          hasShownFailDialog = false;
+
+          // 팝업 닫고 10초 후 다시 실패 시 다이얼로그 표시
+          Future.delayed(const Duration(seconds: 10), () {
+            if (!isPhotoCaptured && !hasShownFailDialog) {
+              showDialog(
+                context: context,
+                builder: (_) => const FailDialog(),
+              ).then((_) => hasShownFailDialog = false);
+              hasShownFailDialog = true;
+            }
+          });
+        });
+        hasShownFailDialog = true;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // 카메라 전체 화면
-          Positioned.fill(child: CameraView(key: _cameraViewKey)),
-
-          // 마스크
-          Positioned.fill(child: CustomPaint(painter: HolePainter())),
-
-          // 점선 사각형
-          Positioned(
-            top: 180,
-            left: 24,
-            right: 24,
-            child: AspectRatio(
-              aspectRatio: 3 / 4.7,
-              child: DashedBorderContainer(
-                child: Container(), // 그냥 빈 영역
-              ),
-            ),
-          ),
-
-          // 오버레이 UI
-          SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
-                const Text(
-                  'musai',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEAE1DC),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    '사각형 영역 안에 작품을 위치시켜주세요',
-                    style: TextStyle(
-                      color: Color(0xFF706B66),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 28),
-
-                const Spacer(),
-
-                // 하단 네비게이션
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 0), // 원하는 만큼 조절 가능
-                  child: Container(
-                    height: 80,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF5E5955),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        Icon(Icons.home, color: Colors.white, size: 28),
-                        Icon(Icons.camera_alt, color: Colors.white, size: 28),
-                        Icon(
-                          Icons.calendar_today,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                        Icon(Icons.person, color: Colors.white, size: 28),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // 하단바 색상 그대로
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 30,
-            child: Container(
-              color: const Color(0xFF5E5955), // 하단바 색상 그대로
-            ),
-          ),
-
-          // 작품 인식 중일 때만 보여줄 로딩 화면
-          if (isRecognizing) const SuccessDialog(),
-        ],
-      ),
-      // 테스트용 버튼
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
+      body: GestureDetector(
+        onTap: () async {
           final picture = await _cameraViewKey.currentState?.takePicture();
 
           if (picture != null) {
@@ -170,12 +88,115 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
 
             setState(() {
               isRecognizing = true;
+              isPhotoCaptured = true; // 사진 촬영 성공 -> false면 실패 팝업 안뜸
             });
           } else {
             print('❌ 사진 촬영 실패');
           }
         },
-        child: const Icon(Icons.camera_alt),
+        child: Stack(
+          children: [
+            // 카메라 전체 화면
+            Positioned.fill(child: CameraView(key: _cameraViewKey)),
+
+            // 마스크
+            Positioned.fill(child: CustomPaint(painter: HolePainter())),
+
+            // 점선 사각형
+            Positioned(
+              top: 180,
+              left: 24,
+              right: 24,
+              child: AspectRatio(
+                aspectRatio: 3 / 4.7,
+                child: DashedBorderContainer(
+                  child: Container(), // 그냥 빈 영역
+                ),
+              ),
+            ),
+
+            // 오버레이 UI
+            SafeArea(
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+                  const Text(
+                    'musai',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAE1DC),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      '영역 안에 작품을 위치시킨 후 화면을 두번 터치해주세요',
+                      style: TextStyle(
+                        color: Color(0xFF706B66),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  const Spacer(),
+
+                  // 하단 네비게이션
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 0), // 원하는 만큼 조절 가능
+                    child: Container(
+                      height: 80,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF5E5955),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Icon(Icons.home, color: Colors.white, size: 28),
+                          Icon(Icons.camera_alt, color: Colors.white, size: 28),
+                          Icon(
+                            Icons.calendar_today,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                          Icon(Icons.person, color: Colors.white, size: 28),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // 하단바 색상 그대로
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 30,
+              child: Container(
+                color: const Color(0xFF5E5955), // 하단바 색상 그대로
+              ),
+            ),
+
+            // 작품 인식 중일 때만 보여줄 로딩 화면
+            if (isRecognizing) const SuccessDialog(),
+          ],
+        ),
       ),
     );
   }
