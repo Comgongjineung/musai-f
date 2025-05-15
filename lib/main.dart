@@ -5,6 +5,8 @@ import 'fail_dialog.dart';
 import 'success_dialog.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(const MusaiApp());
@@ -55,8 +57,8 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
           // 팝업 닫음 표시
           hasShownFailDialog = false;
 
-          // 팝업 닫고 10초 후 다시 실패 시 다이얼로그 표시
-          Future.delayed(const Duration(seconds: 10), () {
+          // 팝업 닫고 15초 후 다시 실패 시 다이얼로그 표시
+          Future.delayed(const Duration(seconds: 15), () {
             if (!isPhotoCaptured && !hasShownFailDialog) {
               showDialog(
                 context: context,
@@ -73,6 +75,9 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: GestureDetector(
         onTap: () async {
@@ -84,7 +89,9 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             final file = File('${dir.path}/captured.jpg');
             await file.writeAsBytes(bytes);
 
+            // API 호출
             print('✅ 사진 파일 생성됨: ${file.path}');
+            await uploadImage(file);
 
             setState(() {
               isRecognizing = true;
@@ -102,13 +109,13 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             // 마스크
             Positioned.fill(child: CustomPaint(painter: HolePainter())),
 
-            // 점선 사각형
+            // 점선 사각형 (반응형)
             Positioned(
-              top: 180,
-              left: 24,
-              right: 24,
+              top: MediaQuery.of(context).size.height * 0.215, // 화면 높이에 비례한 위치 
+              left: MediaQuery.of(context).size.width * 0.065,
+              right: MediaQuery.of(context).size.width * 0.065,
               child: AspectRatio(
-                aspectRatio: 3 / 4.7,
+                aspectRatio: 3 / 4.6,
                 child: DashedBorderContainer(
                   child: Container(), // 그냥 빈 영역
                 ),
@@ -119,44 +126,44 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             SafeArea(
               child: Column(
                 children: [
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: screenHeight * 0.001),
+                  Text(
                     'musai',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 32,
+                      fontSize: screenWidth * 0.08,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.018),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 20,
+                    padding: EdgeInsets.symmetric(
+                      vertical: screenHeight * 0.01,
+                      horizontal: screenWidth * 0.05,
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFEAE1DC),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      '영역 안에 작품을 위치시킨 후 화면을 두번 터치해주세요',
+                    child: Text(
+                      '영역 안에 작품을 위치시키고 화면을 터치해주세요',
                       style: TextStyle(
-                        color: Color(0xFF706B66),
-                        fontSize: 14,
+                        color: const Color(0xFF706B66),
+                        fontSize: screenWidth * 0.035,
                         fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: screenHeight * 0.015),
 
                   const Spacer(),
 
                   // 하단 네비게이션
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 0), // 원하는 만큼 조절 가능
+                    padding: const EdgeInsets.only(bottom: 0), 
                     child: Container(
-                      height: 80,
+                      height: screenHeight * 0.09,
                       decoration: const BoxDecoration(
                         color: Color(0xFF5E5955),
                         borderRadius: BorderRadius.only(
@@ -187,7 +194,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
               left: 0,
               right: 0,
               bottom: 0,
-              height: 30,
+              height: 40,
               child: Container(
                 color: const Color(0xFF5E5955), // 하단바 색상 그대로
               ),
@@ -320,10 +327,11 @@ class HolePainter extends CustomPainter {
           ..color = Colors.black.withOpacity(0.5)
           ..style = PaintingStyle.fill;
 
-    final holeTop = 180.0;
-    final horizontalPadding = 24.0;
+    // Responsive layout based on size
+    final holeTop = size.height * 0.215;
+    final horizontalPadding = size.width * 0.065;
     final holeWidth = size.width - 2 * horizontalPadding;
-    final holeHeight = holeWidth * (4.7 / 3); // 3:4.5 비율
+    final holeHeight = holeWidth * (4.6 / 3);
 
     final holeRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(horizontalPadding, holeTop, holeWidth, holeHeight),
@@ -341,4 +349,29 @@ class HolePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+Future<void> uploadImage(File imageFile) async {
+  final uri = Uri.parse("http://52.79.54.131:8080/recog/analyze"); // fast api 서버: 사진 정보 받아옴
+  var request = http.MultipartRequest("POST", uri);
+
+  request.files.add(
+    await http.MultipartFile.fromPath('file', imageFile.path),
+  );
+
+  final response = await request.send();
+
+  if (response.statusCode == 200) {
+    final res = await http.Response.fromStream(response);
+    final json = jsonDecode(res.body);
+
+    final vision = json['vision_result'];
+    final gemini = json['gemini_result'];
+
+    print('✅ 제목: $vision');
+    print('✅ 설명(gemini): $gemini');
+
+  } else {
+    print('❌ 업로드 실패: ${response.statusCode}');
+  }
 }
