@@ -5,6 +5,9 @@ class FailDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Stack(
@@ -12,24 +15,24 @@ class FailDialog extends StatelessWidget {
         children: [
           // 팝업 박스 
           Container(
-            width: 240,
-            height: 155,
-            margin: const EdgeInsets.only(top: 24),
+            width: screenWidth * 0.65,
+            height: screenHeight * 0.2,
+            margin: EdgeInsets.only(top: screenHeight * 0.02),
             decoration: BoxDecoration(
               color: const Color(0xFF3E3C3B),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(22),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 12, bottom: 16),
+                Padding(
+                  padding: EdgeInsets.only(top: screenHeight * 0.02, bottom: screenHeight * 0.02),
                   child: Text(
                     '작품 인식에 실패했습니다.\n다시 시도해주세요.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: const Color(0xFFFEFDFC),
-                      fontSize: 14,
+                      fontSize: screenWidth * 0.038,
                       height: 1.5,
                       fontWeight: FontWeight.w500,
                     ),
@@ -38,8 +41,8 @@ class FailDialog extends StatelessWidget {
 
                 // 확인 버튼 
                 SizedBox(
-                  width: 150,
-                  height: 35,
+                  width: screenWidth * 0.45,
+                  height: screenHeight * 0.05,
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
@@ -50,28 +53,28 @@ class FailDialog extends StatelessWidget {
                       padding: EdgeInsets.zero,
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       '확인',
                       style: TextStyle(
                         color: const Color(0xFFFEFDFC),
-                        fontSize: 14,
+                        fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: screenHeight * 0.028),
               ],
             ),
           ),
 
           // 경고 아이콘 (세모 PNG만 겹치기)
           Positioned(
-            top: -6,
+            top: -screenHeight * 0.045,
             child: Image.asset(
               'assets/images/warning_icon.png', 
-              width: 60,
-              height: 60,
+              width: screenWidth * 0.3,
+              height: screenWidth * 0.3,
             ),
           ),
         ],
