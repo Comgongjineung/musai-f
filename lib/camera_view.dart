@@ -84,7 +84,19 @@ class CameraViewState extends State<CameraView> {
     return const Center(child: CircularProgressIndicator());
   }
 
-  // ✅ 전체화면 카메라 (ClipRRect, AspectRatio 제거)
-  return CameraPreview(_controller!);
-  }
+  // 전체화면 카메라 (ClipRRect, AspectRatio 제거)
+  final size = MediaQuery.of(context).size;
+  final camera = _controller!.value;
+
+  // 카메라 비율은 landscape 기준이므로, portrait 모드에선 반대로 계산
+  double scale = size.aspectRatio * camera.aspectRatio;
+  if (scale < 1) scale = 1 / scale;
+
+  return Transform.scale(
+    scale: scale,
+    child: Center(
+      child: CameraPreview(_controller!),
+    ),
+  );
+}
 }
