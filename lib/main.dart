@@ -189,17 +189,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                 ],
               ),
             ),
-            // 하단바 색상 그대로
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: 40,
-              child: Container(
-                color: const Color(0xFF5E5955), // 하단바 색상 그대로
-              ),
-            ),
-
+          
             // 작품 인식 중일 때만 보여줄 로딩 화면
             if (isRecognizing) const SuccessDialog(),
           ],
