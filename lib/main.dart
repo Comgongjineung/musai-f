@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'describe_page.dart';
+import 'bottom_nav_bar.dart';
 
 void main() {
   runApp(const MusaiApp());
@@ -161,32 +162,14 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                   const Spacer(),
 
                   // 하단 네비게이션
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 0), 
-                    child: Container(
-                      height: screenHeight * 0.09,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF5E5955),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          Icon(Icons.home, color: Colors.white, size: 28),
-                          Icon(Icons.camera_alt, color: Colors.white, size: 28),
-                          Icon(
-                            Icons.calendar_today,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                          Icon(Icons.person, color: Colors.white, size: 28),
-                        ],
-                      ),
-                    ),
-                  ),
+                  BottomNavBarWidget(
+                    currentIndex: 1,
+                    /*
+                    onItemTapped: (index) {
+                       // 원하는 탭 이동 로직 작성
+                       print("탭 선택: $index");
+  },*/
+),
                 ],
               ),
             ),
