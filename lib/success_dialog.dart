@@ -2,7 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class SuccessDialog extends StatefulWidget {
-  const SuccessDialog({super.key});
+  final VoidCallback onCompleted;
+  const SuccessDialog({super.key, required this.onCompleted});
 
   @override
   State<SuccessDialog> createState() => _SuccessDialogState();
@@ -23,6 +24,12 @@ class _SuccessDialogState extends State<SuccessDialog> with SingleTickerProvider
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        widget.onCompleted();
+      }
+    });
   }
 
   @override
