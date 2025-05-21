@@ -91,11 +91,11 @@ class DescriptionScreen extends StatelessWidget {
 
           // ✅ 하단바
           BottomNavBarWidget(
-            currentIndex: 0, 
+            currentIndex: 1, 
             onItemTapped: (index) {
               if (index == 0) {
                 Navigator.pop(context); // 홈으로 되돌아가기
-              } else if (index == 1) {
+              } else if (index == 2) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (_) => const MusaiHomePage()),
