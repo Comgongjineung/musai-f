@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'describe_page.dart';
 
 void main() {
   runApp(const MusaiApp());
@@ -191,7 +192,15 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             ),
           
             // 작품 인식 중일 때만 보여줄 로딩 화면
-            if (isRecognizing) const SuccessDialog(),
+              if (isRecognizing)
+                SuccessDialog(
+                  onCompleted: () {
+                    setState(() {
+                      isRecognizing = false;
+                    });
+                    ArtCameraController().takePictureAndAnalyze(context);
+                  },
+                ),
           ],
         ),
       ),
@@ -342,7 +351,7 @@ class HolePainter extends CustomPainter {
 }
 
 Future<void> uploadImage(File imageFile) async {
-  final uri = Uri.parse("http://52.79.54.131:8080/recog/analyze"); // fast api 서버: 사진 정보 받아옴
+    final uri = Uri.parse("http://43.203.236.130:8080/recog/analyze"); // fast api 서버: 사진 정보 받아옴
   var request = http.MultipartRequest("POST", uri);
 
   request.files.add(
@@ -353,7 +362,9 @@ Future<void> uploadImage(File imageFile) async {
 
   if (response.statusCode == 200) {
     final res = await http.Response.fromStream(response);
-    final json = jsonDecode(res.body);
+    
+    final decodedBody = utf8.decode(res.bodyBytes);
+    final json = jsonDecode(decodedBody);
 
     final vision = json['vision_result'];
     final gemini = json['gemini_result'];
