@@ -91,8 +91,8 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             final file = File('${dir.path}/captured.jpg');
             await file.writeAsBytes(bytes);
 
+            print('✅ 사진 파일 저장됨: ${file.path}');
             // API 호출
-            print('✅ 사진 파일 생성됨: ${file.path}');
             await uploadImage(file);
 
             setState(() {

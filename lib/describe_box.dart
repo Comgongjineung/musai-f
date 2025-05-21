@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'dart:io';
 import 'bottom_nav_bar.dart'; // 반드시 import 필요
 import 'main.dart'; // 탭 클릭 시 이동하려면 필요
+
 
 class DescriptionScreen extends StatelessWidget {
   final String title;
@@ -9,6 +11,7 @@ class DescriptionScreen extends StatelessWidget {
   final String year;
   final String description;
   final String imagePath;
+  final ScrollController scrollController;
 
   const DescriptionScreen({
     super.key,
@@ -17,18 +20,60 @@ class DescriptionScreen extends StatelessWidget {
     required this.year,
     required this.description,
     required this.imagePath,
+    required this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xff3E362F),
-      appBar: AppBar(
-        title: const Text('musai'),
-        backgroundColor: const Color(0xff3E362F),
-        elevation: 0,
-        foregroundColor: Colors.white,
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xff2E2B28),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
+
+      padding: const EdgeInsets.all(16),
+      child: SingleChildScrollView(
+        controller: scrollController,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$artist, $year',
+              style: const TextStyle(color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              description,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+
       body: Column(
         children: [
           // 상단 이미지
@@ -108,6 +153,7 @@ class DescriptionScreen extends StatelessWidget {
             },
           ),
         ],
+
       ),
     );
   }
