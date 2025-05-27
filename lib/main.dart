@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'describe_page.dart';
 import 'bottom_nav_bar.dart';
+import 'describe_box.dart';
 
 void main() {
   runApp(const MusaiApp());
@@ -48,31 +49,94 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
   @override
   void initState() {
     super.initState();
+  }
 
-    // 10초 후 실패 다이얼로그 표시 (사진이 찍히지 않았을 때만)
-    Future.delayed(const Duration(seconds: 10), () {
-      if (!isPhotoCaptured && !hasShownFailDialog) {
+  Future<void> uploadImage(BuildContext context, File imageFile) async {
+    final uri = Uri.parse("http://3.36.99.189:8080/recog/analyze");
+    var request = http.MultipartRequest("POST", uri);
+
+    request.files.add(
+      await http.MultipartFile.fromPath('file', imageFile.path),
+    );
+
+    try {
+      // 15초 타이머 시작
+      bool isTimeout = false;
+      bool isNavigated = false;  // DescriptionScreen으로 이동했는지 확인하는 플래그
+      
+      Future.delayed(const Duration(seconds: 15), () {
+        if (isRecognizing && !isTimeout && !isNavigated) {  // isNavigated 체크 추가
+          isTimeout = true;
+          setState(() {
+            isRecognizing = false;
+          });
+          showDialog(
+            context: context,
+            builder: (_) => const FailDialog(),
+          );
+        }
+      });
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final res = await http.Response.fromStream(response);
+        final decodedBody = utf8.decode(res.bodyBytes);
+        final json = jsonDecode(decodedBody);
+
+        final vision = json['vision_result'];
+        final gemini = json['gemini_result'];
+        final imageUrl = gemini['image_url'];
+
+        print('✅ 제목: $vision');
+        print('✅ 설명(gemini): $gemini');
+        print('✅ 이미지 URL: $imageUrl');
+
+        // SuccessDialog를 push로 띄우고, 완료 후 DescriptionScreen으로 이동
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SuccessDialog(
+              onCompleted: () {
+                isNavigated = true;  // DescriptionScreen으로 이동하기 전에 플래그 설정
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DescriptionScreen(
+                      title: gemini['title'] ?? vision ?? '제목 없음',
+                      artist: gemini['artist'] ?? '작가 미상',
+                      year: gemini['year'] ?? '연도 미상',
+                      description: gemini['description'] ?? '설명 없음',
+                      imagePath: imageFile.path,
+                      imageUrl: imageUrl,  // API 응답의 이미지 URL을 그대로 전달
+                      scrollController: ScrollController(),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      } else {
+        print('❌ 업로드 실패: ${response.statusCode}');
+        setState(() {
+          isRecognizing = false;
+        });
         showDialog(
           context: context,
           builder: (_) => const FailDialog(),
-        ).then((_) {
-          // 팝업 닫음 표시
-          hasShownFailDialog = false;
-
-          // 팝업 닫고 15초 후 다시 실패 시 다이얼로그 표시
-          Future.delayed(const Duration(seconds: 15), () {
-            if (!isPhotoCaptured && !hasShownFailDialog) {
-              showDialog(
-                context: context,
-                builder: (_) => const FailDialog(),
-              ).then((_) => hasShownFailDialog = false);
-              hasShownFailDialog = true;
-            }
-          });
-        });
-        hasShownFailDialog = true;
+        );
       }
-    });
+    } catch (e) {
+      print('❌ API 호출 중 오류 발생: $e');
+      setState(() {
+        isRecognizing = false;
+      });
+      showDialog(
+        context: context,
+        builder: (_) => const FailDialog(),
+      );
+    }
   }
 
   @override
@@ -93,7 +157,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
 
             print('✅ 사진 파일 저장됨: ${file.path}');
             // API 호출
-            await uploadImage(file);
+            await uploadImage(context, file);
 
             setState(() {
               isRecognizing = true;
@@ -331,31 +395,4 @@ class HolePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-Future<void> uploadImage(File imageFile) async {
-    final uri = Uri.parse("http://43.203.236.130:8080/recog/analyze"); // fast api 서버: 사진 정보 받아옴
-  var request = http.MultipartRequest("POST", uri);
-
-  request.files.add(
-    await http.MultipartFile.fromPath('file', imageFile.path),
-  );
-
-  final response = await request.send();
-
-  if (response.statusCode == 200) {
-    final res = await http.Response.fromStream(response);
-    
-    final decodedBody = utf8.decode(res.bodyBytes);
-    final json = jsonDecode(decodedBody);
-
-    final vision = json['vision_result'];
-    final gemini = json['gemini_result'];
-
-    print('✅ 제목: $vision');
-    print('✅ 설명(gemini): $gemini');
-
-  } else {
-    print('❌ 업로드 실패: ${response.statusCode}');
-  }
 }
