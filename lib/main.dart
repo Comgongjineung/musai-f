@@ -40,32 +40,29 @@ class MusaiHomePage extends StatefulWidget {
 }
 
 class _MusaiHomePageState extends State<MusaiHomePage> {
-  bool isRecognizing = false; // 인식 중인지 상태 관리
-  bool isPhotoCaptured = false; // 사진 촬영 성공 여부
-  bool hasShownFailDialog = false; // 실패 다이얼로그 표시 여부
-  final GlobalKey<CameraViewState> _cameraViewKey =
-      GlobalKey<CameraViewState>();
+  bool isRecognizing = false;
+  bool isPhotoCaptured = false;
+  final GlobalKey<CameraViewState> _cameraViewKey = GlobalKey<CameraViewState>();
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  // 결과 저장용 상태
+  String title = '';
+  String artist = '';
+  String year = '';
+  String description = '';
+  String imageUrl = '';
+  File? analyzedImage;
 
   Future<void> uploadImage(BuildContext context, File imageFile) async {
     final uri = Uri.parse("http://3.36.99.189:8080/recog/analyze");
     var request = http.MultipartRequest("POST", uri);
-
-    request.files.add(
-      await http.MultipartFile.fromPath('file', imageFile.path),
-    );
+    request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
 
     try {
-      // 15초 타이머 시작
       bool isTimeout = false;
-      bool isNavigated = false;  // DescriptionScreen으로 이동했는지 확인하는 플래그
-      
+      bool isNavigated = false;
+
       Future.delayed(const Duration(seconds: 15), () {
-        if (isRecognizing && !isTimeout && !isNavigated) {  // isNavigated 체크 추가
+        if (isRecognizing && !isTimeout && !isNavigated) {
           isTimeout = true;
           setState(() {
             isRecognizing = false;
@@ -86,39 +83,17 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
 
         final vision = json['vision_result'];
         final gemini = json['gemini_result'];
-        final imageUrl = gemini['image_url'];
 
-        print('✅ 제목: $vision');
-        print('✅ 설명(gemini): $gemini');
-        print('✅ 이미지 URL: $imageUrl');
-
-        // SuccessDialog를 push로 띄우고, 완료 후 DescriptionScreen으로 이동
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => SuccessDialog(
-              onCompleted: () {
-                isNavigated = true;  // DescriptionScreen으로 이동하기 전에 플래그 설정
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DescriptionScreen(
-                      title: gemini['title'] ?? vision ?? '제목 없음',
-                      artist: gemini['artist'] ?? '작가 미상',
-                      year: gemini['year'] ?? '연도 미상',
-                      description: gemini['description'] ?? '설명 없음',
-                      imagePath: imageFile.path,
-                      imageUrl: imageUrl,  // API 응답의 이미지 URL을 그대로 전달
-                      scrollController: ScrollController(),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        );
+        setState(() {
+          title = gemini['title'] ?? vision ?? '제목 없음';
+          artist = gemini['artist'] ?? '작가 미상';
+          year = gemini['year'] ?? '연도 미상';
+          description = gemini['description'] ?? '설명 없음';
+          imageUrl = gemini['image_url'];
+          analyzedImage = imageFile;
+          isRecognizing = true;
+        });
       } else {
-        print('❌ 업로드 실패: ${response.statusCode}');
         setState(() {
           isRecognizing = false;
         });
@@ -128,7 +103,6 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
         );
       }
     } catch (e) {
-      print('❌ API 호출 중 오류 발생: $e');
       setState(() {
         isRecognizing = false;
       });
@@ -148,47 +122,30 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
       body: GestureDetector(
         onTap: () async {
           final picture = await _cameraViewKey.currentState?.takePicture();
-
           if (picture != null) {
             final bytes = await picture.readAsBytes();
             final dir = await getTemporaryDirectory();
             final file = File('${dir.path}/captured.jpg');
             await file.writeAsBytes(bytes);
-
-            print('✅ 사진 파일 저장됨: ${file.path}');
-            // API 호출
             await uploadImage(context, file);
-
             setState(() {
-              isRecognizing = true;
-              isPhotoCaptured = true; // 사진 촬영 성공 -> false면 실패 팝업 안뜸
+              isPhotoCaptured = true;
             });
-          } else {
-            print('❌ 사진 촬영 실패');
           }
         },
         child: Stack(
           children: [
-            // 카메라 전체 화면
             Positioned.fill(child: CameraView(key: _cameraViewKey)),
-
-            // 마스크
             Positioned.fill(child: CustomPaint(painter: HolePainter())),
-
-            // 점선 사각형 (반응형)
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.215, // 화면 높이에 비례한 위치 
-              left: MediaQuery.of(context).size.width * 0.065,
-              right: MediaQuery.of(context).size.width * 0.065,
+              top: screenHeight * 0.215,
+              left: screenWidth * 0.065,
+              right: screenWidth * 0.065,
               child: AspectRatio(
                 aspectRatio: 3 / 4.6,
-                child: DashedBorderContainer(
-                  child: Container(), // 그냥 빈 영역
-                ),
+                child: DashedBorderContainer(child: Container()),
               ),
             ),
-
-            // 오버레이 UI
             SafeArea(
               child: Column(
                 children: [
@@ -222,32 +179,33 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.015),
-
                   const Spacer(),
-
-                  // 하단 네비게이션
-                  BottomNavBarWidget(
-                    currentIndex: 1,
-                    /*
-                    onItemTapped: (index) {
-                       // 원하는 탭 이동 로직 작성
-                       print("탭 선택: $index");
-  },*/
-),
+                  BottomNavBarWidget(currentIndex: 1),
                 ],
               ),
             ),
-          
-            // 작품 인식 중일 때만 보여줄 로딩 화면
-              if (isRecognizing)
-                SuccessDialog(
-                  onCompleted: () {
-                    setState(() {
-                      isRecognizing = false;
-                    });
-                    ArtCameraController().takePictureAndAnalyze(context);
-                  },
-                ),
+            if (isRecognizing)
+              SuccessDialog(
+                onCompleted: () {
+                  setState(() {
+                    isRecognizing = false;
+                  });
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DescriptionScreen(
+                        title: title,
+                        artist: artist,
+                        year: year,
+                        description: description,
+                        imagePath: analyzedImage!.path,
+                        imageUrl: imageUrl,
+                        scrollController: ScrollController(),
+                      ),
+                    ),
+                  );
+                },
+              ),
           ],
         ),
       ),
@@ -255,10 +213,8 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
   }
 }
 
-// Custom widget for dashed border
 class DashedBorderContainer extends StatelessWidget {
   final Widget child;
-
   const DashedBorderContainer({super.key, required this.child});
 
   @override
@@ -273,21 +229,18 @@ class DashedBorderContainer extends StatelessWidget {
 class DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint =
-        Paint()
-          ..color = Colors.white
-          ..strokeWidth = 2
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
 
-    final Path path =
-        Path()..addRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromLTWH(0, 0, size.width, size.height),
-            const Radius.circular(20),
-          ),
-        );
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        const Radius.circular(20),
+      ));
 
-    final Path dashPath = Path();
+    final dashPath = Path();
     const double dashWidth = 10.0;
     const double dashSpace = 5.0;
 
@@ -298,8 +251,7 @@ class DashedBorderPainter extends CustomPainter {
           pathMetric.extractPath(distance, distance + dashWidth),
           Offset.zero,
         );
-        distance += dashWidth;
-        distance += dashSpace;
+        distance += dashWidth + dashSpace;
       }
     }
 
@@ -310,70 +262,13 @@ class DashedBorderPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class DarkMask extends StatelessWidget {
-  final double borderRadius;
-  final EdgeInsetsGeometry padding;
-
-  const DarkMask({
-    super.key,
-    required this.borderRadius,
-    required this.padding,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = constraints.biggest;
-        final rect = padding
-            .resolve(TextDirection.ltr)
-            .deflateRect(Offset.zero & size);
-
-        return CustomPaint(
-          size: size,
-          painter: _DarkMaskPainter(rect, borderRadius),
-        );
-      },
-    );
-  }
-}
-
-class _DarkMaskPainter extends CustomPainter {
-  final Rect holeRect;
-  final double radius;
-
-  _DarkMaskPainter(this.holeRect, this.radius);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.black.withOpacity(0.5);
-
-    final outer = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-    final inner =
-        Path()
-          ..addRRect(RRect.fromRectAndRadius(holeRect, Radius.circular(radius)))
-          ..close();
-
-    // combine paths with difference: outer - inner
-    canvas.drawPath(
-      Path.combine(PathOperation.difference, outer, inner),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
-
 class HolePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.black.withOpacity(0.5)
-          ..style = PaintingStyle.fill;
+    final paint = Paint()
+      ..color = Colors.black.withOpacity(0.5)
+      ..style = PaintingStyle.fill;
 
-    // Responsive layout based on size
     final holeTop = size.height * 0.215;
     final horizontalPadding = size.width * 0.065;
     final holeWidth = size.width - 2 * horizontalPadding;
@@ -384,11 +279,10 @@ class HolePainter extends CustomPainter {
       const Radius.circular(20),
     );
 
-    final path =
-        Path()
-          ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
-          ..addRRect(holeRect)
-          ..fillType = PathFillType.evenOdd;
+    final path = Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..addRRect(holeRect)
+      ..fillType = PathFillType.evenOdd;
 
     canvas.drawPath(path, paint);
   }

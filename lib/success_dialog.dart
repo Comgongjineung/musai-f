@@ -53,42 +53,45 @@ class _SuccessDialogState extends State<SuccessDialog> with SingleTickerProvider
                   const Text(
                     '작품 분석 중 입니다.',
                     style: TextStyle(
-                      color: Color(0xFFFEFDFC),
+                      fontSize: 13,
+                      color: Colors.white,
                       fontWeight: FontWeight.w500,
+                      decoration: TextDecoration.none,
                     ),
                   ),
                   const SizedBox(height: 2),
                   const Text(
                     '잠시만 기다려 주세요.',
                     style: TextStyle(
-                      color: Color(0xFFFEFDFC),
+                      fontSize: 13,
+                      color: Colors.white,
+                      decoration: TextDecoration.none,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  SizedBox(
+                  Container(
                     width: 180,
                     height: 12,
-                    child: Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                        ),
-                        AnimatedBuilder(
-                          animation: _animation,
-                          builder: (context, child) {
-                            return Container(
-                              width: 180 * _animation.value,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white.withOpacity(0.3),
+                    ),
+                    child: AnimatedBuilder(
+                      animation: _animation,
+                      builder: (context, child) {
+                        return Align(
+                          alignment: Alignment.centerLeft,
+                          child: FractionallySizedBox(
+                            widthFactor: _animation.value,
+                            child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                color: Color(0xFFFEFDFC),
+                                color: Colors.white,
                               ),
-                            );
-                          },
-                        ),
-                      ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
