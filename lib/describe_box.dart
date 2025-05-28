@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'dart:io';
 import 'bottom_nav_bar.dart'; // 반드시 import 필요
 import 'main.dart'; // 탭 클릭 시 이동하려면 필요
 import 'dart:convert';
-import 'dart:typed_data';
+//import 'dart:typed_data';
 
 class DescriptionScreen extends StatefulWidget {
   final String title;
@@ -47,7 +46,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
             child: SafeArea(
               bottom: false,
               child: Container(
-                height: 56,
+                height: MediaQuery.of(context).size.height * 0.07,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,18 +78,18 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
           // 상단 이미지와 버튼 (디자인 개선)
           Positioned(
-            top: 60, // AppBar 높이(60)
+            top: MediaQuery.of(context).size.height * 0.08, // Responsive top padding
             left: 0,
             right: 0,
             child: Container(
               alignment: Alignment.topCenter,
-              padding: const EdgeInsets.only(top: 24),
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.03),
               child: Stack(
                 children: [
                   // 이미지 (고정 사이즈)
                   Container(
-                    width: 342,
-                    height: 514,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.6,
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(24),
@@ -124,12 +123,15 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   ),
                   // AR 버튼 (가운데)
                   Positioned(
-                    top: 16,
+                    top: MediaQuery.of(context).size.height * 0.02,
                     left: 0,
                     right: 0,
                     child: Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.06,
+                          vertical: MediaQuery.of(context).size.height * 0.01,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
@@ -146,7 +148,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   ),
                   // 북마크 버튼 (오른쪽 상단)
                   Positioned(
-                    top: 16,
+                    top: MediaQuery.of(context).size.height * 0.02,
                     right: 16,
                     child: GestureDetector(
                       onTap: () {
@@ -157,7 +159,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       child: Icon(
                         isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                         color: Colors.white,
-                        size: 32,
+                        size: MediaQuery.of(context).size.width * 0.08,
                       ),
                     ),
                   ),
@@ -184,8 +186,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       padding: const EdgeInsets.only(top: 12, bottom: 8),
                       child: Center(
                         child: Container(
-                          width: 40,
-                          height: 4,
+                          width: MediaQuery.of(context).size.width * 0.1,
+                          height: MediaQuery.of(context).size.height * 0.005,
                           decoration: BoxDecoration(
                             color: Colors.grey[700],
                             borderRadius: BorderRadius.circular(2),
@@ -195,12 +197,12 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     ),
                     // 드롭다운, TTS 버튼
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
                       child: Row(
                         children: [
                           Expanded(
                             child: Container(
-                              height: 36,
+                              height: MediaQuery.of(context).size.height * 0.045,
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF37322F),
@@ -219,8 +221,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           ),
                           const SizedBox(width: 12),
                           Container(
-                            width: 36,
-                            height: 36,
+                            width: MediaQuery.of(context).size.width * 0.09,
+                            height: MediaQuery.of(context).size.width * 0.09,
                             decoration: BoxDecoration(
                               color: const Color(0xFF37322F),
                               borderRadius: BorderRadius.circular(12),
@@ -230,44 +232,44 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.015),
                     // 제목, 작가, 연도
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             widget.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 20,
+                              fontSize: MediaQuery.of(context).size.width * 0.05,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             '${widget.artist}, ${widget.year}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.grey,
-                              fontSize: 14,
+                              fontSize: MediaQuery.of(context).size.width * 0.035,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.015),
                     // 설명 스크롤
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
                         child: SingleChildScrollView(
                           controller: scrollController,
                           child: Text(
                             widget.description,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 14,
+                              fontSize: MediaQuery.of(context).size.width * 0.035,
                               height: 1.5,
                             ),
                           ),

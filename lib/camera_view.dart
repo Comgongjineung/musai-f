@@ -15,6 +15,10 @@ class CameraViewState extends State<CameraView> {
   Timer? _timer;
   bool _isProcessing = false;
 
+  double _currentZoomLevel = 1.0;
+  double _baseZoomLevel = 1.0;
+  double _maxZoomLevel = 1.0;
+  double _minZoomLevel = 1.0;
 
   @override
   void initState() {
@@ -34,6 +38,9 @@ class CameraViewState extends State<CameraView> {
     );
 
     await _controller!.initialize();
+    _maxZoomLevel = await _controller!.getMaxZoomLevel();
+    _minZoomLevel = await _controller!.getMinZoomLevel();
+    print("Zoom range: $_minZoomLevel ~ $_maxZoomLevel");
     await _controller!.startImageStream(_processFrame);
 
     setState(() {});
@@ -78,6 +85,20 @@ class CameraViewState extends State<CameraView> {
     return null;
   }
 
+  void onZoomStart(ScaleStartDetails details) {
+    _baseZoomLevel = _currentZoomLevel;
+    //print("🔍 줌 시작: $_baseZoomLevel");
+  }
+
+  void onZoomUpdate(ScaleUpdateDetails details) async {
+    final newZoom = (_baseZoomLevel * details.scale).clamp(_minZoomLevel, _maxZoomLevel);
+    //final direction = details.scale > 1 ? "🔎 확대 중" : "🔍 축소 중";
+   // print("📏 $direction (요청 줌: $newZoom)");
+    _currentZoomLevel = newZoom;
+    await _controller?.setZoomLevel(_currentZoomLevel);
+    //print("✅ 적용된 줌: $_currentZoomLevel");
+  }
+
   @override
   Widget build(BuildContext context) {
   if (!(_controller?.value.isInitialized ?? false)) {
@@ -92,11 +113,15 @@ class CameraViewState extends State<CameraView> {
   double scale = size.aspectRatio * camera.aspectRatio;
   if (scale < 1) scale = 1 / scale;
 
-  return Transform.scale(
-    scale: scale,
-    child: Center(
-      child: CameraPreview(_controller!),
-    ),
+  return Stack(
+    children: [
+      Transform.scale(
+        scale: scale,
+        child: Center(
+          child: CameraPreview(_controller!),
+        ),
+      ),
+    ],
   );
 }
 }
