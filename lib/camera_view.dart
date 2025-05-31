@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
+//import 'package:flutter/foundation.dart';
 
 class CameraView extends StatefulWidget {
   const CameraView({super.key});
@@ -13,7 +13,7 @@ class CameraView extends StatefulWidget {
 class CameraViewState extends State<CameraView> {
   CameraController? _controller;
   Timer? _timer;
-  bool _isProcessing = false;
+  //bool _isProcessing = false;
 
   double _currentZoomLevel = 1.0;
   double _baseZoomLevel = 1.0;
@@ -41,29 +41,8 @@ class CameraViewState extends State<CameraView> {
     _maxZoomLevel = await _controller!.getMaxZoomLevel();
     _minZoomLevel = await _controller!.getMinZoomLevel();
     print("Zoom range: $_minZoomLevel ~ $_maxZoomLevel");
-    await _controller!.startImageStream(_processFrame);
 
     setState(() {});
-  }
-
-  void _processFrame(CameraImage image) {
-    if (_isProcessing) return;
-    _isProcessing = true;
-
-    _timer ??= Timer.periodic(const Duration(seconds: 1), (_) {
-      final bytes = _concatenatePlanes(image.planes);
-      debugPrint("Captured ${bytes.lengthInBytes} bytes of image data");
-    });
-
-    _isProcessing = false;
-  }
-
-  Uint8List _concatenatePlanes(List<Plane> planes) {
-    final WriteBuffer buffer = WriteBuffer();
-    for (final plane in planes) {
-      buffer.putUint8List(plane.bytes);
-    }
-    return buffer.done().buffer.asUint8List();
   }
 
   @override
@@ -77,7 +56,7 @@ class CameraViewState extends State<CameraView> {
   Future<XFile?> takePicture() async {
     if (_controller != null && _controller!.value.isInitialized) {
       await _controller!.setFlashMode(FlashMode.off); //촬영 전 플래시 끄기
-      await _controller!.stopImageStream(); // 스트리밍 중지
+      //await _controller!.stopImageStream(); // 스트리밍 중지
       final picture = await _controller!.takePicture();
       await _controller!.setFlashMode(FlashMode.off); //촬영 후 다시 플래시 끄기
       return picture;
