@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'camera_view.dart';
 import 'fail_dialog.dart';
-import 'success_dialog.dart';
+//import 'success_dialog.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -43,6 +43,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
   bool isRecognizing = false;
   bool isPhotoCaptured = false;
   final GlobalKey<CameraViewState> _cameraViewKey = GlobalKey<CameraViewState>();
+  //final ArtCameraController _cameraController = ArtCameraController();
 
   // 결과 저장용 상태
   String title = '';
@@ -59,13 +60,12 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
 
     try {
       bool isTimeout = false;
-      bool isNavigated = false;
-
-      Future.delayed(const Duration(seconds: 15), () {
-        if (isRecognizing && !isTimeout && !isNavigated) {
+      // API 호출 타임아웃 처리
+      Future.delayed(const Duration(seconds: 10), () {
+        if (isRecognizing && !isTimeout && mounted) { // isRecognizing 상태로 타임아웃 체크
           isTimeout = true;
           setState(() {
-            isRecognizing = false;
+            isRecognizing = false; // 타임아웃 시 로딩 상태 해제
           });
           showDialog(
             context: context,
@@ -76,40 +76,45 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
 
       final response = await request.send();
 
-      if (response.statusCode == 200) {
-        final res = await http.Response.fromStream(response);
-        final decodedBody = utf8.decode(res.bodyBytes);
-        final json = jsonDecode(decodedBody);
-
-        final vision = json['vision_result'];
-        final gemini = json['gemini_result'];
-
-        setState(() {
-          title = gemini['title'] ?? vision ?? '제목 없음';
-          artist = gemini['artist'] ?? '작가 미상';
-          year = gemini['year'] ?? '연도 미상';
-          description = gemini['description'] ?? '설명 없음';
-          imageUrl = gemini['image_url'];
-          analyzedImage = imageFile;
-          isRecognizing = true;
-        });
-      } else {
+      if (mounted) { // 위젯 마운트 상태 확인
+        if (response.statusCode == 200) {
+          print('✅ 작품 인식 성공');
+          // 성공 시 isRecognizing 상태 해제 및 DescribePage로 이동
+          setState(() {
+            isRecognizing = false;
+          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DescribePage(
+                imagePath: imageFile.path,
+              ),
+            ),
+          );
+        } else {
+          print('❌ 작품 인식 실패');
+          // 실패 시 isRecognizing 상태 해제 및 FailDialog 표시
+          setState(() {
+            isRecognizing = false;
+          });
+           showDialog(
+            context: context,
+            builder: (_) => const FailDialog(),
+          );
+        }
+      }
+    } catch (e) {
+      print('❌ 에러 발생: $e');
+      // 에러 발생 시 isRecognizing 상태 해제 및 FailDialog 표시
+      if(mounted) {
         setState(() {
           isRecognizing = false;
         });
-        showDialog(
+         showDialog(
           context: context,
           builder: (_) => const FailDialog(),
         );
       }
-    } catch (e) {
-      setState(() {
-        isRecognizing = false;
-      });
-      showDialog(
-        context: context,
-        builder: (_) => const FailDialog(),
-      );
     }
   }
 
@@ -127,10 +132,17 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             final dir = await getTemporaryDirectory();
             final file = File('${dir.path}/captured.jpg');
             await file.writeAsBytes(bytes);
-            await uploadImage(context, file);
+            
+            // 사진 촬영 후 로딩 시작 (isRecognizing 상태 true)
             setState(() {
+              isRecognizing = true;
               isPhotoCaptured = true;
             });
+
+            // uploadImage 함수 호출 (API 호출 및 결과 처리)
+            await uploadImage(context, file);
+
+            // uploadImage 내에서 isRecognizing 상태가 업데이트 되므로 여기서 추가적인 setState는 필요 없습니다.
           }
         },
         onScaleStart: (details) {
@@ -190,28 +202,14 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                 ],
               ),
             ),
+            /*
             if (isRecognizing)
               SuccessDialog(
                 onCompleted: () {
-                  setState(() {
-                    isRecognizing = false;
-                  });
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DescriptionScreen(
-                        title: title,
-                        artist: artist,
-                        year: year,
-                        description: description,
-                        imagePath: analyzedImage!.path,
-                        imageUrl: imageUrl,
-                        scrollController: ScrollController(),
-                      ),
-                    ),
-                  );
+                  // SuccessDialog 내용은 describe_page에서
                 },
               ),
+            */
           ],
         ),
       ),
@@ -254,7 +252,7 @@ class DashedBorderPainter extends CustomPainter {
     for (PathMetric pathMetric in path.computeMetrics()) {
       while (distance < pathMetric.length) {
         dashPath.addPath(
-          pathMetric.extractPath(distance, distance + dashWidth),
+          pathMetric.extractPath(distance, distance + dashWidth), 
           Offset.zero,
         );
         distance += dashWidth + dashSpace;

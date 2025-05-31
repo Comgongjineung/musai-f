@@ -3,7 +3,7 @@ import 'dart:io';
 import 'bottom_nav_bar.dart'; // 반드시 import 필요
 import 'main.dart'; // 탭 클릭 시 이동하려면 필요
 import 'dart:convert';
-//import 'dart:typed_data';
+import 'dart:typed_data';
 
 class DescriptionScreen extends StatefulWidget {
   final String title;
@@ -78,7 +78,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
           // 상단 이미지와 버튼 (디자인 개선)
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.08, // Responsive top padding
+            top: MediaQuery.of(context).size.height * 0.105, // Responsive top padding
             left: 0,
             right: 0,
             child: Container(
@@ -96,29 +96,29 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24),
-                      child: widget.imageUrl != null &&
-                              widget.imageUrl!.isNotEmpty &&
-                              widget.imageUrl!.startsWith('data:image')
-                          ? (() {
-                              try {
-                                final base64Str = widget.imageUrl!.split(',').last;
-                                final bytes = base64Decode(base64Str);
-                                return Image.memory(
-                                  bytes,
-                                  fit: BoxFit.cover,
-                                );
-                              } catch (e) {
-                                print('❌ Base64 디코딩 오류: $e');
-                                return Image.file(
-                                  File(widget.imagePath),
-                                  fit: BoxFit.cover,
-                                );
-                              }
-                            })()
-                          : Image.file(
-                              File(widget.imagePath),
+                      child: Builder(
+                        builder: (context) {
+                          if (widget.imageUrl != null && widget.imageUrl!.startsWith('data:image')) {
+                            final base64Str = widget.imageUrl!.split(',').last;
+                            final bytes = base64Decode(base64Str);
+                            print('✅ base64 메모리 받음');
+                            return Image.memory(
+                              bytes,
                               fit: BoxFit.cover,
-                            ),
+                            );
+                            
+                          } else if (widget.imageUrl != null && widget.imageUrl!.isNotEmpty) {
+                            print('✅ base64 네트워크 받음');
+                            return Image.network(
+                              widget.imageUrl!,
+                              fit: BoxFit.cover,
+                            );
+                          } else {
+                            print('✅ 렌더링 안보임');
+                            return const SizedBox.shrink();
+                          }
+                        },
+                      ),
                     ),
                   ),
                   // AR 버튼 (가운데)
