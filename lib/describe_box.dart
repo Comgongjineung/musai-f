@@ -4,6 +4,8 @@ import 'bottom_nav_bar.dart'; // 반드시 import 필요
 import 'main.dart'; // 탭 클릭 시 이동하려면 필요
 import 'dart:convert';
 import 'dart:typed_data';
+import 'tts_service.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class DescriptionScreen extends StatefulWidget {
   final String title;
@@ -31,6 +33,15 @@ class DescriptionScreen extends StatefulWidget {
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
   bool isBookmarked = false;
+  String selectedDescription = '클래식한 해설';  // 기본값 설정
+
+  final List<String> descriptionTypes = [
+    '한눈에 보는 해설',
+    '클래식한 해설',
+    '깊이 있는 해설',
+  ];
+
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
@@ -195,41 +206,66 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                         ),
                       ),
                     ),
-                    // 드롭다운, TTS 버튼
+                    // 상단 컨트롤 바 (진한 회색)
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              height: MediaQuery.of(context).size.height * 0.045,
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.06,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF37322F), // 진한 회색
+                          // color: const Color(0xFFEAE1DC), // 연한 회색
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            // 드롭다운 메뉴 감싸는 연한 회색 박스
+                            Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12),
+                              height: MediaQuery.of(context).size.height * 0.045,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF37322F),
+                                color: const Color(0xFFEAE1DC),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Row(
-                                children: const [
-                                  Text(
-                                    '적당한 설명',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
-                                ],
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: selectedDescription,
+                                  dropdownColor: const Color(0xFFEAE1DC),
+                                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF4B4237)),
+                                  style: const TextStyle(color: Color(0xFF4B4237), fontWeight: FontWeight.w500),
+                                  borderRadius: BorderRadius.circular(20),
+                                  items: descriptionTypes.map((type) {
+                                    return DropdownMenuItem<String>(
+                                      value: type,
+                                      child: Text(type, style: const TextStyle(color: Color(0xFF4B4237))),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedDescription = value;
+                                      });
+                                    }
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.09,
-                            height: MediaQuery.of(context).size.width * 0.09,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF37322F),
-                              borderRadius: BorderRadius.circular(12),
+                            const Spacer(),
+                            // TTS 버튼 감싸는 연한 회색 박스
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEAE1DC),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.volume_up, color: Color(0xFF4B4237)),
+                                onPressed: _playTTS,
+                              ),
                             ),
-                            child: const Icon(Icons.volume_up, color: Colors.white),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.015),
@@ -308,5 +344,28 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _playTTS() async {
+    var ttsText = [
+      widget.title,
+      widget.artist,
+      widget.year,
+      widget.description,
+    ].where((e) => e != null && e.isNotEmpty).join(', ');
+    ttsText = ttsText.replaceAll('*', '');
+    try {
+      print('TTS 요청 텍스트: $ttsText');
+      final audioBytes = await TTSService.synthesize(ttsText);
+      if (audioBytes != null) {
+        await _audioPlayer.play(BytesSource(audioBytes));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('TTS 오류: $e')),
+        );
+      }
+    }
   }
 }
