@@ -42,6 +42,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   ];
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  bool isPlaying = false;
 
   @override
   Widget build(BuildContext context) {
@@ -347,6 +348,14 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   }
 
   Future<void> _playTTS() async {
+    if (isPlaying) {
+      await _audioPlayer.stop();
+      setState(() {
+        isPlaying = false;
+      });
+      return;
+    }
+
     var ttsText = [
       widget.title,
       widget.artist,
@@ -358,7 +367,19 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       print('TTS 요청 텍스트: $ttsText');
       final audioBytes = await TTSService.synthesize(ttsText);
       if (audioBytes != null) {
-        await _audioPlayer.play(BytesSource(audioBytes));
+        if (Platform.isIOS) {
+          // iOS는 BytesSource 지원 안하므로 파일로 저장 후 재생
+          final tempDir = await Directory.systemTemp.createTemp();
+          final tempFile = File('${tempDir.path}/tts_audio.mp3');
+          await tempFile.writeAsBytes(audioBytes);
+          await _audioPlayer.play(DeviceFileSource(tempFile.path));
+        } else {
+          // Android 등에서는 BytesSource로 직접 재생
+          await _audioPlayer.play(BytesSource(audioBytes));
+        }
+        setState(() {
+          isPlaying = true;
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -367,5 +388,11 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         );
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
   }
 }
