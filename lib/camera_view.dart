@@ -47,6 +47,7 @@ class CameraViewState extends State<CameraView> {
 
   @override
   void dispose() {
+    print('📷 CameraView dispose() called');
     _timer?.cancel();
     _controller?.dispose();
     super.dispose();
