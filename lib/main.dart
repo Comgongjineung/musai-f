@@ -216,6 +216,8 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          print('📦 Disposing cameraView before ARView');
+          _cameraViewKey.currentState?.dispose();
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ARViewPage()),
