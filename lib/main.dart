@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'describe_page.dart';
 import 'bottom_nav_bar.dart';
 import 'describe_box.dart';
+import 'ar_camera.dart';
 
 void main() {
   runApp(const MusaiApp());
@@ -212,6 +213,16 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
             */
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ARViewPage()),
+          );
+        },
+        child: Icon(Icons.view_in_ar),
+        backgroundColor: Colors.deepOrange, // 원하는 색상
       ),
     );
   }
