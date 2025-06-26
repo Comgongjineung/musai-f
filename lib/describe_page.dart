@@ -54,7 +54,7 @@ class _DescribePageState extends State<DescribePage> {
     // 이미지 분석 API 호출
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://3.36.99.189:8080/recog/analyze'),
+      Uri.parse('http://52.78.107.134:8080/recog/analyze'),
     );
     request.files.add(await http.MultipartFile.fromPath('file', widget.imagePath));
 

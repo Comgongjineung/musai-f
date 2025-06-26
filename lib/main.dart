@@ -55,7 +55,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
   File? analyzedImage;
 
   Future<void> uploadImage(BuildContext context, File imageFile) async {
-    final uri = Uri.parse("http://3.36.99.189:8080/recog/analyze");
+    final uri = Uri.parse("http://52.78.107.134:8080/recog/analyze");
     var request = http.MultipartRequest("POST", uri);
     request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
 

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 class TTSService {
-  static const String _baseUrl = 'http://3.36.99.189:8080/tts/synthesize';
+  static const String _baseUrl = 'http://52.78.107.134:8080/tts/synthesize';
 
   /// 텍스트를 받아 TTS 음성(mp3) 데이터를 반환합니다.
   static Future<Uint8List?> synthesize(String text) async {
