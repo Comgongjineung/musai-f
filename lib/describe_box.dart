@@ -110,19 +110,19 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       borderRadius: BorderRadius.circular(24),
                       child: Builder(
                         builder: (context) {
-                          if (widget.imageUrl != null && widget.imageUrl!.startsWith('data:image')) {
+                          print('📷 widget.imageUrl: ${widget.imageUrl}');
+                          if (widget.imageUrl != null && widget.imageUrl!.startsWith('http')) {
+                            print('✅ 네트워크 이미지 받음');
+                            return Image.network(
+                              widget.imageUrl!,
+                              fit: BoxFit.cover,
+                            );
+                          } else if (widget.imageUrl != null && widget.imageUrl!.startsWith('data:image')) {
                             final base64Str = widget.imageUrl!.split(',').last;
                             final bytes = base64Decode(base64Str);
                             print('✅ base64 메모리 받음');
                             return Image.memory(
                               bytes,
-                              fit: BoxFit.cover,
-                            );
-                            
-                          } else if (widget.imageUrl != null && widget.imageUrl!.isNotEmpty) {
-                            print('✅ base64 네트워크 받음');
-                            return Image.network(
-                              widget.imageUrl!,
                               fit: BoxFit.cover,
                             );
                           } else {
@@ -274,7 +274,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
                             widget.title,
@@ -303,7 +303,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                         child: SingleChildScrollView(
                           controller: scrollController,
                           child: Text(
-                            widget.description,
+                            widget.description.replaceAll('*', ''),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: MediaQuery.of(context).size.width * 0.035,
