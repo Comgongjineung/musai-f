@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ar_flutter_plugin/ar_flutter_plugin.dart';
-import 'package:ar_flutter_plugin/datatypes/config_planedetection.dart';
-import 'package:ar_flutter_plugin/managers/ar_session_manager.dart';
-import 'package:ar_flutter_plugin/managers/ar_object_manager.dart';
-import 'package:ar_flutter_plugin/managers/ar_anchor_manager.dart';
-import 'package:ar_flutter_plugin/managers/ar_location_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ARViewPage extends StatefulWidget {
@@ -15,10 +9,6 @@ class ARViewPage extends StatefulWidget {
 }
 
 class _ARViewPageState extends State<ARViewPage> {
-  late ARSessionManager arSessionManager;
-  late ARObjectManager arObjectManager;
-  late ARAnchorManager arAnchorManager;
-
   bool _hasPermission = false;
   String _permissionStatusMessage = 'Granting permission...';
 
@@ -53,21 +43,17 @@ class _ARViewPageState extends State<ARViewPage> {
   }
 
   @override
-  void dispose() {
-    print('🧹 ARViewPage dispose() called');
-    arSessionManager.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('AR View'),
       ),
       body: _hasPermission
-          ? ARView(
-              onARViewCreated: onARViewCreated,
+          ? const Center(
+              child: Text(
+                '🔧 Unity 연동 뷰가 여기에 들어갈 예정입니다.',
+                style: TextStyle(fontSize: 16),
+              ),
             )
           : Center(
               child: Column(
@@ -89,24 +75,5 @@ class _ARViewPageState extends State<ARViewPage> {
               ),
             ),
     );
-  }
-
-  void onARViewCreated(
-    ARSessionManager arSessionManager,
-    ARObjectManager arObjectManager,
-    ARAnchorManager arAnchorManager,
-    ARLocationManager arLocationManager,
-  ) {
-    this.arSessionManager = arSessionManager;
-    this.arObjectManager = arObjectManager;
-    this.arAnchorManager = arAnchorManager;
-
-    arSessionManager.onInitialize(
-      showFeaturePoints: false,
-      showPlanes: true,
-      customPlaneTexturePath: "assets/images/pointer.png",
-      showWorldOrigin: true,
-    );
-    arObjectManager.onInitialize();
   }
 }

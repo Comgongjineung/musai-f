@@ -75,7 +75,10 @@ class _DescribePageState extends State<DescribePage> {
         fetchedArtist = data['gemini_result']['artist'] ?? '';
         fetchedYear = data['gemini_result']['year'] ?? '';
         fetchedDescription = data['gemini_result']['description'] ?? '';
-        fetchedImageUrl = data['gemini_result']['image_url'] ?? '';
+
+        print('🎨 original_image_url: ${data['original_image_url']}');
+        fetchedImageUrl = data['original_image_url']?.toString() ?? '';
+        print('🎨 fetchedImageUrl: $fetchedImageUrl');
 
         // 데이터 로딩 완료 후 DescriptionScreen으로 이동
         // DescribePage는 데이터를 준비한 뒤 바로 DescriptionScreen으로 전환합니다.
