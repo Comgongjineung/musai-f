@@ -23,3 +23,5 @@ plugins {
 }
 
 include(":app")
+include(":unityLibrary")
+include(":unityLibrary:xrmanifest.androidlib")
