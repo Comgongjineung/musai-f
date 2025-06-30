@@ -320,7 +320,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           ),
 
           // 하단바
-          Positioned(
+          /*Positioned(
             left: 0,
             right: 0,
             bottom: 0,
@@ -341,7 +341,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                 }
               },
             ),
-          ),
+          ),*/
         ],
       ),
     );
@@ -361,7 +361,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       widget.artist,
       widget.year,
       widget.description,
-    ].where((e) => e != null && e.isNotEmpty).join(', ');
+    ].where((e) => e.isNotEmpty).join(', ');
     ttsText = ttsText.replaceAll('*', '');
     try {
       print('TTS 요청 텍스트: $ttsText');
