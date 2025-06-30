@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
-import 'bottom_nav_bar.dart';
+import 'bottom_nav_bar.dart'; // 이 파일이 존재하는지 확인해주세요.
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,21 +17,97 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _requestLocationPermission(); // 위치 권한 요청
+    _requestLocationPermission(); // 앱 시작 시 위치 권한 요청 및 GPS 활성화 확인
   }
 
+  // 위치 권한 요청 및 GPS 활성화 확인 함수
   Future<void> _requestLocationPermission() async {
-    final status = await Permission.location.request();
-    if (status.isDenied || status.isPermanentlyDenied) {
-      openAppSettings(); // 사용자에게 권한 허용을 유도
-      return;
+    // 1. 앱 위치 권한 상태 확인 및 요청
+    var status = await Permission.location.status;
+
+    if (status.isDenied) {
+      // 권한이 거부되었으면 요청
+      status = await Permission.location.request();
     }
 
-    final permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      await Geolocator.requestPermission();
+    if (status.isPermanentlyDenied) {
+      // 권한이 영구적으로 거부되었으면 설정 페이지로 이동 안내
+      if (mounted) { // 위젯이 마운트된 상태에서만 showDialog 호출
+        _showPermissionDeniedDialog();
+      }
+      return; // 권한이 없으므로 더 진행하지 않음
     }
+
+    // 2. 기기의 위치 서비스(GPS) 활성화 상태 확인
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        _showLocationServiceDisabledDialog(); // 위치 서비스 비활성화 다이얼로그 표시
+      }
+      return; // 위치 서비스가 비활성화되어 있으므로 더 진행하지 않음
+    }
+
+    // 모든 권한 및 서비스가 활성화되었다면, 여기에서 웹뷰에 위치 정보를 요청하거나
+    // kakaomap.html이 자동으로 위치 정보를 가져오도록 둡니다.
+  }
+
+  // 위치 권한 영구 거부 시 다이얼로그 표시
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('위치 권한 필요', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: const Text('이 앱은 현재 위치를 표시하기 위해 위치 권한이 필요합니다. 설정에서 위치 권한을 허용해주세요.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('나중에', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('설정으로 이동', style: TextStyle(color: Colors.blueAccent)),
+              onPressed: () {
+                openAppSettings(); // 앱 설정으로 이동
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 위치 서비스 비활성화 시 다이얼로그 표시 및 설정 이동 옵션 제공
+  void _showLocationServiceDisabledDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('위치 서비스 비활성화됨', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: const Text('현재 위치를 가져오기 위해 기기의 위치 서비스를 활성화해야 합니다.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('확인', style: TextStyle(color: Colors.grey)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('설정 열기', style: TextStyle(color: Colors.blueAccent)),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await Geolocator.openLocationSettings(); // 기기의 위치 설정 화면 열기
+                // 사용자가 설정을 변경한 후 앱으로 돌아올 경우를 대비하여
+                // 다시 위치 권한 및 서비스 상태를 확인하는 로직을 추가할 수 있습니다.
+                // 예: Future.delayed(Duration(seconds: 1), () => _requestLocationPermission());
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -51,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Pretendard',
+                    fontFamily: 'Pretendard', // 폰트가 앱에 포함되어 있는지 확인 필요
                   ),
                 ),
               ),
@@ -77,6 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /* ────────── Widget Helpers ────────── */
 
+  // 검색 바 위젯
   Widget _searchBar() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
@@ -94,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
 
+  // 섹션 제목 위젯
   Widget _sectionTitle(String text) => Text(
         text,
         style: const TextStyle(
@@ -103,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
 
+  // 지도 컨테이너 위젯 (InAppWebView 포함)
   Widget _mapContainer() => SizedBox(
         height: 150,
         child: ClipRRect(
@@ -115,9 +194,11 @@ class _HomeScreenState extends State<HomeScreen> {
               crossPlatform: InAppWebViewOptions(
                 javaScriptEnabled: true,
                 mediaPlaybackRequiresUserGesture: false,
+                transparentBackground: true, // 웹뷰 배경 투명하게 설정
               ),
               android: AndroidInAppWebViewOptions(
-                geolocationEnabled: true,
+                geolocationEnabled: true, // 안드로이드 웹뷰에서 위치 정보 사용 허용
+                useHybridComposition: true, // 웹뷰 렌더링 성능 향상
               ),
             ),
             androidOnGeolocationPermissionsShowPrompt: (controller, origin) async {
@@ -130,10 +211,23 @@ class _HomeScreenState extends State<HomeScreen> {
             onWebViewCreated: (controller) {
               webViewController = controller;
             },
+            onConsoleMessage: (controller, consoleMessage) {
+              print('[WebView Console] ${consoleMessage.message}');
+            },
+            onLoadStop: (controller, url) {
+              print('[WebView] Page loaded: $url');
+            },
+            onLoadError: (controller, url, code, message) {
+              print('[WebView] Load Error: $url, Code: $code, Message: $message');
+            },
+            onReceivedHttpError: (controller, request, response) {
+              print('[WebView] HTTP Error: ${response.statusCode}, URL: ${request.url}');
+            },
           ),
         ),
       );
 
+  // 액션 버튼 행 위젯
   Widget _actionRow() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -144,6 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       );
 
+  // 추천 목록 위젯
   Widget _recommendationList() => Expanded(
         child: ListView(
           scrollDirection: Axis.horizontal,
@@ -163,6 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
 
+  // 원형 아이콘 위젯
   Widget _buildCircleIcon(IconData icon) => Container(
         width: 44,
         height: 44,
@@ -173,6 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Icon(icon, color: Colors.white),
       );
 
+  // 추천 카드 위젯
   Widget _buildRecommendationCard({
     required String title,
     required String description,
@@ -198,7 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.black,
               ),
               maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              overflow: TextOverflow.ellipsis, // 오타 수정!
             ),
             const SizedBox(height: 4),
             Text(
@@ -208,7 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.black87,
               ),
               maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+              overflow: TextOverflow.ellipsis, // 오타 수정!
             ),
           ],
         ),
