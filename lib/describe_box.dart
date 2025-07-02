@@ -47,7 +47,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF4B4237),
+      backgroundColor: const Color(0xFF47423D),
       body: Stack(
         children: [
           // 상단 바(AppBar)

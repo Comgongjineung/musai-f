@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'bottom_nav_bar.dart';
 import 'secrets.dart'; // secrets.dart 파일에서 kakaoMapKey를 가져옵니다.
+import 'dart:io';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,35 +22,30 @@ class _HomeScreenState extends State<HomeScreen> {
     _requestLocationPermission(); // 앱 시작 시 위치 권한 요청 및 GPS 활성화 확인
   }
 
-  // 위치 권한 요청 및 GPS 활성화 확인 함수
+  // 위치 권한 요청 및 GPS 활성화 확인 함수 (Geolocator만 사용)
   Future<void> _requestLocationPermission() async {
-    // 1. 앱 위치 권한 상태 확인 및 요청
-    var status = await Permission.location.status;
+    
+    LocationPermission permission = await Geolocator.checkPermission();
 
-    if (status.isDenied) {
-      // 권한이 거부되었으면 요청
-      status = await Permission.location.request();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      //print('[Geolocator] Requested permission: $permission');
     }
 
-    if (status.isPermanentlyDenied) {
-      // 권한이 영구적으로 거부되었으면 설정 페이지로 이동 안내
-      if (mounted) { // 위젯이 마운트된 상태에서만 showDialog 호출
-        _showPermissionDeniedDialog();
-      }
-      return; // 권한이 없으므로 더 진행하지 않음
+    if (permission == LocationPermission.deniedForever) {
+      //print('[Geolocator] Permanently denied');
+      if (mounted) _showPermissionDeniedDialog();
+      return;
     }
 
-    // 2. 기기의 위치 서비스(GPS) 활성화 상태 확인
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    print('[Geolocator] Location service enabled: $serviceEnabled');
     if (!serviceEnabled) {
-      if (mounted) {
-        _showLocationServiceDisabledDialog(); // 위치 서비스 비활성화 다이얼로그 표시
-      }
-      return; // 위치 서비스가 비활성화되어 있으므로 더 진행하지 않음
+      if (mounted) _showLocationServiceDisabledDialog();
+      return;
     }
 
-    // 모든 권한 및 서비스가 활성화되었다면, 여기에서 웹뷰에 위치 정보를 요청하거나
-    // kakaomap.html이 자동으로 위치 정보를 가져오도록 둡니다.
+    //print('[Geolocator] Location permission granted and service enabled.');
   }
 
   // 위치 권한 영구 거부 시 다이얼로그 표시
@@ -113,39 +109,44 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: const Color(0xFF3C342E),
+      backgroundColor: const Color(0xFF2E2A26),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: Text(
-                  'musai',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Pretendard', // 폰트가 앱에 포함되어 있는지 확인 필요
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Padding(
+              padding: EdgeInsets.all(screenWidth * 0.06),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      'musai',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(height: screenWidth * 0.05), 
+                  _searchBar(screenWidth),
+                  SizedBox(height: screenWidth * 0.06), 
+                  _sectionTitle('Nearby Exhibition', screenWidth),
+                  SizedBox(height: screenWidth * 0.02), 
+                  _mapContainer(constraints),
+                  SizedBox(height: screenWidth * 0.03),
+                  _actionRow(constraints),
+                  SizedBox(height: screenWidth * 0.06),
+                  _sectionTitle('Recommendation', screenWidth),
+                  SizedBox(height: screenWidth * 0.02),
+                  _recommendationList(constraints, screenWidth),
+                ],
               ),
-              const SizedBox(height: 12),
-              _searchBar(),
-              const SizedBox(height: 20),
-              _sectionTitle('Nearby Exhibition'),
-              const SizedBox(height: 10),
-              _mapContainer(),
-              const SizedBox(height: 12),
-              _actionRow(),
-              const SizedBox(height: 20),
-              _sectionTitle('Recommendation'),
-              const SizedBox(height: 10),
-              _recommendationList(),
-            ],
-          ),
+            );
+          },
         ),
       ),
       bottomNavigationBar: const BottomNavBarWidget(currentIndex: 0),
@@ -155,55 +156,56 @@ class _HomeScreenState extends State<HomeScreen> {
   /* ────────── Widget Helpers ────────── */
 
   // 검색 바 위젯
-  Widget _searchBar() => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+  Widget _searchBar(double screenWidth) => Container(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(screenWidth * 0.05),
         ),
-        child: const TextField(
-          style: TextStyle(color: Colors.white),
+        child: TextField(
+          style: TextStyle(color: Colors.white, fontSize: screenWidth * 0.04),
           decoration: InputDecoration(
-            icon: Icon(Icons.search, color: Colors.white),
+            icon: Icon(Icons.search, color: Colors.white, size: screenWidth * 0.06),
             hintText: '전시회를 검색하세요',
-            hintStyle: TextStyle(color: Colors.white70),
+            hintStyle: TextStyle(color: Colors.white70, fontSize: screenWidth * 0.04),
             border: InputBorder.none,
           ),
         ),
       );
 
   // 섹션 제목 위젯
-  Widget _sectionTitle(String text) => Text(
+  Widget _sectionTitle(String text, double screenWidth) => Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 18,
+          fontSize: screenWidth * 0.05,
           fontWeight: FontWeight.bold,
         ),
       );
 
   // 지도 컨테이너 위젯 (InAppWebView 포함)
-  Widget _mapContainer() => SizedBox(
-        height: 150,
+  Widget _mapContainer(BoxConstraints constraints) => SizedBox(
+        height: constraints.maxWidth * 0.45,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(constraints.maxWidth * 0.05),
           child: InAppWebView(
-            initialUrlRequest: URLRequest(
-              url: WebUri("file:///android_asset/flutter_assets/assets/kakaomap.html"),
+            initialUrlRequest: Platform.isAndroid
+                ? URLRequest(url: WebUri("file:///android_asset/flutter_assets/assets/kakaomap.html"))
+                : null,
+            initialFile: Platform.isIOS ? "assets/kakaomap.html" : null,
+            initialSettings: InAppWebViewSettings(
+              javaScriptEnabled: true,
+              mediaPlaybackRequiresUserGesture: false,
+              transparentBackground: true,
+              allowsInlineMediaPlayback: true, // iOS용 옵션
+              allowsAirPlayForMediaPlayback: true, // iOS용 옵션
+              allowsBackForwardNavigationGestures: true, // iOS용 옵션
+              allowsLinkPreview: false, // iOS용 옵션
+              sharedCookiesEnabled: true, // iOS용 옵션
+              geolocationEnabled: true, // Android용 옵션
+              useHybridComposition: true, // Android용 옵션
             ),
-            initialOptions: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(
-                javaScriptEnabled: true,
-                mediaPlaybackRequiresUserGesture: false,
-                transparentBackground: true, // 웹뷰 배경 투명하게 설정
-              ),
-              android: AndroidInAppWebViewOptions(
-                geolocationEnabled: true, // 안드로이드 웹뷰에서 위치 정보 사용 허용
-                useHybridComposition: true, // 웹뷰 렌더링 성능 향상
-              ),
-            ),
-            androidOnGeolocationPermissionsShowPrompt: (controller, origin) async {
-              // 위치 권한 요청 시 항상 허용하도록 설정 (Flutter 앱에서 이미 권한을 처리했으므로)
+            onGeolocationPermissionsShowPrompt: (controller, origin) async {
               return GeolocationPermissionShowPromptResponse(
                 origin: origin,
                 allow: true,
@@ -214,13 +216,11 @@ class _HomeScreenState extends State<HomeScreen> {
               webViewController = controller;
             },
             onConsoleMessage: (controller, consoleMessage) {
-              print('[WebView Console] ${consoleMessage.message}');
+              print('[WebView Console] [33m${consoleMessage.message}[0m');
             },
             onLoadStop: (controller, url) async {
               print('[WebView] Page loaded: $url');
-              // 페이지 로드 완료 후 Kakao Map API 키 주입 및 지도 초기화
               if (url.toString().contains('kakaomap.html')) {
-                // 'injectKakaoMapKeyAndLoadMap' 함수를 호출하여 키를 전달하고 지도 로딩 시작
                 await controller.evaluateJavascript(source: 'injectKakaoMapKeyAndLoadMap("$kakaoMapKey");');
                 print('[WebView] Injected Kakao Map Key and called load function.');
               }
@@ -236,45 +236,58 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
   // 액션 버튼 행 위젯
-  Widget _actionRow() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildCircleIcon(Icons.grid_view),
-          _buildCircleIcon(Icons.palette_outlined),
-          _buildCircleIcon(Icons.image_outlined),
-          _buildCircleIcon(Icons.add_circle_outline),
-        ],
-      );
+  Widget _actionRow(BoxConstraints constraints) {
+    final iconSize = constraints.maxWidth * 0.1;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildCircleIcon(Icons.grid_view, iconSize),
+        _buildCircleIcon(Icons.palette_outlined, iconSize),
+        _buildCircleIcon(Icons.image_outlined, iconSize),
+        _buildCircleIcon(Icons.add_circle_outline, iconSize),
+      ],
+    );
+  }
 
   // 추천 목록 위젯
-  Widget _recommendationList() => Expanded(
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: [
-            _buildRecommendationCard(
-              title: "What's inside the pencil",
-              description: 'Lorem ipsum dolor sit amet, consectetur...',
-              backgroundColor: Colors.white,
-            ),
-            const SizedBox(width: 12),
-            _buildRecommendationCard(
-              title: 'The 2nd Chonnam Graduation Exhibition',
-              description: 'Lorem ipsum dolor sit amet, consectetur...',
-              backgroundColor: Colors.orange[100]!,
-            ),
-          ],
-        ),
-      );
+  Widget _recommendationList(BoxConstraints constraints, double screenWidth) {
+    final cardWidth = constraints.maxWidth * 0.4;
+    final cardMargin = constraints.maxWidth * 0.02;
+    return Expanded(
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _buildRecommendationCard(
+            title: "What's inside the pencil",
+            description: 'Lorem ipsum dolor sit amet, consectetur...',
+            backgroundColor: const Color.fromARGB(255, 255, 230, 238),
+            width: cardWidth,
+            marginRight: cardMargin,
+            screenWidth: screenWidth,
+          ),
+          SizedBox(width: cardMargin),
+          _buildRecommendationCard(
+            title: 'The 2nd Chonnam Graduation Exhibition',
+            description: 'Lorem ipsum dolor sit amet, consectetur...',
+            backgroundColor: Colors.orange[100]!,
+            width: cardWidth,
+            marginRight: cardMargin,
+            screenWidth: screenWidth,
+          ),
+        ],
+      ),
+    );
+  }
 
   // 원형 아이콘 위젯
-  Widget _buildCircleIcon(IconData icon) => Container(
-        width: 44,
-        height: 44,
+  Widget _buildCircleIcon(IconData icon, double size) => Container(
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.15),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: Colors.white),
+        child: Icon(icon, color: Colors.white, size: size * 0.6),
       );
 
   // 추천 카드 위젯
@@ -282,40 +295,64 @@ class _HomeScreenState extends State<HomeScreen> {
     required String title,
     required String description,
     required Color backgroundColor,
+    required double width,
+    required double marginRight,
+    required double screenWidth,
   }) =>
-      Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Spacer(),
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.black,
+      AspectRatio(
+        aspectRatio: 1, // 정사각형 유지
+        child: Container(
+          width: width,
+          margin: EdgeInsets.only(right: marginRight),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(screenWidth * 0.05),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: EdgeInsets.all(screenWidth * 0.05),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.40),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(screenWidth * 0.05),
+                      bottomRight: Radius.circular(screenWidth * 0.05),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.04,
+                          color: Colors.black,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: screenWidth * 0.01),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.03,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.black87,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       );
 }

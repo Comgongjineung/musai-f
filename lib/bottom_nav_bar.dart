@@ -17,21 +17,29 @@ class BottomNavBarWidget extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      height: screenHeight * 0.09,
+      height: screenHeight * 0.10,
       decoration: const BoxDecoration(
-        color: Color(0xFF3C342E),
+        color: Color(0xFF2E2A26),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x4D6E5E5E), // #6E5E5E with 30% opacity
+            offset: Offset(0, -2), // shadow only on top
+            blurRadius: 20,
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavItem(context, icon: Icons.home, label: '홈', index: 0),
-          _buildNavItem(context, icon: Icons.camera_alt, label: '카메라', index: 1),
-          _buildNavItem(context, icon: Icons.forum, label: '커뮤니티', index: 2),
-          _buildNavItem(context, icon: Icons.person, label: '마이페이지', index: 3),
+          Expanded(child: _buildNavItem(context, icon: Icons.home, label: '홈', index: 0)),
+          Expanded(child: _buildNavItem(context, icon: Icons.camera_alt, label: '카메라', index: 1)),
+          Expanded(child: _buildNavItem(context, icon: Icons.forum, label: '커뮤니티', index: 2)),
+          Expanded(child: _buildNavItem(context, icon: Icons.person, label: '마이페이지', index: 3)),
         ],
       ),
     );
@@ -85,11 +93,12 @@ class BottomNavBarWidget extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: FontWeight.w500,
               color: isSelected ? Colors.white : Colors.white54,
             ),
           ),
+          const SizedBox(height: 4),
         ],
       ),
     );

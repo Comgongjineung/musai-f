@@ -28,18 +28,18 @@
       font-family: 'Inter', sans-serif; /* Tailwind의 Inter 폰트 사용 */
     }
     #map { 
-      width: 100%; 
-      height: 100%; 
+      width: 100vw; 
+      height: 100vh; 
       border-radius: 16px; /* 둥근 모서리 적용 */
       overflow: hidden; /* 둥근 모서리 내부 콘텐츠 클리핑 */
     }
     #moveCurrent {
       position: absolute;
-      bottom: 12px;
-      right: 12px;
+      bottom: 4vh;
+      right: 4vw;
       background: white;
       border-radius: 50%;
-      padding: 8px;
+      padding: 4vw;
       box-shadow: 0 0 8px rgba(0,0,0,0.4); /* 그림자 효과 강화 */
       cursor: pointer;
       z-index: 10;
@@ -59,7 +59,8 @@
         transform: translate(-50%, -50%);
         background-color: rgba(0, 0, 0, 0.8);
         color: white;
-        padding: 15px 25px;
+        padding: 3vw 5vw;
+        font-size: 3.5vw;
         border-radius: 8px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         z-index: 1000;
@@ -80,7 +81,7 @@
   <div id="map"></div>
   <div id="moveCurrent" onclick="moveToCurrentLocation()">
     <!-- 구글 아이콘을 SVG로 직접 포함하여 외부 의존성 제거 및 스타일링 유연성 확보 -->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20" class="text-gray-700">
+    <svg style="width: 7vw; height: 7vw;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-gray-700">
       <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
     </svg>
   </div>
@@ -114,13 +115,13 @@
 
     // Flutter에서 호출되어 Kakao Map API 키를 주입하고 지도를 초기화하는 함수
     function injectKakaoMapKeyAndLoadMap(appkey) {
-      console.log("[KakaoMap HTML] injectKakaoMapKeyAndLoadMap called with key (first 5 chars):", appkey.substring(0, 5)); // 보안을 위해 키 전체를 로깅하지 않습니다.
+      //console.log("[KakaoMap HTML] injectKakaoMapKeyAndLoadMap 호출됨");
+      //console.log("[KakaoMap HTML] injectKakaoMapKeyAndLoadMap called with key (first 5 chars):", appkey.substring(0, 5)); // 보안을 위해 키 전체를 로깅하지 않습니다.
       
       // 기존에 로드된 Kakao Map SDK 스크립트가 있다면 제거 (중복 로드 방지)
       const existingScript = document.getElementById('kakao-map-sdk-script');
       if (existingScript) {
           existingScript.remove();
-          console.log("[KakaoMap HTML] Removed existing Kakao Map SDK script.");
       }
 
       // 새로운 스크립트 요소 생성
@@ -129,12 +130,12 @@
       script.type = 'text/javascript';
       script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appkey}&libraries=services&autoload=false`;
       script.async = true; // 비동기 로드 설정
-      console.log("[KakaoMap HTML] Dynamically created Kakao Map SDK script with src:", script.src);
+      //console.log("[KakaoMap HTML] Dynamically created Kakao Map SDK script with src:", script.src);
       
       script.onload = () => {
-        console.log("[KakaoMap HTML] Kakao Map SDK loaded successfully. Calling kakao.maps.load...");
         kakao.maps.load(() => {
-          console.log("[KakaoMap HTML] kakao.maps.load callback fired. Initializing map...");
+          console.log("[KakaoMap HTML] kakao.maps.load() 진입");
+          //console.log("[KakaoMap HTML] kakao.maps.load callback fired. Initializing map...");
           initKakaoMap(); // SDK 로드 완료 후 지도 초기화 함수 호출
         });
       };
@@ -145,7 +146,7 @@
 
       // 스크립트를 문서의 head에 추가하여 로드를 시작합니다.
       document.head.appendChild(script);
-      console.log("[KakaoMap HTML] Appended Kakao Map SDK script to document head.");
+      //console.log("[KakaoMap HTML] Appended Kakao Map SDK script to document head.");
     }
 
     // Kakao Map 초기화 및 위치 정보 가져오기 로직
@@ -163,23 +164,29 @@
       };
       map = new kakao.maps.Map(mapContainer, mapOptions);
       ps = new kakao.maps.services.Places();
-      console.log("[KakaoMap HTML] Kakao Map and Places service initialized.");
+      //console.log("[KakaoMap HTML] Kakao Map and Places service initialized.");
 
       if (navigator.geolocation) {
-        console.log("[KakaoMap HTML] Geolocation supported. Attempting to get current position...");
+        // Explicit permission query using Permissions API for debugging
+        if (navigator.permissions) {
+          navigator.permissions.query({ name: 'geolocation' }).then(function (result) {
+            //console.log('[KakaoMap HTML] Geolocation permission state:', result.state);
+          });
+        }
+        //console.log("[KakaoMap HTML] Geolocation supported. Attempting to get current position...");
         navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, {
           enableHighAccuracy: true,
           maximumAge: 300000, // 5분 이내 캐시된 위치 정보는 재사용
           timeout: 30000 // 30초 내에 응답 없으면 타임아웃
         });
       } else {
-        console.error('[KakaoMap HTML] This browser does not support geolocation.');
+        //console.error('[KakaoMap HTML] This browser does not support geolocation.');
         showMessage('현재 브라우저에서는 위치 정보를 지원하지 않습니다.');
       }
     }
 
     function onLocationSuccess(position) {
-      console.log("[KakaoMap HTML] Geolocation success. Lat:", position.coords.latitude, "Lon:", position.coords.longitude);
+      //console.log("[KakaoMap HTML] Geolocation success. Lat:", position.coords.latitude, "Lon:", position.coords.longitude);
       currentPos = new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude);
       map.setCenter(currentPos);
 
@@ -193,7 +200,7 @@
           { offset: new kakao.maps.Point(15, 15) }
         )
       });
-      console.log("[KakaoMap HTML] Current location marker added.");
+      //console.log("[KakaoMap HTML] Current location marker added.");
 
       searchNearbyExhibitions(position.coords.latitude, position.coords.longitude);
     }
@@ -218,10 +225,10 @@
     }
 
     function searchNearbyExhibitions(lat, lon) {
-      console.log("[KakaoMap HTML] Searching nearby exhibitions around Lat:", lat, "Lon:", lon);
+      //console.log("[KakaoMap HTML] Searching nearby exhibitions around Lat:", lat, "Lon:", lon);
       ps.keywordSearch('전시', (data, status, pagination) => {
         if (status === kakao.maps.services.Status.OK) {
-          console.log("[KakaoMap HTML] Exhibition search successful. Found", data.length, "places.");
+          //console.log("[KakaoMap HTML] Exhibition search successful. Found", data.length, "places.");
           data.forEach(place => {
             const marker = new kakao.maps.Marker({
               map,
@@ -241,14 +248,15 @@
             });
           });
           if (data.length === 0) {
-              console.log('[KakaoMap HTML] No exhibition places found nearby.');
+              //console.log('[KakaoMap HTML] No exhibition places found nearby.');
               showMessage('현재 위치 근처에 전시 장소가 없습니다.');
           }
         } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-          console.log('[KakaoMap HTML] No exhibition places found nearby (ZERO_RESULT).');
+          //console.log('[KakaoMap HTML] No exhibition places found nearby (ZERO_RESULT).');
           showMessage('근처에 전시 장소가 없습니다.');
         } else {
-          console.error(`[KakaoMap HTML] Search error: ${status}`);
+          //console.error("[KakaoMap HTML] Search failed. Full status:", status);
+          //console.error("[KakaoMap HTML] ps.keywordSearch failed with lat:", lat, "lon:", lon);
           showMessage(`전시 장소 검색 오류가 발생했습니다. 상태: ${status}`);
         }
       }, {
@@ -262,12 +270,17 @@
       if (currentPos) {
         map.setCenter(currentPos);
         showMessage('현재 위치로 이동했습니다.');
-        console.log("[KakaoMap HTML] Moved map to current location.");
+        //console.log("[KakaoMap HTML] Moved map to current location.");
       } else {
-        console.error('[KakaoMap HTML] Cannot move to current location: currentPos is null.');
+        //console.error('[KakaoMap HTML] Cannot move to current location: currentPos is null.');
         showMessage('현재 위치를 불러올 수 없습니다.');
       }
     }
+
+    window.onFlutterLocation = function(lat, lon) {
+      // lat, lon을 받아서 지도 중심 이동 등 처리
+      // 예: map.setCenter(new kakao.maps.LatLng(lat, lon));
+    };
   </script>
 </body>
 </html>
