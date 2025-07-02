@@ -319,29 +319,6 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
             },
           ),
 
-          // 하단바
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: BottomNavBarWidget(
-              currentIndex: 1,
-              onItemTapped: (index) {
-                if (index == 0) {
-                  Navigator.pop(context);
-                } else if (index == 2) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MusaiHomePage()),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('탭 $index: 연결된 페이지가 아직 없습니다.')),
-                  );
-                }
-              },
-            ),
-          ),
         ],
       ),
     );
