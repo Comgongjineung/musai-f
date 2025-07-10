@@ -129,47 +129,68 @@ Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: const Color(0xFFFFFDFC),
     body: SafeArea(
-      child: CustomScrollView(
-        physics: const ClampingScrollPhysics(),
-        slivers: [
-          SliverPadding(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 상단 로고
+          Padding(
             padding: EdgeInsets.fromLTRB(
               screenWidth * 0.04,
               16,
               screenWidth * 0.04,
-              screenWidth * 0.04,
+              0,
             ),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                Center(
-                  child: Text(
-                    'musai',
-                    style: TextStyle(
-                      color: const Color(0xFF343231),
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Pretendard',
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+            child: Center(
+              child: Text(
+                'musai',
+                style: TextStyle(
+                  color: const Color(0xFF343231),
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Pretendard',
+                  letterSpacing: 1.2,
                 ),
-                SizedBox(height: screenWidth * 0.04),
-                _searchBar(screenWidth),
-                SizedBox(height: screenWidth * 0.06),
+              ),
+            ),
+          ),
+
+          // 검색창
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04,
+              vertical: screenWidth * 0.04,
+            ),
+            child: _searchBar(screenWidth),
+          ),
+
+          // 섹션 제목 + 지도
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 _sectionTitle('Nearby Exhibition', screenWidth),
                 SizedBox(height: screenWidth * 0.018),
-
-                // 지도는 WebView 제스처 보호를 위해 별도 처리
                 _buildMapWrapper(screenWidth),
-
                 SizedBox(height: screenWidth * 0.035),
                 _actionRow(BoxConstraints(maxWidth: screenWidth)),
-                SizedBox(height: screenWidth * 0.06),
+                SizedBox(height: screenWidth * 0.05),
                 _sectionTitle('Recommendation', screenWidth),
-                SizedBox(height: screenWidth * 0.018),
-                _recommendationList(BoxConstraints(maxWidth: screenWidth), screenWidth),
-                SizedBox(height: 12),
-              ]),
+              ],
+            ),
+          ),
+
+          // 추천 카드만 스크롤 가능
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: screenWidth * 0.04,
+                top: screenWidth * 0.018,
+              ),
+              child: _recommendationList(
+                BoxConstraints(maxWidth: screenWidth),
+                screenWidth,
+              ),
             ),
           ),
         ],
