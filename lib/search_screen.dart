@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bottom_nav_bar.dart';
+import 'exhibition_detail_page.dart';
 
 Color getStatusColor(String status) {
   switch (status) {
@@ -142,87 +143,108 @@ class _ExhibitionList extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final status = '전시중';
-        return Container(
-  padding: const EdgeInsets.all(14),
-  decoration: BoxDecoration(
-    color: const Color(0xFFFEFDFC),
-    borderRadius: BorderRadius.circular(16),
-    border: Border.all(color: const Color(0xFFEAEAEA)),
-  ),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // 상단 태그들
-      Row(
-        children: [
-          const _Tag(
-            text: '카테고리',
-            bgColor: Color(0xFFE6E0DC),
-            textColor: Colors.white,
-            radius: 15,
-          ),
-          const SizedBox(width: 4),
-          _Tag(
-            text: status,
-            bgColor: getStatusColor(status),
-            textColor: Colors.white,
-            radius: 15,
-          ),
-        ],
-      ),
-      const SizedBox(height: 8),
-
-      // 대표사진 + 텍스트 Row
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 67,
-            height: 67,
+        return GestureDetector(
+          onTap: () {
+            final dummy = Exhibition(
+              title: '이탈리아 국립 카포디몬테 컬렉션',
+              category: '카테고리',
+              status: '전시중',
+              price: '무료',
+              date: '2025.07.08 ~ 2025.08.08',
+              time: '09시 ~ 18시, 일요일 휴무',
+              place: '소마미술관',
+              description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, (소개글)',
+              homepageUrl: 'https://example.com',
+              detailInfo: '연계 기관',
+            );
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ExhibitionDetailPage(exhibition: dummy),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFFFEFDFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFEAEAEA)),
             ),
-            alignment: Alignment.center,
-            child: const Text('(대표사진)', style: TextStyle(fontSize: 11)),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  '전시회 제목',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+              children: [
+                // 상단 태그들
+                Row(
+                  children: [
+                    const _Tag(
+                      text: '카테고리',
+                      bgColor: Color(0xFFE6E0DC),
+                      textColor: Colors.white,
+                      radius: 15,
+                    ),
+                    const SizedBox(width: 4),
+                    _Tag(
+                      text: status,
+                      bgColor: getStatusColor(status),
+                      textColor: Colors.white,
+                      radius: 15,
+                    ),
+                  ],
                 ),
-                SizedBox(height: 4),
-                Text(
-                  '소마미술관',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF706B66),
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  '2025.07.08 - 2025.08.08',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                const SizedBox(height: 8),
+
+                // 대표사진 + 텍스트 Row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 67,
+                      height: 67,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('(대표사진)', style: TextStyle(fontSize: 11)),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            '전시회 제목',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '소마미술관',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF706B66),
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            '2025.07.08 - 2025.08.08',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    ],
-  ),
-);
-
+        );
       },
     );
   }

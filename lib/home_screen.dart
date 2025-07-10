@@ -7,6 +7,7 @@ import 'secrets.dart'; // secrets.dart 파일에서 kakaoMapKey를 가져옵니�
 import 'dart:io';
 import 'search_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'exhibition_detail_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -414,72 +415,94 @@ Widget _buildMapWrapper(double screenWidth) {
     required double height,
     required double marginRight,
     Widget? image,
-  }) => Container(
-    width: width,
-    height: height,
-    margin: EdgeInsets.only(right: marginRight),
-    decoration: BoxDecoration(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.04),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
+  }) => GestureDetector(
+    onTap: () {
+      final dummy = Exhibition(
+        title: '이탈리아 국립 카포디몬테 컬렉션',
+        category: '카테고리',
+        status: '전시중',
+        price: '무료',
+        date: '2025.07.08 ~ 2025.08.08',
+        time: '09시 ~ 18시, 일요일 휴무',
+        place: '소마미술관',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, (소개글)',
+        homepageUrl: 'https://example.com',
+        detailInfo: '연계 기관',
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ExhibitionDetailPage(exhibition: dummy),
         ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 100,
-          child:
-              image ??
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF4F0ED),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
+      );
+    },
+    child: Container(
+      width: width,
+      height: height,
+      margin: EdgeInsets.only(right: marginRight),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 100,
+            child:
+                image ??
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF4F0ED),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.image, size: 48, color: Color(0xFFB1B1B1)),
                   ),
                 ),
-                child: const Center(
-                  child: Icon(Icons.image, size: 48, color: Color(0xFFB1B1B1)),
-                ),
-              ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Colors.black,
-                  fontFamily: 'Pretendard',
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                description,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF837670),
-                  fontFamily: 'Pretendard',
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.black,
+                    fontFamily: 'Pretendard',
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF837670),
+                    fontFamily: 'Pretendard',
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }

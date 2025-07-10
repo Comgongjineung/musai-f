@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'tts_service.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'main_camera_page.dart';
 
 class DescriptionScreen extends StatefulWidget {
   final String title;
