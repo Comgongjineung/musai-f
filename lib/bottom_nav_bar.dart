@@ -7,10 +7,7 @@ import 'main.dart';
 class BottomNavBarWidget extends StatelessWidget {
   final int currentIndex;
 
-  const BottomNavBarWidget({
-    super.key,
-    required this.currentIndex,
-  });
+  const BottomNavBarWidget({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +16,7 @@ class BottomNavBarWidget extends StatelessWidget {
     return Container(
       height: screenHeight * 0.10,
       decoration: const BoxDecoration(
-        color: Color(0xFF2E2A26),
+        color: Color(0xFFFFFDFC), // 배경색 변경
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -36,25 +33,57 @@ class BottomNavBarWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(child: _buildNavItem(context, icon: Icons.home, label: '홈', index: 0)),
-          Expanded(child: _buildNavItem(context, icon: Icons.camera_alt, label: '카메라', index: 1)),
-          Expanded(child: _buildNavItem(context, icon: Icons.forum, label: '커뮤니티', index: 2)),
-          Expanded(child: _buildNavItem(context, icon: Icons.person, label: '마이페이지', index: 3)),
+          Expanded(
+            child: _buildNavItem(
+              context,
+              icon: Icons.home,
+              label: '홈',
+              index: 0,
+            ),
+          ),
+          Expanded(
+            child: _buildNavItem(
+              context,
+              icon: Icons.camera_alt,
+              label: '카메라',
+              index: 1,
+            ),
+          ),
+          Expanded(
+            child: _buildNavItem(
+              context,
+              icon: Icons.forum,
+              label: '커뮤니티',
+              index: 2,
+            ),
+          ),
+          Expanded(
+            child: _buildNavItem(
+              context,
+              icon: Icons.person,
+              label: '마이페이지',
+              index: 3,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(BuildContext context, {
+  Widget _buildNavItem(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required int index,
   }) {
     final isSelected = index == currentIndex;
 
-    return GestureDetector(
-      onTap: () {
-        if (!isSelected) {
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // 💡 터치 범위 전체 확장
+        onTap: () {
+          if (index == currentIndex) return;
+
           switch (index) {
             case 0:
               Navigator.pushReplacement(
@@ -69,37 +98,44 @@ class BottomNavBarWidget extends StatelessWidget {
               );
               break;
             case 2:
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('커뮤니티는 준비 중입니다.')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('커뮤니티는 준비 중입니다.')));
               break;
             case 3:
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('마이페이지는 준비 중입니다.')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('마이페이지는 준비 중입니다.')));
               break;
           }
-        }
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? Colors.white : Colors.white54,
-            size: 26,
+        },
+        child: Container(
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color:
+                    isSelected ? Color(0xFF837670) : Color(0xFFB1B1B1), // 색상 변경
+                size: 26,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      isSelected
+                          ? Color(0xFF837670)
+                          : Color(0xFFB1B1B1), // 색상 변경
+                ),
+              ),
+              const SizedBox(height: 4),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? Colors.white : Colors.white54,
-            ),
-          ),
-          const SizedBox(height: 4),
-        ],
+        ),
       ),
     );
   }
