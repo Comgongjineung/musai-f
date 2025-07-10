@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'main.dart';
+import 'main_camera_page.dart';
 // import 'community.dart';
 // import 'mypage.dart';
 
