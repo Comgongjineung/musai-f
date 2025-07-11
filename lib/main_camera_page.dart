@@ -35,7 +35,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
     print('🔍 uploadImage 시작 - 파일 경로: ${imageFile.path}');
     print('🔍 파일 크기: ${await imageFile.length()} bytes');
     
-    final uri = Uri.parse("http://52.78.107.134:8080/recog/analyze");
+    final uri = Uri.parse("http://52.78.107.134:8080/recog/analyzeAndRegister");
     print('🔍 API 엔드포인트: $uri');
     
     var request = http.MultipartRequest("POST", uri);
@@ -218,7 +218,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.015),
-                  const Spacer(),
+                  Expanded(child: Container()),
                   BottomNavBarWidget(currentIndex: 1),
                 ],
               ),

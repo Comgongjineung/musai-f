@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bottom_nav_bar.dart';
+import 'app_bar_widget.dart';
 import 'exhibition_detail_page.dart';
 
 Color getStatusColor(String status) {
@@ -25,23 +26,13 @@ class SearchScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFDFC),
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: const Text(
-          'musai',
-          style: TextStyle(
-            color: Color(0xFF343231),
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: const Color(0xFFFFFDFC),
-        elevation: 0,
-        centerTitle: true,
-        automaticallyImplyLeading: true,
+      appBar: const AppBarWidget(
+        showBackButton: true,
+        backgroundColor: Color(0xFFFFFDFC),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(width * 0.04),
+          padding: EdgeInsets.all(width * 0.06),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -67,6 +58,7 @@ class SearchScreen extends StatelessWidget {
   }
 
   Widget _searchBar(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return TextField(
       decoration: InputDecoration(
         hintText: '전시회를 검색하세요',
@@ -74,9 +66,9 @@ class SearchScreen extends StatelessWidget {
         suffixIcon: const Icon(Icons.search),
         filled: true,
         fillColor: const Color(0xFFF4F0ED),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+        contentPadding: EdgeInsets.symmetric(horizontal: width * 0.06), // 24px → 반응형
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(width * 0.06),
           borderSide: BorderSide.none,
         ),
       ),

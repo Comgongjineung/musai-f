@@ -69,5 +69,14 @@
 		<true/>
 	</dict>
 
+	<key>CFBundleURLTypes</key>
+	<array>
+	  <dict>
+	    <key>CFBundleURLSchemes</key>
+	    <array>
+	      <string>40d335903b3e49454e6045336e765012</string>
+	    </array>
+	  </dict>
+	</array>
 </dict>
 </plist>

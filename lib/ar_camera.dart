@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
+import 'app_bar_widget.dart';
 
 class ARViewPage extends StatefulWidget {
   const ARViewPage({Key? key}) : super(key: key);
@@ -102,10 +103,11 @@ class _ARViewPageState extends State<ARViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AR View'),
+      appBar: const AppBarWidget(
+        title: 'AR View',
         backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        titleColor: Colors.white,
+        showBackButton: true,
       ),
       body: _buildBody(),
     );
