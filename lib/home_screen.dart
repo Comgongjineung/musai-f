@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
 import 'bottom_nav_bar.dart';
+import 'app_bar_widget.dart';
 import 'secrets.dart'; // secrets.dart 파일에서 kakaoMapKey를 가져옵니다.
 import 'dart:io';
 import 'search_screen.dart';
@@ -129,53 +130,35 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     backgroundColor: const Color(0xFFFFFDFC),
+    appBar: const AppBarWidget(),
     body: SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 상단 로고
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              screenWidth * 0.04,
-              16,
-              screenWidth * 0.04,
-              0,
-            ),
-            child: Center(
-              child: Text(
-                'musai',
-                style: TextStyle(
-                  color: const Color(0xFF343231),
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Pretendard',
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ),
-          ),
 
           // 검색창
           Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.04,
-              vertical: screenWidth * 0.04,
+            padding: EdgeInsets.only(
+              left: screenWidth * 0.06,
+              right: screenWidth * 0.06,
+              top: screenWidth * 0.05,
+              bottom: screenWidth * 0.05, 
             ),
             child: _searchBar(screenWidth),
           ),
 
           // 섹션 제목 + 지도
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _sectionTitle('Nearby Exhibition', screenWidth),
-                SizedBox(height: screenWidth * 0.018),
+                SizedBox(height: screenWidth * 0.02),
                 _buildMapWrapper(screenWidth),
-                SizedBox(height: screenWidth * 0.035),
+                SizedBox(height: screenWidth * 0.04),
                 _actionRow(BoxConstraints(maxWidth: screenWidth)),
-                SizedBox(height: screenWidth * 0.05),
+                SizedBox(height: screenWidth * 0.06),
                 _sectionTitle('Recommendation', screenWidth),
               ],
             ),
@@ -183,11 +166,11 @@ Widget build(BuildContext context) {
 
           // 추천 카드만 스크롤 가능
           Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: screenWidth * 0.04,
-                top: screenWidth * 0.018,
-              ),
+                          child: Padding(
+                padding: EdgeInsets.only(
+                  left: screenWidth * 0.06,
+                  top: screenWidth * 0.02,
+                ),
               child: _recommendationList(
                 BoxConstraints(maxWidth: screenWidth),
                 screenWidth,
@@ -203,8 +186,8 @@ Widget build(BuildContext context) {
 
 Widget _buildMapWrapper(double screenWidth) {
   return SizedBox(
-    height: 195,
-    child: _mapContainer(BoxConstraints(maxWidth: screenWidth)),
+    height: screenWidth * 0.52, // 195px → 반응형
+    child: _mapContainer(BoxConstraints(maxWidth: screenWidth), screenWidth),
   );
 }
 
@@ -217,13 +200,13 @@ Widget _buildMapWrapper(double screenWidth) {
       );
     },
     child: Container(
-      height: 44,
+              height: screenWidth * 0.12, // 44px → 반응형
       decoration: BoxDecoration(
         color: const Color(0xFFF4F0ED),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(screenWidth * 0.05), // 20px → 반응형
       ),
       alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // 16px → 반응형
       child: Row(
         children: [
           Expanded(
@@ -231,36 +214,33 @@ Widget _buildMapWrapper(double screenWidth) {
               '전시회를 검색하세요',
               style: TextStyle(
                 color: const Color(0xFFB1B1B1),
-                fontSize: 15,
+                fontSize: screenWidth * 0.04, // 16px → 반응형
                 fontFamily: 'Pretendard',
               ),
             ),
           ),
-          Icon(Icons.search, color: const Color(0xFFB1B1B1), size: 22),
+          Icon(Icons.search, color: const Color(0xFFB1B1B1), size: screenWidth * 0.055), // 22px → 반응형
         ],
       ),
     ),
   );
 
   // 섹션 제목 위젯
-  Widget _sectionTitle(String text, double screenWidth) => Padding(
-    padding: const EdgeInsets.only(left: 2.0),
-    child: Text(
-      text,
-      style: TextStyle(
-        color: const Color(0xFF837670),
-        fontSize: 17,
-        fontWeight: FontWeight.bold,
-        fontFamily: 'Pretendard',
-      ),
+  Widget _sectionTitle(String text, double screenWidth) => Text(
+    text,
+    style: TextStyle(
+      color: const Color(0xFF706B66),
+      fontSize: screenWidth * 0.05, // 20px → 반응형
+      fontWeight: FontWeight.bold,
+      fontFamily: 'Pretendard',
     ),
   );
 
   // 지도 컨테이너 위젯 (InAppWebView 포함)
-  Widget _mapContainer(BoxConstraints constraints) => SizedBox(
-    height: 195,
+  Widget _mapContainer(BoxConstraints constraints, double screenWidth) => SizedBox(
+    height: constraints.maxWidth * 0.52, // 195px → 반응형
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(screenWidth * 0.05), // 20px → 반응형
       child: Stack(
         children: [
           InAppWebView(
@@ -357,18 +337,18 @@ Widget _buildMapWrapper(double screenWidth) {
       children: List.generate(icons.length * 2 - 1, (i) {
         if (i.isOdd) {
           // 간격 삽입
-          return const SizedBox(width: 8);
+          return SizedBox(width: constraints.maxWidth * 0.02); // 8px → 반응형
         } else {
           final index = i ~/ 2;
           final isPlus = index == 3;
           return Container(
-            width: 69,
-            height: 43,
+            width: constraints.maxWidth * 0.18, // 69px → 반응형
+            height: constraints.maxWidth * 0.11, // 43px → 반응형
             decoration: BoxDecoration(
               color: isPlus ? const Color(0xB2A28F7D) : const Color(0xFFA28F7D),
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(constraints.maxWidth * 0.08), // 30px → 반응형
             ),
-            child: Icon(icons[index], color: const Color(0xFFFEFDFC), size: 28),
+            child: Icon(icons[index], color: const Color(0xFFFEFDFC), size: constraints.maxWidth * 0.07), // 28px → 반응형
           );
         }
       }),
@@ -378,131 +358,168 @@ Widget _buildMapWrapper(double screenWidth) {
   // 추천 목록 위젯
   Widget _recommendationList(BoxConstraints constraints, double screenWidth) {
     return SizedBox(
-      height: 237, // 카드 높이에 맞춤
+      height: constraints.maxWidth * 0.61, // 237px → 반응형
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildRecommendationCard(
+          RecommendationCard(
             title: "What's inside the pencil",
             description: '전시 장소\n전시 기간',
             backgroundColor: Colors.white,
-            width: 240, // 카드 가로
-            height: 237, // 카드 세로
-            marginRight: 12,
+            width: constraints.maxWidth * 0.62, // 240px → 반응형
+            height: constraints.maxWidth * 0.61, // 237px → 반응형
+            marginRight: constraints.maxWidth * 0.03, // 12px → 반응형
             image: null,
+            screenWidth: constraints.maxWidth,
           ),
-          _buildRecommendationCard(
+          RecommendationCard(
             title: 'The 2nd Chonnam Graduation Exhibition',
             description:
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
             backgroundColor: Colors.white,
-            width: 240,
-            height: 237,
-            marginRight: 12,
+            width: constraints.maxWidth * 0.62, // 240px → 반응형
+            height: constraints.maxWidth * 0.61, // 237px → 반응형
+            marginRight: constraints.maxWidth * 0.03, // 12px → 반응형
             image: null,
+            screenWidth: constraints.maxWidth,
           ),
         ],
       ),
     );
   }
 
-  // 추천 카드 위젯
-  Widget _buildRecommendationCard({
-    required String title,
-    required String description,
-    required Color backgroundColor,
-    required double width,
-    required double height,
-    required double marginRight,
-    Widget? image,
-  }) => GestureDetector(
-    onTap: () {
-      final dummy = Exhibition(
-        title: '이탈리아 국립 카포디몬테 컬렉션',
-        category: '카테고리',
-        status: '전시중',
-        price: '무료',
-        date: '2025.07.08 ~ 2025.08.08',
-        time: '09시 ~ 18시, 일요일 휴무',
-        place: '소마미술관',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, (소개글)',
-        homepageUrl: 'https://example.com',
-        detailInfo: '연계 기관',
-      );
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ExhibitionDetailPage(exhibition: dummy),
-        ),
-      );
-    },
-    child: Container(
-      width: width,
-      height: height,
-      margin: EdgeInsets.only(right: marginRight),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+}
+
+// RecommendationCard 위젯
+class RecommendationCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final Color backgroundColor;
+  final double width;
+  final double height;
+  final double marginRight;
+  final Widget? image;
+  final double screenWidth;
+
+  const RecommendationCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.backgroundColor,
+    required this.width,
+    required this.height,
+    required this.marginRight,
+    this.image,
+    required this.screenWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        final dummy = Exhibition(
+          title: '이탈리아 국립 카포디몬테 컬렉션',
+          category: '카테고리',
+          status: '전시중',
+          price: '무료',
+          date: '2025.07.08 ~ 2025.08.08',
+          time: '09시 ~ 18시, 일요일 휴무',
+          place: '소마미술관',
+          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam',
+          homepageUrl: 'https://example.com',
+          detailInfo: '연계 기관',
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ExhibitionDetailPage(exhibition: dummy),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 100,
-            child:
-                image ??
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4F0ED),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
+        );
+      },
+      child: Container(
+        width: width,
+        height: height,
+        margin: EdgeInsets.only(right: marginRight),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(screenWidth * 0.05),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Stack(
+          children: [
+            // 이미지 (없으면 기본 배경)
+            Positioned.fill(
+              child: image ??
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F0ED),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '전시회 이미지',
+                        style: TextStyle(
+                          color: const Color(0xFFB1B1B1),
+                          fontSize: screenWidth * 0.035, // 14px → 반응형
+                        ),
+                      ),
                     ),
                   ),
-                  child: const Center(
-                    child: Icon(Icons.image, size: 48, color: Color(0xFFB1B1B1)),
-                  ),
-                ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: Colors.black,
-                    fontFamily: 'Pretendard',
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF837670),
-                    fontFamily: 'Pretendard',
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
             ),
-          ),
-        ],
+            // 하단 반투명 설명 박스 (카드 내부에 8px 여백)
+            Positioned(
+              left: screenWidth * 0.02, // 8px → 반응형
+              right: screenWidth * 0.02, // 8px → 반응형
+              bottom: screenWidth * 0.02, // 8px → 반응형
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.04, // 16px → 반응형
+                  vertical: screenWidth * 0.035, // 14px → 반응형
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF999999).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(screenWidth * 0.04),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: const Color(0xFFFEFDFC),
+                        fontSize: screenWidth * 0.04,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Pretendard',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: screenWidth * 0.01),
+                    Text(
+                      description,
+                      style: TextStyle(
+                        color: const Color(0xFF706B66),
+                        fontSize: screenWidth * 0.03,
+                        fontFamily: 'Pretendard',
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

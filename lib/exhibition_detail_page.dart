@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bottom_nav_bar.dart';
+import 'app_bar_widget.dart';
 
 class Exhibition {
   final String title;
@@ -45,17 +46,10 @@ class _ExhibitionDetailPageState extends State<ExhibitionDetailPage> {
     final posterSize = width * 0.85;
     return Scaffold(
       backgroundColor: const Color(0xFFFFFDFC),
-      appBar: AppBar(
-        title: const Text('musai', style: TextStyle(
-          color: Color(0xFF343231), fontWeight: FontWeight.bold, fontSize: 22, fontFamily: 'Pretendard',
-        )),
-        backgroundColor: const Color(0xFFFFFDFC),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF343231)),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: const AppBarWidget(
+        showBackButton: true,
+        backgroundColor: Color(0xFFFFFDFC),
+        titleSize: 22,
       ),
       body: SingleChildScrollView(
         child: Padding(
