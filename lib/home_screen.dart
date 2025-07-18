@@ -9,6 +9,7 @@ import 'dart:io';
 import 'search_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'exhibition_detail_page.dart';
+import 'login_UI.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -181,6 +182,18 @@ Widget build(BuildContext context) {
       ),
     ),
     bottomNavigationBar: const BottomNavBarWidget(currentIndex: 0),
+    floatingActionButton: FloatingActionButton(
+      onPressed: () {
+        print('✅ 로그인 테스트 버튼 클릭됨');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SignupPage()),
+        );
+      },
+      child: Icon(Icons.login),
+      backgroundColor: Colors.blue,
+      heroTag: 'loginTestBtn',
+    ),
   );
 }
 

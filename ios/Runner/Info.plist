@@ -75,8 +75,16 @@
 	    <key>CFBundleURLSchemes</key>
 	    <array>
 	      <string>40d335903b3e49454e6045336e765012</string>
+		  <string>com.googleusercontent.apps.951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn</string>
 	    </array>
 	  </dict>
+	</array>
+
+
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+	    <string>google</string>
+	    <string>com.googleusercontent.apps.951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn</string>
 	</array>
 </dict>
 </plist>
