@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'main_camera_page.dart';
 
 void main() {
   runApp(const MusaiApp());
@@ -16,7 +15,7 @@ class MusaiApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Pretendard',
         primarySwatch: Colors.grey,
-        scaffoldBackgroundColor: const Color(0xFF5F5F5F),
+        scaffoldBackgroundColor: const Color(0xFFFFFDFC),
       ),
       home: const HomeScreen(),
     );

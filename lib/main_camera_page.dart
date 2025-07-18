@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
 import 'dart:ui';
+import 'login_google.dart';
 
 class MusaiHomePage extends StatefulWidget {
   const MusaiHomePage({super.key});
@@ -35,7 +36,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
     print('🔍 uploadImage 시작 - 파일 경로: ${imageFile.path}');
     print('🔍 파일 크기: ${await imageFile.length()} bytes');
     
-    final uri = Uri.parse("http://52.78.107.134:8080/recog/analyzeAndRegister");
+    final uri = Uri.parse("http://43.203.23.173:8080/recog/analyzeAndRegister");
     print('🔍 API 엔드포인트: $uri');
     
     var request = http.MultipartRequest("POST", uri);
@@ -234,17 +235,12 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print('📦 Disposing cameraView before ARView');
-          _cameraViewKey.currentState?.dispose();
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ARViewPage()),
-          );
+      floatingActionButton: ElevatedButton(
+        onPressed: () async {
+          print('버튼 눌림');
+          await signInWithGoogle(); // 이게 실제로 호출되고 있는지 확인
         },
-        child: Icon(Icons.view_in_ar),
-        backgroundColor: Colors.deepOrange, // 원하는 색상
+        child: Text('Google 로그인'),
       ),
     );
   }
