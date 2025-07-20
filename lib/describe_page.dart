@@ -57,6 +57,9 @@ class _DescribePageState extends State<DescribePage> {
       Uri.parse('http://43.203.23.173:8080/recog/analyzeAndRegister'),
     );
     request.files.add(await http.MultipartFile.fromPath('file', widget.imagePath));
+    
+    // 기본적으로 (level: 중)으로 설정
+    request.fields['level'] = '중';
 
     try {
       final response = await request.send();

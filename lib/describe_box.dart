@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'tts_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'main_camera_page.dart';
+import 'package:http/http.dart' as http;
 
 class DescriptionScreen extends StatefulWidget {
   final String title;
@@ -35,6 +36,8 @@ class DescriptionScreen extends StatefulWidget {
 class _DescriptionScreenState extends State<DescriptionScreen> {
   bool isBookmarked = false;
   String selectedDescription = '클래식한 해설';  // 기본값 설정
+  String currentDescription = ''; // 현재 표시되는 설명
+  bool isLoadingDescription = false; // 설명 로딩 상태
 
   final List<String> descriptionTypes = [
     '한눈에 보는 해설',
@@ -44,6 +47,13 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool isPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 초기 설명 설정
+    currentDescription = widget.description;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -243,10 +253,12 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                                     );
                                   }).toList(),
                                   onChanged: (value) {
-                                    if (value != null) {
+                                    if (value != null && value != selectedDescription) {
                                       setState(() {
                                         selectedDescription = value;
                                       });
+                                      // 새로운 해설 타입으로 API 호출
+                                      _fetchNewDescription(value);
                                     }
                                   },
                                 ),
@@ -303,14 +315,23 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                         padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
                         child: SingleChildScrollView(
                           controller: scrollController,
-                          child: Text(
-                            widget.description.replaceAll('*', ''),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: MediaQuery.of(context).size.width * 0.035,
-                              height: 1.5,
-                            ),
-                          ),
+                          child: isLoadingDescription
+                              ? const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(20.0),
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  currentDescription.replaceAll('*', ''),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: MediaQuery.of(context).size.width * 0.035,
+                                    height: 1.5,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -338,7 +359,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       widget.title,
       widget.artist,
       widget.year,
-      widget.description,
+      currentDescription,
     ].where((e) => e != null && e.isNotEmpty).join(', ');
     ttsText = ttsText.replaceAll('*', '');
     try {
@@ -363,6 +384,69 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('TTS 오류: $e')),
+        );
+      }
+    }
+  }
+
+  // 해설 타입에 따른 level 매핑
+  String _getLevelForDescriptionType(String descriptionType) {
+    switch (descriptionType) {
+      case '한눈에 보는 해설':
+        return '하';
+      case '클래식한 해설':
+        return '중';
+      case '깊이 있는 해설':
+        return '상';
+      default:
+        return '하';
+    }
+  }
+
+  // 새로운 해설 타입으로 API 호출
+  Future<void> _fetchNewDescription(String descriptionType) async {
+    setState(() {
+      isLoadingDescription = true;
+    });
+
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://43.203.23.173:8080/recog/analyzeAndRegister'),
+      );
+      request.files.add(await http.MultipartFile.fromPath('file', widget.imagePath));
+      request.fields['level'] = _getLevelForDescriptionType(descriptionType);
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        final data = json.decode(responseBody);
+        final newDescription = data['gemini_result']['description'] ?? '';
+        
+        setState(() {
+          currentDescription = newDescription;
+          isLoadingDescription = false;
+        });
+      } else {
+        print('❌ 새로운 해설 요청 실패: ${response.statusCode}');
+        setState(() {
+          isLoadingDescription = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('새로운 해설을 가져오는데 실패했습니다.')),
+          );
+        }
+      }
+    } catch (e) {
+      print('❌ 새로운 해설 요청 에러: $e');
+      setState(() {
+        isLoadingDescription = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('새로운 해설 요청 중 에러가 발생했습니다: $e')),
         );
       }
     }
