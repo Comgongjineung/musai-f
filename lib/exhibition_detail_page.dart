@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'bottom_nav_bar.dart';
 import 'app_bar_widget.dart';
 
@@ -43,7 +44,27 @@ class _ExhibitionDetailPageState extends State<ExhibitionDetailPage> {
   Widget build(BuildContext context) {
     final ex = widget.exhibition;
     final width = MediaQuery.of(context).size.width;
-    final posterSize = width * 0.85;
+    
+    // 반응형 폰트 크기 계산
+    final baseFontSize = width <= 360 ? 0.95 : width >= 768 ? 1.1 : 1.0;
+    final titleFontSize = 20 * baseFontSize;
+    final mediumFontSize = 16 * baseFontSize;
+    final smallFontSize = 12 * baseFontSize;
+    
+    // 반응형 여백 계산
+    final baseSpacing = width <= 360 ? 0.9 : width >= 768 ? 1.2 : 1.0;
+    final marginHorizontal = 24 * baseSpacing;
+    final spacing4 = 4 * baseSpacing;
+    final spacing8 = 8 * baseSpacing;
+    final spacing12 = 12 * baseSpacing;
+    final spacing16 = 16 * baseSpacing;
+    final spacing20 = 20 * baseSpacing;
+    final spacing24 = 24 * baseSpacing;
+    
+    // 전시 이미지 크기 계산 (343:264 비율)
+    final imageWidth = width - (marginHorizontal * 2);
+    final imageHeight = (imageWidth * 264) / 343;
+    
     return Scaffold(
       backgroundColor: const Color(0xFFFFFDFC),
       appBar: const AppBarWidget(
@@ -53,91 +74,165 @@ class _ExhibitionDetailPageState extends State<ExhibitionDetailPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: width * 0.06),
+          padding: EdgeInsets.symmetric(horizontal: marginHorizontal),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 2️⃣ 전시 메인 포스터
-              SizedBox(height: 10),
-              Container(
-                width: posterSize,
-                height: posterSize,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF4F0ED),
-                  borderRadius: BorderRadius.circular(16),
+              // 전시 메인 포스터 (343:264 비율)
+              SizedBox(height: spacing24),
+              Center(
+                child: Container(
+                  width: imageWidth,
+                  height: imageHeight,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF4F0ED),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text('전시회 메인 포스터', style: TextStyle(color: Color(0xFFB1B1B1))),
                 ),
-                alignment: Alignment.center,
-                child: const Text('전시회 메인 포스터', style: TextStyle(color: Color(0xFFB1B1B1))),
               ),
-              const SizedBox(height: 18),
-              // 3️⃣ 태그 영역
-              Row(
+              SizedBox(height: spacing16),
+              
+              // 카테고리 + 상태 뱃지
+              Wrap(
+                spacing: spacing8,
+                runSpacing: spacing8,
                 children: [
-                  _Tag(text: ex.category, bgColor: const Color(0xFFEEE9E4), textColor: Colors.black),
-                  const SizedBox(width: 8),
-                  _Tag(text: ex.status, bgColor: const Color(0xFFD86B6B), textColor: Colors.white),
+                  _Tag(
+                    text: ex.category, 
+                    bgColor: const Color(0xFFF8EFEA), 
+                    textColor: Colors.black,
+                    fontSize: mediumFontSize,
+                  ),
+                  _Tag(
+                    text: ex.status, 
+                    bgColor: const Color(0xFFB75456), // 원래 0xFFC46567 
+                    textColor: Colors.white,
+                    fontSize: mediumFontSize,
+                  ),
                 ],
               ),
-              const SizedBox(height: 10),
-              // 4️⃣ 전시 정보 블럭
-              Text(ex.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF343231), fontFamily: 'Pretendard')),
-              const SizedBox(height: 12),
-              _InfoRow(label: '가격', value: ex.price),
-              _InfoRow(label: '일정', value: ex.date),
-              _InfoRow(label: '시간', value: ex.time),
-              _InfoRow(label: '장소', value: ex.place),
-              const SizedBox(height: 18),
-              // 5️⃣ 상세 내용 / 상세 정보 탭
+              SizedBox(height: spacing8),
+              
+              // 전시 제목
+              Text(
+                ex.title, 
+                style: TextStyle(
+                  fontWeight: FontWeight.w600, 
+                  fontSize: titleFontSize, 
+                  color: const Color(0xFF343231), 
+                  fontFamily: 'Pretendard',
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: spacing12),
+              
+              // 전시 상세 정보
+              _InfoRow(label: '가격', value: ex.price, fontSize: mediumFontSize, valueFontSize: mediumFontSize),
+              SizedBox(height: spacing4),
+              _InfoRow(label: '일정', value: ex.date, fontSize: mediumFontSize, valueFontSize: mediumFontSize),
+              SizedBox(height: spacing4),
+              _InfoRow(label: '시간', value: ex.time, fontSize: mediumFontSize, valueFontSize: mediumFontSize),
+              SizedBox(height: spacing4),
+              _InfoRow(label: '장소', value: ex.place, fontSize: mediumFontSize, valueFontSize: mediumFontSize),
+              SizedBox(height: spacing12),
+              
+              // 상세 내용 / 상세 정보 탭
               Row(
                 children: [
                   _TabButton(
                     text: '상세 내용',
                     selected: selectedTab == 0,
                     onTap: () => setState(() => selectedTab = 0),
+                    fontSize: mediumFontSize,
                   ),
+                  SizedBox(width: spacing20),
                   _TabButton(
                     text: '상세 정보',
                     selected: selectedTab == 1,
                     onTap: () => setState(() => selectedTab = 1),
+                    fontSize: mediumFontSize,
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              // 6️⃣ 탭 콘텐츠
+              SizedBox(height: spacing4),
+              
+              // 탭 콘텐츠
               if (selectedTab == 0) ...[
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.symmetric(horizontal: spacing20, vertical: spacing20), //원래 16 12
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9F1EC),
-                    borderRadius: BorderRadius.circular(16),
+                    color: const Color(0xFFF8EFEA),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () async {
+                          if (ex.homepageUrl.isNotEmpty) {
+                            final Uri url = Uri.parse(ex.homepageUrl);
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url, mode: LaunchMode.externalApplication);
+                            } else {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('링크를 열 수 없습니다.')),
+                                );
+                              }
+                            }
+                          } else {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('홈페이지 링크가 없습니다.')),
+                              );
+                            }
+                          }
+                        },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          padding: EdgeInsets.symmetric(horizontal: spacing16, vertical: spacing8),
                           decoration: BoxDecoration(
                             color: const Color(0xFFBDAF9D),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Text('홈페이지 바로가기', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                          child: Text(
+                            '홈페이지 바로가기', 
+                            style: TextStyle(
+                              color: Colors.white, 
+                              fontWeight: FontWeight.w400,
+                              fontSize: mediumFontSize,
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Text(ex.description, style: const TextStyle(fontSize: 15, color: Color(0xFF343231))),
-                      const SizedBox(height: 18),
+                      SizedBox(height: spacing12),
+                      Text(
+                        ex.description, 
+                        style: TextStyle(
+                          fontSize: smallFontSize, 
+                          color: const Color(0xFF343231),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      SizedBox(height: spacing16),
                       Container(
                         width: double.infinity,
-                        height: posterSize,
+                        height: imageHeight * 0.6,
                         decoration: BoxDecoration(
                           color: const Color(0xFFE6E0DC),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         alignment: Alignment.center,
-                        child: const Text('전시회에서 제공하는 포스터', style: TextStyle(color: Color(0xFFB1B1B1))),
+                        child: Text(
+                          '전시회에서 제공하는 포스터', 
+                          style: TextStyle(
+                            color: const Color(0xFFB1B1B1),
+                            fontSize: smallFontSize,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -145,22 +240,36 @@ class _ExhibitionDetailPageState extends State<ExhibitionDetailPage> {
               ] else ...[
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.symmetric(horizontal: spacing16, vertical: spacing12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9F1EC),
-                    borderRadius: BorderRadius.circular(16),
+                    color: const Color(0xFFF8EFEA),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('연계 기관', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF343231))),
-                      const SizedBox(height: 8),
-                      Text(ex.detailInfo, style: const TextStyle(fontSize: 14, color: Color(0xFF837670))),
+                      Text(
+                        '연계 기관', 
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400, 
+                          fontSize: smallFontSize, 
+                          color: const Color(0xFF343231),
+                        ),
+                      ),
+                      SizedBox(height: spacing8),
+                      Text(
+                        ex.detailInfo, 
+                        style: TextStyle(
+                          fontSize: smallFontSize, 
+                          color: const Color(0xFF837670),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
-              const SizedBox(height: 30),
+              SizedBox(height: spacing24),
             ],
           ),
         ),
@@ -174,16 +283,29 @@ class _Tag extends StatelessWidget {
   final String text;
   final Color bgColor;
   final Color textColor;
-  const _Tag({required this.text, required this.bgColor, required this.textColor});
+  final double fontSize;
+  const _Tag({
+    required this.text, 
+    required this.bgColor, 
+    required this.textColor,
+    required this.fontSize,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(100),
       ),
-      child: Text(text, style: TextStyle(fontSize: 12, color: textColor)),
+      child: Text(
+        text, 
+        style: TextStyle(
+          fontSize: fontSize, 
+          color: textColor,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
     );
   }
 }
@@ -191,16 +313,42 @@ class _Tag extends StatelessWidget {
 class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
-  const _InfoRow({required this.label, required this.value});
+  final double fontSize;
+  final double valueFontSize;
+  const _InfoRow({
+    required this.label, 
+    required this.value,
+    required this.fontSize,
+    required this.valueFontSize,
+  });
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 60, child: Text(label, style: const TextStyle(color: Color(0xFFB1B1B1), fontSize: 14))),
+          SizedBox(
+            width: 60, 
+            child: Text(
+              label, 
+              style: TextStyle(
+                color: const Color(0xFF343231), 
+                fontSize: fontSize,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
           const SizedBox(width: 8),
-          Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF343231)))),
+          Expanded(
+            child: Text(
+              value, 
+              style: TextStyle(
+                fontWeight: FontWeight.w400, 
+                fontSize: valueFontSize, 
+                color: const Color(0xFF343231),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -211,28 +359,27 @@ class _TabButton extends StatelessWidget {
   final String text;
   final bool selected;
   final VoidCallback onTap;
-  const _TabButton({required this.text, required this.selected, required this.onTap});
+  final double fontSize;
+  const _TabButton({
+    required this.text, 
+    required this.selected, 
+    required this.onTap,
+    required this.fontSize,
+  });
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Text(
-              text,
-              style: TextStyle(
-                fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 15,
-                color: const Color(0xFF343231),
-              ),
-            ),
-            const SizedBox(height: 2),
-            Container(
-              height: 2,
-              color: selected ? const Color(0xFFD86B6B) : Colors.transparent,
-            ),
-          ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 48, // 최소 터치 영역 보장
+        alignment: Alignment.centerLeft,
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: selected ? FontWeight.bold : FontWeight.w400,
+            fontSize: fontSize,
+            color: const Color(0xFF343231),
+          ),
         ),
       ),
     );
