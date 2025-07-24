@@ -37,9 +37,16 @@ Future<void> signInWithGoogle() async {
 
     if (response.statusCode == 200) {
       //print('로그인 성공: ${response.body}');
-      final token = jsonDecode(response.body)['accessToken'];
+      final responseJson = jsonDecode(response.body);
+      final token = responseJson['accessToken'];
+      final userId = responseJson['user']['userId'];
+      print('서버 응답: ${response.body}');
+
       await storage.write(key: 'jwt_token', value: token);
+      await storage.write(key: 'user_id', value: userId.toString());
+
       print('JWT 저장 완료: $token');
+      print('userId 저장 완료: $userId');
 
     } else {
       print('로그인 실패: ${response.statusCode} / ${response.body}');
