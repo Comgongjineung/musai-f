@@ -8,6 +8,7 @@ import 'tts_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'main_camera_page.dart';
 import 'package:http/http.dart' as http;
+import 'utils/auth_storage.dart';
 
 class DescriptionScreen extends StatefulWidget {
   final String title;
@@ -34,7 +35,10 @@ class DescriptionScreen extends StatefulWidget {
 }
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
+  String? token;
+  int? userId;
   bool isBookmarked = false;
+  int? bookmarkId;
   String selectedDescription = '클래식한 해설';  // 기본값 설정
   String currentDescription = ''; // 현재 표시되는 설명
   bool isLoadingDescription = false; // 설명 로딩 상태
@@ -53,7 +57,22 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     super.initState();
     // 초기 설명 설정
     currentDescription = widget.description;
+    _loadAuthInfo();
   }
+
+  Future<void> _loadAuthInfo() async {
+  token = await getJwtToken();
+  userId = await getUserId();
+  if (mounted) {
+    setState(() {}); // UI 갱신
+  }
+  await _initializeState();
+}
+
+  Future<void> _initializeState() async {
+  await _checkBookmarkStatus();  // 북마크 여부 확인
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -121,9 +140,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       borderRadius: BorderRadius.circular(24),
                       child: Builder(
                         builder: (context) {
-                          print('📷 widget.imageUrl: ${widget.imageUrl}');
+                          print('widget.imageUrl: ${widget.imageUrl}');
                           if (widget.imageUrl != null && widget.imageUrl!.startsWith('http')) {
-                            print('✅ 네트워크 이미지 받음');
+                            print('네트워크 이미지 받음');
                             return Image.network(
                               widget.imageUrl!,
                               fit: BoxFit.cover,
@@ -131,13 +150,13 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           } else if (widget.imageUrl != null && widget.imageUrl!.startsWith('data:image')) {
                             final base64Str = widget.imageUrl!.split(',').last;
                             final bytes = base64Decode(base64Str);
-                            print('✅ base64 메모리 받음');
+                            print('base64 메모리 받음');
                             return Image.memory(
                               bytes,
                               fit: BoxFit.cover,
                             );
                           } else {
-                            print('✅ 렌더링 안보임');
+                            print('렌더링 안보임');
                             return const SizedBox.shrink();
                           }
                         },
@@ -171,21 +190,17 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   ),
                   // 북마크 버튼 (오른쪽 상단)
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.02,
-                    right: 16,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isBookmarked = !isBookmarked;
-                        });
-                      },
-                      child: Icon(
-                        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                        color: Colors.white,
-                        size: MediaQuery.of(context).size.width * 0.08,
-                      ),
-                    ),
-                  ),
+    top: MediaQuery.of(context).size.height * 0.02,
+    right: 16,
+    child: GestureDetector(
+      onTap: _handleBookmarkToggle,
+      child: Icon(
+        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+        color: Colors.white,
+        size: MediaQuery.of(context).size.width * 0.08,
+      ),
+    ),
+  ),
                 ],
               ),
             ),
@@ -346,6 +361,74 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     );
   }
 
+  Future<void> _handleBookmarkToggle() async {
+    if (token == null || userId == null) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('인증 정보가 없습니다. 다시 로그인해주세요.')),
+  );
+  return;
+}
+
+    if (!isBookmarked) {
+      // 북마크 추가
+      final response = await http.post(
+        Uri.parse('http://43.203.23.173:8080/bookmark/add'),
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token',},
+        body: jsonEncode({
+          'userId': userId,
+          'title': widget.title,
+          'artist': widget.artist,
+          'description': widget.description,
+          'imageUrl': widget.imageUrl ?? '',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          isBookmarked = true;
+          bookmarkId = result['bookmarkId']; // 응답에서 bookmarkId 저장
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('북마크에 추가되었습니다.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('북마크 추가 실패: ${response.statusCode}')),
+        );
+      }
+    } else {
+      // 북마크 삭제
+      if (bookmarkId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('bookmarkId가 없어 삭제할 수 없습니다.')),
+        );
+        return;
+      }
+
+      final deleteUrl = 'http://43.203.23.173:8080/bookmark/delete/$bookmarkId/$userId';
+      final deleteResponse = await http.delete( Uri.parse(deleteUrl),
+      headers: {
+    'Authorization': 'Bearer $token',
+  },);
+
+      if (deleteResponse.statusCode == 200) {
+        setState(() {
+          isBookmarked = false;
+          bookmarkId = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('북마크가 삭제되었습니다.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('북마크 삭제 실패: ${deleteResponse.statusCode}')),
+        );
+      }
+    }
+  }
+
+
   Future<void> _playTTS() async {
     if (isPlaying) {
       await _audioPlayer.stop();
@@ -405,6 +488,13 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
   // 새로운 해설 타입으로 API 호출
   Future<void> _fetchNewDescription(String descriptionType) async {
+    if (token == null || userId == null) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('인증 정보가 없습니다. 다시 로그인해주세요.')),
+  );
+  return;
+}
+
     setState(() {
       isLoadingDescription = true;
     });
@@ -429,7 +519,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           isLoadingDescription = false;
         });
       } else {
-        print('❌ 새로운 해설 요청 실패: ${response.statusCode}');
+        print('새로운 해설 요청 실패: ${response.statusCode}');
         setState(() {
           isLoadingDescription = false;
         });
@@ -440,7 +530,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         }
       }
     } catch (e) {
-      print('❌ 새로운 해설 요청 에러: $e');
+      print('새로운 해설 요청 에러: $e');
       setState(() {
         isLoadingDescription = false;
       });
@@ -451,6 +541,35 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       }
     }
   }
+
+Future<void> _checkBookmarkStatus() async {
+  if (userId == null) return;
+
+  final response = await http.get(Uri.parse(
+    'http://43.203.23.173:8080/bookmark/readAll/$userId'), 
+    headers: {
+    'Authorization': 'Bearer $token',
+  },
+  );
+
+  if (response.statusCode == 200) {
+    final utf8Decoded = utf8.decode(response.bodyBytes);
+    final List<dynamic> bookmarks = json.decode(utf8Decoded);
+    final match = bookmarks.firstWhere(
+      (item) =>
+          item['title'] == widget.title &&
+          item['artist'] == widget.artist,
+      orElse: () => null,
+    );
+
+    if (match != null) {
+      setState(() {
+        isBookmarked = true;
+        bookmarkId = match['bookmarkId'];
+      });
+    }
+  }
+}
 
   @override
   void dispose() {
