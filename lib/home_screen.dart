@@ -431,17 +431,15 @@ class RecommendationCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         final dummy = Exhibition(
-          title: '이탈리아 국립 카포디몬테 컬렉션',
-          category: '카테고리',
-          status: '전시중',
-          price: '무료',
-          date: '2025.07.08 ~ 2025.08.08',
-          time: '09시 ~ 18시, 일요일 휴무',
-          place: '소마미술관',
-          description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam',
-          homepageUrl: 'https://example.com',
-          detailInfo: '연계 기관',
-        );
+  exhiId: 1,
+  title: '이탈리아 국립 카포디몬테 컬렉션',
+  startDate: '2025.07.08',
+  endDate: '2025.08.08',
+  place: '소마미술관',
+  realmName: '', // realmName은 의미 없으므로 빈 값
+  thumbnail: '', // 또는 썸네일 URL 입력
+  seqnum: 1,
+);
         Navigator.push(
           context,
           MaterialPageRoute(

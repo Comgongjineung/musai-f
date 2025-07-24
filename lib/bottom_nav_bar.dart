@@ -4,6 +4,7 @@ import 'main.dart';
 import 'main_camera_page.dart';
 // import 'community.dart';
 // import 'mypage.dart';
+import 'mypage_bookmark.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
   final int currentIndex;
@@ -104,9 +105,10 @@ class BottomNavBarWidget extends StatelessWidget {
               ).showSnackBar(const SnackBar(content: Text('커뮤니티는 준비 중입니다.')));
               break;
             case 3:
-              ScaffoldMessenger.of(
+              Navigator.pushReplacement(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('마이페이지는 준비 중입니다.')));
+                MaterialPageRoute(builder: (_) => BookmarkScreen()),
+              );
               break;
           }
         },

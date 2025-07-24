@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'bottom_nav_bar.dart';
 import 'app_bar_widget.dart';
 import 'exhibition_detail_page.dart';
+import 'package:intl/intl.dart';
+import 'utils/auth_storage.dart';
 
 // 상태별 태그 색상 함수
 Color getTagBgColor(String status) {
@@ -15,7 +17,7 @@ Color getTagBgColor(String status) {
     case '완료':
       return const Color(0xFFB1B1B1);
     default:
-      return const Color(0xFFE6E0DC);
+      return const Color(0xFFFEFDFC);
   }
 }
 
@@ -68,37 +70,36 @@ class _SearchScreenState extends State<SearchScreen> {
   bool isSearchDone = false;
   List<dynamic> exhibitionList = [];
 
-  Future<void> fetchExhibitions(String query) async {
-    if (query.trim().isEmpty) {
+ Future<void> fetchExhibitions(String query) async {
+  if (query.trim().isEmpty) {
     setState(() {
       isSearchDone = false;
       exhibitionList = [];
     });
     return;
   }
-  final uri = Uri.parse('http://43.203.23.173:8080/exhibition');  // 전체 불러오기
-  final response = await http.get(uri);
+  final token = await getJwtToken(); // 저장된 토큰 가져오기
+  if (token == null) {
+    debugPrint('토큰 없음. 로그인 필요');
+    return;
+  }
+
+  final uri = Uri.parse('http://43.203.23.173:8080/exhibition/search/title?keyword=${Uri.encodeQueryComponent(query)}');
+  final response = await http.get(
+    uri,
+    headers: {
+      'accept': '*/*',
+      'Authorization': 'Bearer $token',
+    },
+  );
 
   if (response.statusCode == 200) {
     final utf8Decoded = utf8.decode(response.bodyBytes);
     final List<dynamic> data = json.decode(utf8Decoded);
 
-    // 검색 필터링
-    final filtered = data.where((exhi) {
-      final keyword = query.toLowerCase().trim();
-
-      final title = (exhi['title'] ?? '').toLowerCase();
-      final organization = (exhi['organization'] ?? '').toLowerCase();
-      final genre = (exhi['genre'] ?? '').toLowerCase();
-
-      return title.contains(keyword) ||
-          organization.contains(keyword) ||
-          genre.contains(keyword);
-    }).toList();
-
     setState(() {
       isSearchDone = true;
-      exhibitionList = filtered;
+      exhibitionList = data;
     });
   } else {
     setState(() {
@@ -130,32 +131,32 @@ class _SearchScreenState extends State<SearchScreen> {
               _searchBar(context),
               const SizedBox(height: 20),
               if (exhibitionList.isNotEmpty) ...[
-  Row(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: const [
-      _SortDropdown(label: '최신순'),
-    ],
-  ),
-  const SizedBox(height: 20),
-],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: const [
+                    _SortDropdown(label: '최신순'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
               const SizedBox(height: 20),
               exhibitionList.isEmpty
-  ? Center(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 250),
-        child: Text(
-          isSearchDone
-              ? '검색 결과가 없습니다.'
-              : '전시 제목, 장소, 카테고리 등을 검색하여\n원하는 전시회를 찾아보세요.',
-          style: const TextStyle(
-            color: Color(0xFF706B66),
-            fontSize: 16,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    )
-  : _ExhibitionList(exhibitionList: exhibitionList),
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 250),
+                        child: Text(
+                          isSearchDone
+                              ? '검색 결과가 없습니다.'
+                              : '전시 제목, 장소, 카테고리 등을 검색하여\n원하는 전시회를 찾아보세요.',
+                          style: const TextStyle(
+                            color: Color(0xFF706B66),
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    )
+                  : _ExhibitionList(exhibitionList: exhibitionList),
             ],
           ),
         ),
@@ -248,25 +249,18 @@ class _ExhibitionList extends StatelessWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final exhi = exhibitionList[index];
-        final status = getStatusFromPeriod(exhi['period'] ?? '');
+        final startDate = exhi['startDate'] ?? '';
+        final endDate = exhi['endDate'] ?? '';
+        final period = '${formatDate(startDate)} ~ ${formatDate(endDate)}';
+        final status = getStatusFromPeriod(period);
 
         return GestureDetector(
           onTap: () {
+            final exhibition = Exhibition.fromJson(exhi);
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ExhibitionDetailPage(exhibition: Exhibition(
-                  title: exhi['title'] ?? '',
-                  category: exhi['genre'] ?? '',
-                  status: status,
-                  price: '무료',
-                  date: exhi['period'] ?? '',
-                  time: exhi['time'] ?? '',
-                  place: exhi['organization'] ?? '',
-                  description: exhi['description'] ?? '',
-                  homepageUrl: exhi['pageUrl'] ?? '',
-                  detailInfo: exhi['host'] ?? '',
-                )),
+                builder: (_) => ExhibitionDetailPage(exhibition: exhibition),
               ),
             );
           },
@@ -283,10 +277,13 @@ class _ExhibitionList extends StatelessWidget {
                 Row(
                   children: [
                     _Tag(
-                      text: exhi['genre'] ?? '카테고리',
-                      bgColor: const Color(0xFFE6E0DC),
-                      textColor: Colors.white,
+                      text: '카테고리',
+                      bgColor: const Color(0xFFA28F7D),
+                      textColor: const Color(0xFFFEFDFC),
                       radius: 15,
+                      width: 60,
+                      height: 20,
+                      fontSize: 12,
                     ),
                     const SizedBox(width: 4),
                     _Tag(
@@ -295,6 +292,9 @@ class _ExhibitionList extends StatelessWidget {
                       textColor: getTagTextColor(status),
                       radius: 15,
                       border: getTagBorder(status),
+                      width: 49,
+                      height: 20,
+                      fontSize: 12,
                     ),
                   ],
                 ),
@@ -309,17 +309,29 @@ class _ExhibitionList extends StatelessWidget {
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: exhi['imageUrl'] == null || exhi['imageUrl'] == 'null'
-                          ? const Center(child: Text('(대표사진)', style: TextStyle(fontSize: 11)))
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                exhi['imageUrl'],
-                                fit: BoxFit.cover,
-                                width: 67,
-                                height: 67,
-                              ),
-                            ),
+                      child: exhi['thumbnail'] == null || exhi['thumbnail'] == 'null'
+    ? const SizedBox.shrink()
+    : ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          exhi['thumbnail'],
+          width: 67,
+          height: 67,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              color: Colors.grey[300],
+              child: const Center(
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(Icons.broken_image, size: 30, color: Colors.grey);
+          },
+        ),
+      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -335,7 +347,7 @@ class _ExhibitionList extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            exhi['organization'] ?? '',
+                            exhi['place'] ?? '',
                             style: const TextStyle(
                               fontSize: 13,
                               color: Color(0xFF706B66),
@@ -343,7 +355,7 @@ class _ExhibitionList extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            exhi['period'] ?? '',
+                            period,
                             style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
@@ -363,12 +375,24 @@ class _ExhibitionList extends StatelessWidget {
   }
 }
 
+String formatDate(String yyyymmdd) {
+  try {
+    final date = DateTime.parse(yyyymmdd);
+    return DateFormat('yyyy.MM.dd').format(date);
+  } catch (_) {
+    return yyyymmdd; // 포맷 실패 시 원본 출력
+  }
+}
+
 class _Tag extends StatelessWidget {
   final String text;
   final Color bgColor;
   final Color textColor;
   final double radius;
   final Border? border;
+  final double width;
+  final double height;
+  final double fontSize;
 
   const _Tag({
     required this.text,
@@ -376,18 +400,23 @@ class _Tag extends StatelessWidget {
     this.textColor = Colors.black,
     this.radius = 6,
     this.border,
+    this.width = 49,
+    this.height = 20,
+    this.fontSize = 12,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      width: width,
+      height: height,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(radius),
         border: border,
       ),
-      child: Text(text, style: TextStyle(fontSize: 11, color: textColor)),
+      child: Text(text, style: TextStyle(fontSize: 12, color: textColor),  textAlign: TextAlign.center,),
     );
   }
 }
