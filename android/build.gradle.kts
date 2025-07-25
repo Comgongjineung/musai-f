@@ -1,6 +1,10 @@
+plugins {
+    id("com.google.gms.google-services") version "4.4.3" apply false
+}
+
 buildscript {
+    extra["kotlin_version"] = "2.1.0"
     dependencies {
-        //classpath("com.google.gms:google-services:4.3.15")
     }
     repositories {
         google()
