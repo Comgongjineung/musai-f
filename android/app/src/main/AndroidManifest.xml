@@ -17,6 +17,11 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
+
+        <meta-data
+        android:name="com.google.android.gms.client_id"
+        android:value="951832016031-jd45mhlsf0bqo57dmph72804sp9jglj4.apps.googleusercontent.com" />
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"

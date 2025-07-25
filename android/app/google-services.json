@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "951832016031",
+    "project_id": "musai-459505",
+    "storage_bucket": "musai-459505.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951832016031:android:8f046ab169e2817a4ddeaa",
+        "android_client_info": {
+          "package_name": "com.example.musai_f"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951832016031-nb4arj9ite4tafpbul5o5nikflk5crsd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.musai_f",
+            "certificate_hash": "b78fbb7370d6745255f1c35d3988eaa28dac10b1"
+          }
+        },
+        {
+          "client_id": "951832016031-j4cuc74iq1jajbfa736spra90lu69sc0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA15s7WBHDbCYLqmV6mdMzg_NfCtf74N8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "951832016031-bvh0bpst80oep57dp64510hp5s0jt51o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.musaif"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
