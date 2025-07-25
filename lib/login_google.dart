@@ -6,7 +6,7 @@ import 'dart:convert';
 final GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: ['email', 'profile'],
   //clientId: '951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn.apps.googleusercontent.com', //ios 용
-  clientId: '951832016031-jd45mhlsf0bqo57dmph72804sp9jglj4.apps.googleusercontent.com',
+  // clientId: '951832016031-jd45mhlsf0bqo57dmph72804sp9jglj4.apps.googleusercontent.com',
 );
 
 final storage = FlutterSecureStorage();
