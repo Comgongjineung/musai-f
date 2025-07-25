@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
-import 'main.dart';
 import 'main_camera_page.dart';
 // import 'community.dart';
-// import 'mypage.dart';
+import 'mypage.dart';
 import 'mypage_bookmark.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
@@ -107,7 +106,7 @@ class BottomNavBarWidget extends StatelessWidget {
             case 3:
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => BookmarkScreen()),
+                MaterialPageRoute(builder: (_) => MyPageScreen()),
               );
               break;
           }
