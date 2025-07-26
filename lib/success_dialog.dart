@@ -18,7 +18,7 @@ class _SuccessDialogState extends State<SuccessDialog> with SingleTickerProvider
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 10),
     )..forward();
 
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
