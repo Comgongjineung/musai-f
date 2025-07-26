@@ -2,19 +2,33 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io' show Platform;
 
-final GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: ['email', 'profile'],
-  //clientId: '951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn.apps.googleusercontent.com', //ios 용
-  //serverClientId: '951832016031-jd45mhlsf0bqo57dmph72804sp9jglj4.apps.googleusercontent.com', //android 용
-  serverClientId: '951832016031-bvh0bpst80oep57dp64510hp5s0jt51o.apps.googleusercontent.com', //웹 용
-);
+late final GoogleSignIn _googleSignIn;
+
+void configureGoogleSignIn() {
+  if (Platform.isIOS) {
+    _googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+      clientId: '951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn.apps.googleusercontent.com',
+    );
+  } else if (Platform.isAndroid) {
+    _googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+      serverClientId: '951832016031-bvh0bpst80oep57dp64510hp5s0jt51o.apps.googleusercontent.com',
+    );
+  } else {
+    _googleSignIn = GoogleSignIn(
+      scopes: ['email', 'profile'],
+    );
+  }
+}
 
 final storage = FlutterSecureStorage();
 
 Future<void> signInWithGoogle() async {
   try {
-
+    configureGoogleSignIn();
     final account = await _googleSignIn.signIn();
     print('account 반환값: $account');
 
