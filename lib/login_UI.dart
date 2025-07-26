@@ -153,7 +153,7 @@ class SignupPage extends StatelessWidget {
                     height: screenHeight * 0.06,
                     child: OutlinedButton(
                       onPressed: () {
-                        signInWithGoogle();
+                        signInWithGoogle(context);
                       },
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,
