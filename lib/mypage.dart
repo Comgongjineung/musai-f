@@ -36,7 +36,7 @@ class MyPageScreen extends StatelessWidget {
       children: [
         const CircleAvatar(
           radius: 40,
-          backgroundImage: AssetImage('assets/profile.png'),
+          backgroundImage: AssetImage('assets/images/profile.png'),
         ),
         const SizedBox(height: 16),
         const Text('닉네임', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
@@ -135,38 +135,35 @@ class MyPageScreen extends StatelessWidget {
   }
 
   Widget _writtenItemsSection() {
-    return Column(
-      children: [
-        Container(
-          height: 90,
-          decoration: BoxDecoration(
-            color: Color(0xFFF5F0EC),
-            borderRadius: BorderRadius.circular(20),
+    return Container(
+      height: 90,
+      decoration: BoxDecoration(
+        color: Color(0xFFF5F0EC),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: ListTile(
+              title: const Text('작성한 글', style: TextStyle(fontSize: 16)),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                // TODO: Navigate to written posts page
+              },
+            ),
           ),
-          child: ListTile(
-            title: const Text('작성한 글', style: TextStyle(fontSize: 16)),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Navigate to written posts page
-            },
+          //const Divider(height: 1, color: Colors.grey),
+          Expanded(
+            child: ListTile(
+              title: const Text('작성한 댓글', style: TextStyle(fontSize: 16)),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                // TODO: Navigate to written comments page
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: Color(0xFFF5F0EC),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: ListTile(
-            title: const Text('작성한 댓글', style: TextStyle(fontSize: 16)),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Navigate to written comments page
-            },
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
