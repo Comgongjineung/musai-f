@@ -9,6 +9,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'main_camera_page.dart';
 import 'package:http/http.dart' as http;
 import 'utils/auth_storage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DescriptionScreen extends StatefulWidget {
   final String title;
@@ -57,30 +58,41 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     super.initState();
     // 초기 설명 설정
     currentDescription = widget.description;
-    _loadAuthInfo();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _loadAuthInfo();      // 토큰, userId 불러오기
+    await _initializeState();   // 그다음 상태 초기화
   }
 
   Future<void> _loadAuthInfo() async {
-  token = await getJwtToken();
-  userId = await getUserId();
-  if (mounted) {
-    setState(() {}); // UI 갱신
+    token = await getJwtToken();
+    userId = await getUserId();
+    if (mounted) {
+      setState(() {}); // UI 갱신
+    }
   }
-  await _initializeState();
-}
 
   Future<void> _initializeState() async {
-  await _checkBookmarkStatus();  // 북마크 여부 확인
-}
+    if (token != null && userId != null) {
+      await _checkBookmarkStatus();  // 북마크 여부 확인
+    }
+  }
 
 
   @override
   Widget build(BuildContext context) {
+    // 반응형 디자인을 위한 화면 크기 변수들 (Figma 기준: 390 × 844)
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF47423D),
+      backgroundColor: const Color(0xFFFFFDFC),
       body: Stack(
         children: [
-          // 상단 바(AppBar)
+          // ===== 상단 네비게이션 바 =====
+          // - 뒤로가기 버튼과 앱 로고가 있는 상단 고정 영역
           Positioned(
             top: 0,
             left: 0,
@@ -88,27 +100,37 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
             child: SafeArea(
               bottom: false,
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.07,
+                height: 60,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => const MusaiHomePage()),
-                        );
-                      },
+                    // ===== 뒤로가기 버튼 (검정색) =====
+                    SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Colors.black, // 검정색으로 수정
+                          size: 24,
+                        ),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const MusaiHomePage()),
+                          );
+                        },
+                      ),
                     ),
-                    const Text(
+                    // ===== musai 텍스트 =====
+                    Text(
                       'musai',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
+                        color: const Color(0xFF343231), // #343231
+                        fontFamily: 'Pretendard',
+                        fontSize: screenWidth * (32 / 390), // 약 8.2
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 40), // 오른쪽 여백(아이콘 자리)
@@ -118,26 +140,29 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
             ),
           ),
 
-          // 상단 이미지와 버튼 (디자인 개선)
+          // ===== 메인 이미지 영역 =====
+          // - 작품 이미지가 표시되는 중앙 영역
+          // - AR 버튼과 북마크 버튼이 오버레이로 배치
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.105, // Responsive top padding
+            top: screenHeight * 0.09, // 상단 네비게이션 바 아래 여백
             left: 0,
             right: 0,
             child: Container(
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.03),
+              padding: EdgeInsets.only(top: screenHeight * 0.02), // 추가 상단 패딩
               child: Stack(
                 children: [
-                  // 이미지 (고정 사이즈)
+                  // ===== 작품 이미지 컨테이너 =====
+                  // - Figma 기준 정확한 크기: 342×473 (390×844 기준)
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.6,
+                    width: screenWidth * (342 / 390), // 정확한 비율 계산
+                    height: screenHeight * (473 / 844), // 정확한 비율 계산
                     decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
                       color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(24),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                       child: Builder(
                         builder: (context) {
                           print('widget.imageUrl: ${widget.imageUrl}');
@@ -163,198 +188,281 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       ),
                     ),
                   ),
-                  // AR 버튼 (가운데)
+                  // ===== AR 버튼 (이미지 중앙 오버레이) =====
+                  // - 작품 이미지 위에 떠있는 AR 기능 버튼
                   Positioned(
-                    top: MediaQuery.of(context).size.height * 0.02,
+                    top: screenHeight * 0.02,
                     left: 0,
                     right: 0,
                     child: Center(
                       child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.06,
-                          vertical: MediaQuery.of(context).size.height * 0.01,
-                        ),
+                        width: 58, // Figma 기준 정확한 크기
+                        height: 30, // Figma 기준 정확한 크기
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          color: const Color(0xFFFEFDFC), // 흰색 배경
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromRGBO(102, 94, 94, 0.3),
+                              blurRadius: 20,
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          'AR',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+                        child: const Center(
+                          child: Text(
+                            'AR',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  // 북마크 버튼 (오른쪽 상단)
+                  // ===== 북마크 버튼 (이미지 우상단 오버레이) =====
+                  // - 작품을 북마크에 추가/제거할 수 있는 버튼
                   Positioned(
-    top: MediaQuery.of(context).size.height * 0.02,
-    right: 16,
-    child: GestureDetector(
-      onTap: _handleBookmarkToggle,
-      child: Icon(
-        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-        color: Colors.white,
-        size: MediaQuery.of(context).size.width * 0.08,
-      ),
-    ),
-  ),
+                    top: screenHeight * 0.02,
+                    right: screenWidth * 0.04,
+                    child: GestureDetector(
+                      onTap: _handleBookmarkToggle,
+                      child: Icon(
+                        isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
 
-          // Draggable 설명 카드
+          // ===== 드래그 가능한 설명 카드 =====
+          // - 하단에서 위로 드래그하여 확장할 수 있는 작품 정보 영역
+          // - 초기 크기: 화면의 38%, 최소: 38%, 최대: 85%
           DraggableScrollableSheet(
             initialChildSize: 0.38,
             minChildSize: 0.38,
             maxChildSize: 0.85,
             builder: (context, scrollController) {
               return Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFF22201F),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                margin: EdgeInsets.symmetric(
+                  horizontal: screenWidth * ((390 - 367) / 2 / 390), // 약 11.5px 양쪽 여백
+                ),
+                width: screenWidth * (367 / 390), // Figma 기준 정확한 너비 (약 94% 수준)
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFAF5F0),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(19.045), // Figma 기준 정확한 값
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromRGBO(63, 65, 70, 0.2),
+                      blurRadius: 19.045,
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
-                    // 드래그 핸들
+                    // ===== 드래그 핸들 =====
+                    // - 사용자가 카드를 드래그할 수 있음을 나타내는 시각적 표시
+                    // - V자형 SVG 아이콘 사용 (Figma 디자인 기준)
                     Padding(
-                      padding: const EdgeInsets.only(top: 12, bottom: 8),
+                      padding: const EdgeInsets.only(
+                        top: 2,
+                        bottom: 0, // 드래그 핸들과 상단 컨트롤 바 사이 패딩 최소화
+                      ),
                       child: Center(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.1,
-                          height: MediaQuery.of(context).size.height * 0.005,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[700],
-                            borderRadius: BorderRadius.circular(2),
+                        child: SizedBox(
+                          width: 30, // 1.5배 크기 (21.879 * 2)
+                          height: 50, // 1.5배 크기 (38.632 * 2)
+                          child: SvgPicture.asset(
+                            'assets/icons/drag_v_handle.svg',
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
                     ),
-                    // 상단 컨트롤 바 (진한 회색)
+                    // ===== 상단 컨트롤 바 =====
+                    // - 해설 타입 선택 드롭다운과 TTS 버튼이 있는 제어 영역
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Container(
-                        height: MediaQuery.of(context).size.height * 0.06,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        width: screenWidth * (340 / 390), // Figma 기준 정확한 너비
+                        height: 40, // Figma 기준 정확한 높이
                         decoration: BoxDecoration(
-                          color: const Color(0xFF37322F), // 진한 회색
-                          // color: const Color(0xFFEAE1DC), // 연한 회색
-                          borderRadius: BorderRadius.circular(20),
+                          color: const Color(0xFFF0E4DE), // 상단 컨트롤 바 배경
+                          borderRadius: BorderRadius.circular(18),
                         ),
                         child: Row(
                           children: [
-                            // 드롭다운 메뉴 감싸는 연한 회색 박스
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              height: MediaQuery.of(context).size.height * 0.045,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEAE1DC),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  value: selectedDescription,
-                                  dropdownColor: const Color(0xFFEAE1DC),
-                                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF4B4237)),
-                                  style: const TextStyle(color: Color(0xFF4B4237), fontWeight: FontWeight.w500),
-                                  borderRadius: BorderRadius.circular(20),
-                                  items: descriptionTypes.map((type) {
-                                    return DropdownMenuItem<String>(
-                                      value: type,
-                                      child: Text(type, style: const TextStyle(color: Color(0xFF4B4237))),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    if (value != null && value != selectedDescription) {
-                                      setState(() {
-                                        selectedDescription = value;
-                                      });
-                                      // 새로운 해설 타입으로 API 호출
-                                      _fetchNewDescription(value);
-                                    }
-                                  },
+                            // ===== 해설 타입 선택 드롭다운 =====
+                            // - 한눈에 보는 해설, 클래식한 해설, 깊이 있는 해설 중 선택
+                            Padding(
+                              padding: const EdgeInsets.only(left: 6), // 왼쪽 여백 추가
+                              child: Container(
+                                width: 127,
+                                height: 30, // Figma 기준 정확한 크기
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFA28F7D), // 드롭다운 배경
+                                  borderRadius: BorderRadius.circular(15.907), // Figma 기준 정확한 값
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromRGBO(63, 65, 70, 0.2),
+                                      blurRadius: 17.675,
+                                    ),
+                                  ],
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: selectedDescription,
+                                    dropdownColor: const Color(0xFFEAE1DC),
+                                    icon: Padding(
+                                      padding: const EdgeInsets.only(right: 4.27),
+                                      child: SvgPicture.asset('assets/icons/dropdown_icon.svg', width: 20.7, height: 20.7),
+                                    ),
+                                    style: const TextStyle(
+                                      color: Color(0xFFFEFDFC),
+                                      fontFamily: 'Pretendard',
+                                      fontSize: 14.849, // Figma 기준 정확한 크기
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: -0.247, // Figma 기준 정확한 값
+                                    ),
+                                     borderRadius: BorderRadius.circular(8),
+                                     items: descriptionTypes.map((type) {
+                                       return DropdownMenuItem<String>(
+                                         value: type,
+                                         child: Padding(
+                                           padding: const EdgeInsets.only(left: 15), // 왼쪽 패딩 15px 추가
+                                           child: Text(type),
+                                         ),
+                                       );
+                                     }).toList(),
+                                    onChanged: (value) {
+                                      if (value != null && value != selectedDescription) {
+                                        setState(() {
+                                          selectedDescription = value;
+                                        });
+                                        // 새로운 해설 타입으로 API 호출
+                                        _fetchNewDescription(value);
+                                      }
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
                             const Spacer(),
-                            // TTS 버튼 감싸는 연한 회색 박스
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFEAE1DC),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: IconButton(
-                                icon: Icon(Icons.volume_up, color: Color(0xFF4B4237)),
-                                onPressed: _playTTS,
+                            // ===== TTS 버튼 =====
+                            // - 텍스트를 음성으로 변환하여 읽어주는 기능
+                            Padding(
+                              padding: const EdgeInsets.only(right: 7), // 오른쪽 여백 추가
+                              child: Container(
+                                width: 43, // Figma 기준 정확한 크기
+                                height: 30, // Figma 기준 정확한 크기
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFA28F7D), // TTS 버튼 배경
+                                  borderRadius: BorderRadius.circular(15.907), // Figma 기준 정확한 값
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color.fromRGBO(63, 65, 70, 0.2),
+                                      blurRadius: 17.675,
+                                    ),
+                                  ],
+                                ),
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(
+                                    Icons.volume_up,
+                                    color: Color(0xFFFEFDFC),
+                                    size: 19, // Figma 기준 정확한 크기
+                                  ),
+                                  onPressed: _playTTS,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.015),
-                    // 제목, 작가, 연도
+                    const SizedBox(height: 18),
+                    // ===== 작품 정보 헤더 =====
+                    // - 작품 제목, 작가명, 제작 연도가 표시되는 영역
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            widget.title,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: MediaQuery.of(context).size.width * 0.05,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${widget.artist}, ${widget.year}',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: MediaQuery.of(context).size.width * 0.035,
-                            ),
-                          ),
+                                                     Text(
+                             widget.title.replaceAll('*', ''),
+                             style: const TextStyle(
+                               color: Colors.black,
+                               fontSize: 20,
+                               fontWeight: FontWeight.bold,
+                             ),
+                             textAlign: TextAlign.center,
+                           ),
+                           const SizedBox(height: 6),
+                           Text(
+                             '${widget.artist.replaceAll('*', '')}, ${widget.year.replaceAll('*', '')}',
+                             style: const TextStyle(
+                               color: Color(0xFFB1B1B1),
+                               fontSize: 14,
+                               fontWeight: FontWeight.w600,
+                             ),
+                             textAlign: TextAlign.center,
+                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.015),
-                    // 설명 스크롤
+                    const SizedBox(height: 18),
+                    // ===== 작품 설명 스크롤 영역 =====
+                    // - 선택된 해설 타입에 따른 작품 설명 텍스트가 표시되는 영역
+                    // - 로딩 중일 때는 CircularProgressIndicator 표시
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.04),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: SingleChildScrollView(
                           controller: scrollController,
                           child: isLoadingDescription
-                              ? const Center(
+                              ? Center(
                                   child: Padding(
-                                    padding: EdgeInsets.all(20.0),
+                                    padding: const EdgeInsets.all(20),
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
+                                      strokeWidth: 3,
                                     ),
                                   ),
                                 )
                               : Text(
                                   currentDescription.replaceAll('*', ''),
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: MediaQuery.of(context).size.width * 0.035,
+                                  style: const TextStyle(
+                                    color: Color(0xFF343231),
+                                    fontSize: 14,
                                     height: 1.5,
+                                    fontWeight: FontWeight.w600,
                                   ),
+                                  textAlign: TextAlign.justify,
                                 ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+                                         ),
+                   ],
+                 ),
+               );
+             },
+           ),
+
+           // ===== 하단 네비게이션 바 =====
+           // - 다른 페이지와 동일한 하단 탭 바
+           Positioned(
+             bottom: 0,
+             left: 0,
+             right: 0,
+             child: BottomNavBarWidget(currentIndex: 1), // 현재 인덱스는 1 (카메라 탭)
+           ),
 
         ],
       ),
@@ -489,11 +597,14 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   // 새로운 해설 타입으로 API 호출
   Future<void> _fetchNewDescription(String descriptionType) async {
     if (token == null || userId == null) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('인증 정보가 없습니다. 다시 로그인해주세요.')),
-  );
-  return;
-}
+      debugPrint('❗ 토큰 또는 유저 ID가 없습니다. 로그인 필요');
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그인이 필요합니다.')),
+        );
+      }
+      return;
+    }
 
     setState(() {
       isLoadingDescription = true;
@@ -506,6 +617,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       );
       request.files.add(await http.MultipartFile.fromPath('file', widget.imagePath));
       request.fields['level'] = _getLevelForDescriptionType(descriptionType);
+      
+      // Authorization 헤더 추가
+      request.headers['Authorization'] = 'Bearer $token';
 
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
@@ -543,7 +657,10 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   }
 
 Future<void> _checkBookmarkStatus() async {
-  if (userId == null) return;
+  if (token == null || userId == null) {
+    debugPrint('❗ 토큰 또는 유저 ID가 없습니다. 북마크 상태 확인 불가');
+    return;
+  }
 
   final response = await http.get(Uri.parse(
     'http://43.203.23.173:8080/bookmark/readAll/$userId'), 
