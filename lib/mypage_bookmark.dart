@@ -34,6 +34,26 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   setState(() {});
 }
 
+Future<void> _deleteBookmark(int bookmarkId) async {
+    if (token == null) return;
+
+    final response = await http.delete(
+      Uri.parse('http://43.203.23.173:8080/bookmark/delete/$bookmarkId'),
+      headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        bookmarks.removeWhere((item) => item['bookmarkId'] == bookmarkId);
+      });
+    } else {
+      debugPrint('❌ 삭제 실패: ${response.statusCode}');
+    }
+  }
+
   Future<void> _loadBookmarks() async {
     if (token == null || userId == null) {
     debugPrint('❗ 토큰 또는 유저 ID가 없습니다. 로그인 필요');
@@ -115,65 +135,77 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                             separatorBuilder: (_, __) => const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final item = bookmarks[index];
-                              return Container(
-                                width: 342,
-                                padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 18),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFEFDFC),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: const Color(0xFFEAEAEA)),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 67,
-                                      height: 67,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(8),
-                                        image: item['imageUrl'] != null
-                                            ? DecorationImage(
-                                                image: NetworkImage(item['imageUrl']),
-                                                fit: BoxFit.cover,
-                                              )
-                                            : null,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            item['title'] ?? '',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0xFF343231),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            item['artist'] ?? '',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF706B66),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          const Text(
-                                            '등록됨',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF706B66),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
+                              return Stack(
+  children: [
+    Container(
+      width: 342,
+      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 18),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEFDFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFEAEAEA)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 67,
+            height: 67,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
+              image: item['imageUrl'] != null
+                  ? DecorationImage(
+                      image: NetworkImage(item['imageUrl']),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['title'] ?? '',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF343231),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item['artist'] ?? '',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF706B66),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  '북마크 등록 날짜',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF706B66),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+    Positioned(
+      right: 8,
+      top: 8,
+      child: GestureDetector(
+        onTap: () => _deleteBookmark(item['bookmarkId']),
+        child: const Icon(Icons.close, size: 12, color: Color(0xFFA28F7D)),
+      ),
+    ),
+  ],
+);
                             },
                           ),
               ),

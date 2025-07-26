@@ -97,6 +97,13 @@ class _SearchScreenState extends State<SearchScreen> {
     final utf8Decoded = utf8.decode(response.bodyBytes);
     final List<dynamic> data = json.decode(utf8Decoded);
 
+    data.sort((a, b) {
+  final aDate = DateTime.tryParse(a['startDate'] ?? '') ?? DateTime(1900);
+  final bDate = DateTime.tryParse(b['startDate'] ?? '') ?? DateTime(1900);
+  return bDate.compareTo(aDate); // 최신순 (내림차순)
+});
+
+
     setState(() {
       isSearchDone = true;
       exhibitionList = data;
