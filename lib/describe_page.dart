@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'describe_box.dart';
 import 'success_dialog.dart';
+import 'utils/auth_storage.dart';
 
 class DescribePage extends StatefulWidget {
   final String imagePath;
@@ -23,6 +24,8 @@ class _DescribePageState extends State<DescribePage> {
 
   bool isLoading = true;
   bool successDialogCompleted = false;
+  String? token;
+  int? userId;
 
   String fetchedTitle = '';
   String fetchedArtist = '';
@@ -33,11 +36,33 @@ class _DescribePageState extends State<DescribePage> {
   @override
   void initState() {
     super.initState();
-    // 위젯이 처음 생성될 때 이미지 분석 시작
-    analyzeImage();
+    // 위젯이 처음 생성될 때 인증 정보 로드 후 이미지 분석 시작
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _loadAuthInfo();      // 토큰, userId 불러오기
+    await analyzeImage();       // 그다음 이미지 분석 시작
+  }
+
+  Future<void> _loadAuthInfo() async {
+    token = await getJwtToken();
+    userId = await getUserId();
+    setState(() {});
   }
 
   Future<void> analyzeImage() async {
+    if (token == null || userId == null) {
+      debugPrint('❗ 토큰 또는 유저 ID가 없습니다. 로그인 필요');
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('로그인이 필요합니다.')),
+        );
+        Navigator.pop(context);
+      }
+      return;
+    }
+
     final savedPhoto = File(widget.imagePath);
 
     if (!savedPhoto.existsSync()) {
@@ -60,6 +85,9 @@ class _DescribePageState extends State<DescribePage> {
     
     // 기본적으로 (level: 중)으로 설정
     request.fields['level'] = '중';
+    
+    // Authorization 헤더 추가
+    request.headers['Authorization'] = 'Bearer $token';
 
     try {
       final response = await request.send();
