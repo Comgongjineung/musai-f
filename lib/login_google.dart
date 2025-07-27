@@ -6,9 +6,11 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'login_profile.dart';
 
-late final GoogleSignIn _googleSignIn;
+GoogleSignIn? _googleSignIn;
 
 void configureGoogleSignIn() {
+  if (_googleSignIn != null) return;
+
   if (Platform.isIOS) {
     _googleSignIn = GoogleSignIn(
       scopes: ['email', 'profile'],
@@ -31,7 +33,13 @@ final storage = FlutterSecureStorage();
 Future<void> signInWithGoogle(BuildContext context) async {
   try {
     configureGoogleSignIn();
-    final account = await _googleSignIn.signIn();
+
+    // 이전 계정 로그아웃
+    await _googleSignIn!.signOut();
+    await storage.deleteAll();
+
+    // 새로운 계정 로그인
+    final account = await _googleSignIn!.signIn();
     print('account 반환값: $account');
 
     if (account == null) {
