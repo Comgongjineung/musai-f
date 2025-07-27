@@ -238,7 +238,7 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
       floatingActionButton: ElevatedButton(
         onPressed: () async {
           print('버튼 눌림');
-          await signInWithGoogle(); // 이게 실제로 호출되고 있는지 확인
+          await signInWithGoogle(context); // 이게 실제로 호출되고 있는지 확인
         },
         child: Text('Google 로그인'),
       ),

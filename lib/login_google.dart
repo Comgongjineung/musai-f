@@ -3,10 +3,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io' show Platform;
+import 'package:flutter/material.dart';
+import 'login_profile.dart';
 
-late final GoogleSignIn _googleSignIn;
+GoogleSignIn? _googleSignIn;
 
 void configureGoogleSignIn() {
+  if (_googleSignIn != null) return;
+
   if (Platform.isIOS) {
     _googleSignIn = GoogleSignIn(
       scopes: ['email', 'profile'],
@@ -26,10 +30,16 @@ void configureGoogleSignIn() {
 
 final storage = FlutterSecureStorage();
 
-Future<void> signInWithGoogle() async {
+Future<void> signInWithGoogle(BuildContext context) async {
   try {
     configureGoogleSignIn();
-    final account = await _googleSignIn.signIn();
+
+    // 이전 계정 로그아웃
+    await _googleSignIn!.signOut();
+    await storage.deleteAll();
+
+    // 새로운 계정 로그인
+    final account = await _googleSignIn!.signIn();
     print('account 반환값: $account');
 
     if (account == null) {
@@ -63,6 +73,11 @@ Future<void> signInWithGoogle() async {
 
       print('JWT 저장 완료: $token');
       print('userId 저장 완료: $userId');
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginProfileScreen(userId: userId)),
+      );
 
     } else {
       print('로그인 실패: ${response.statusCode} / ${response.body}');
