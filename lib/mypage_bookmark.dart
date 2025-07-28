@@ -24,17 +24,17 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   }
 
   Future<void> _initialize() async {
-  await _loadAuthInfo();      // 토큰, userId 불러오기
-  await _loadBookmarks();     // 그다음 북마크 불러오기
-}
+    await _loadAuthInfo();      // 토큰, userId 불러오기
+    await _loadBookmarks();     // 북마크 불러오기
+  }
 
   Future<void> _loadAuthInfo() async {
-  token = await getJwtToken();
-  userId = await getUserId();
-  setState(() {});
-}
+    token = await getJwtToken();
+    userId = await getUserId();
+    setState(() {});
+  }
 
-Future<void> _deleteBookmark(int bookmarkId) async {
+  Future<void> _deleteBookmark(int bookmarkId) async {
     if (token == null) return;
 
     final response = await http.delete(
@@ -56,10 +56,10 @@ Future<void> _deleteBookmark(int bookmarkId) async {
 
   Future<void> _loadBookmarks() async {
     if (token == null || userId == null) {
-    debugPrint('❗ 토큰 또는 유저 ID가 없습니다. 로그인 필요');
-    setState(() => isLoading = false);
-    return;
-  }
+      debugPrint('❗ 토큰 또는 유저 ID가 없습니다. 로그인 필요');
+      setState(() => isLoading = false);
+      return;
+    }
 
     final response = await http.get(
       Uri.parse('http://43.203.23.173:8080/bookmark/readAll/$userId'),
@@ -132,80 +132,91 @@ Future<void> _deleteBookmark(int bookmarkId) async {
                         : ListView.separated(
                             padding: const EdgeInsets.only(bottom: 16),
                             itemCount: bookmarks.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final item = bookmarks[index];
-                              return Stack(
-  children: [
-    Container(
-      width: 342,
-      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 18),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFEFDFC),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEAEAEA)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 67,
-            height: 67,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-              image: item['imageUrl'] != null
-                  ? DecorationImage(
-                      image: NetworkImage(item['imageUrl']),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['title'] ?? '',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF343231),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item['artist'] ?? '',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF706B66),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  '북마크 등록 날짜',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF706B66),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
-    Positioned(
-      right: 8,
-      top: 8,
-      child: GestureDetector(
-        onTap: () => _deleteBookmark(item['bookmarkId']),
-        child: const Icon(Icons.close, size: 12, color: Color(0xFFA28F7D)),
-      ),
-    ),
-  ],
-);
+                              return Container(
+                                width: 342,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 17, vertical: 18),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFEFDFC),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                      color: const Color(0xFFEAEAEA)),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 67,
+                                      height: 67,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(8),
+                                        image: item['imageUrl'] != null
+                                            ? DecorationImage(
+                                                image: NetworkImage(
+                                                    item['imageUrl']),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : null,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  (item['title'] ?? '').replaceAll('*', ''),
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    color: Color(0xFF343231),
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () => _deleteBookmark(
+                                                    item['bookmarkId']),
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  size: 19,
+                                                  color: Color(0xFFA28F7D),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            (item['artist'] ?? '').replaceAll('*', ''),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF706B66),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          const Text(
+                                            '북마크 등록 날짜',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF706B66),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
                             },
                           ),
               ),
@@ -237,7 +248,8 @@ class _TabButton extends StatelessWidget {
         text,
         style: TextStyle(
           fontSize: 16,
-          color: selected ? const Color(0xFFFEFDFC) : const Color(0xFF706B66),
+          color:
+              selected ? const Color(0xFFFEFDFC) : const Color(0xFF706B66),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -272,7 +284,8 @@ class _SortDropdown extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
-            const Icon(Icons.arrow_drop_down, color: Color(0xFF837670), size: 18),
+            const Icon(Icons.arrow_drop_down,
+                color: Color(0xFF837670), size: 18),
           ],
         ),
       ),

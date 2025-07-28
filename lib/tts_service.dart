@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'utils/auth_storage.dart';
 
 class TTSService {
   static const String _baseUrl = 'http://43.203.23.173:8080/tts/synthesize';
@@ -8,9 +9,17 @@ class TTSService {
   /// 텍스트를 받아 TTS 음성(mp3) 데이터를 반환합니다.
   static Future<Uint8List?> synthesize(String text) async {
     try {
+      final token = await getJwtToken();
+      if (token == null) {
+        throw Exception('JWT 토큰이 존재하지 않습니다.');
+      }
+
       final response = await http.post(
         Uri.parse(_baseUrl),
-        headers: {'Content-Type': 'text/plain'},
+        headers: {
+          'Content-Type': 'text/plain',
+          'Authorization': 'Bearer $token', // 토큰 추가
+        },
         body: text,
       );
 
@@ -28,4 +37,4 @@ class TTSService {
       rethrow;
     }
   }
-} 
+}
