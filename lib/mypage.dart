@@ -244,7 +244,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
               DropdownButton<String>(
                 value: dropdownValue,
                 underline: const SizedBox(),
-                icon: const Icon(Icons.keyboard_arrow_down),
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Color(0xFF343231),
+                ),
                 dropdownColor: Color(0xFFFEF6F2),
                 items: <String>['쉬운 해설', '클래식한 해설', '전문가 해설']
                     .map<DropdownMenuItem<String>>((String value) {
@@ -302,7 +305,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('작성한 글', style: TextStyle(fontSize: screenWidth * 0.04)),
-                const Icon(Icons.chevron_right),
+                Icon(Icons.chevron_right, color: Color(0xFF343231)),
               ],
             ),
           ),
@@ -315,7 +318,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('작성한 댓글', style: TextStyle(fontSize: screenWidth * 0.04)),
-                const Icon(Icons.chevron_right),
+                Icon(Icons.chevron_right, color: Color(0xFF343231)),
               ],
             ),
           ),

@@ -18,7 +18,7 @@ class _SuccessDialogState extends State<SuccessDialog> with SingleTickerProvider
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 10),
+      duration: const Duration(seconds: 12),
     )..forward();
 
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -53,25 +53,25 @@ class _SuccessDialogState extends State<SuccessDialog> with SingleTickerProvider
                   const Text(
                     '작품 분석 중 입니다.',
                     style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
+                      fontSize: 16,
+                      color: Color(0xFFFEFDFC),
                       fontWeight: FontWeight.w500,
                       decoration: TextDecoration.none,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1),
                   const Text(
                     '잠시만 기다려 주세요.',
                     style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
+                      fontSize: 16,
+                      color: Color(0xFFFEFDFC),
                       decoration: TextDecoration.none,
                     ),
                   ),
                   const SizedBox(height: 16),
                   Container(
-                    width: 180,
-                    height: 12,
+                    width: 220,
+                    height: 16,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       color: Colors.white.withOpacity(0.3),
@@ -86,7 +86,7 @@ class _SuccessDialogState extends State<SuccessDialog> with SingleTickerProvider
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
+                                color: Color(0xFFFEFDFC),
                               ),
                             ),
                           ),

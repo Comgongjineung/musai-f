@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_bar_widget.dart';
 import 'dart:io';
 import 'bottom_nav_bar.dart'; // 반드시 import 필요
 import 'main.dart'; // 탭 클릭 시 이동하려면 필요
@@ -91,69 +92,26 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       backgroundColor: const Color(0xFFFFFDFC),
       body: Stack(
         children: [
-          // ===== 상단 네비게이션 바 =====
-          // - 뒤로가기 버튼과 앱 로고가 있는 상단 고정 영역
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: Container(
-                height: 60,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // ===== 뒤로가기 버튼 (검정색) =====
-                    SizedBox(
-                      width: 36,
-                      height: 36,
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Colors.black, // 검정색으로 수정
-                          size: 24,
-                        ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const MusaiHomePage()),
-                          );
-                        },
-                      ),
-                    ),
-                    // ===== musai 텍스트 =====
-                    Text(
-                      'musai',
-                      style: TextStyle(
-                        color: const Color(0xFF343231), // #343231
-                        fontFamily: 'Pretendard',
-                        fontSize: screenWidth * (32 / 390), // 약 8.2
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 40), // 오른쪽 여백(아이콘 자리)
-                  ],
-                ),
-              ),
-            ),
+          AppBarWidget(
+            showBackButton: true,
+            onBackPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const MusaiHomePage()),
+              );
+            },
           ),
 
           // ===== 메인 이미지 영역 =====
-          // - 작품 이미지가 표시되는 중앙 영역
-          // - AR 버튼과 북마크 버튼이 오버레이로 배치
           Positioned(
-            top: screenHeight * 0.09, // 상단 네비게이션 바 아래 여백
+            top: kToolbarHeight + MediaQuery.of(context).padding.top + screenHeight * 0.01,
             left: 0,
             right: 0,
             child: Container(
               alignment: Alignment.topCenter,
-              padding: EdgeInsets.only(top: screenHeight * 0.02), // 추가 상단 패딩
               child: Stack(
                 children: [
                   // ===== 작품 이미지 컨테이너 =====
-                  // - Figma 기준 정확한 크기: 342×473 (390×844 기준)
                   Container(
                     width: screenWidth * (342 / 390), // 정확한 비율 계산
                     height: screenHeight * (473 / 844), // 정확한 비율 계산
@@ -189,18 +147,17 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     ),
                   ),
                   // ===== AR 버튼 (이미지 중앙 오버레이) =====
-                  // - 작품 이미지 위에 떠있는 AR 기능 버튼
                   Positioned(
                     top: screenHeight * 0.02,
                     left: 0,
                     right: 0,
                     child: Center(
                       child: Container(
-                        width: 58, // Figma 기준 정확한 크기
-                        height: 30, // Figma 기준 정확한 크기
+                        width: screenWidth * 0.15, 
+                        height: screenHeight * 0.04, 
                         decoration: BoxDecoration(
                           color: const Color(0xFFFEFDFC), // 흰색 배경
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
                               color: const Color.fromRGBO(102, 94, 94, 0.3),
@@ -212,9 +169,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           child: Text(
                             'AR',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: Color(0xFF343231),
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -222,7 +179,6 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     ),
                   ),
                   // ===== 북마크 버튼 (이미지 우상단 오버레이) =====
-                  // - 작품을 북마크에 추가/제거할 수 있는 버튼
                   Positioned(
                     top: screenHeight * 0.02,
                     right: screenWidth * 0.04,
@@ -230,8 +186,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       onTap: _handleBookmarkToggle,
                       child: Icon(
                         isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                        color: Color(0xFFA28F7D),
-                        size: 32,
+                        color: Color(0xFFFEFDFC),
+                        size: screenHeight * 0.04,
                       ),
                     ),
                   ),
@@ -256,7 +212,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFFAF5F0),
         borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(19.045),
+          top: Radius.circular(20),
         ),
         boxShadow: [
           BoxShadow(
@@ -272,34 +228,36 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           children: [
             // 드래그 핸들
             Padding(
-              padding: const EdgeInsets.only(top: 2, bottom: 0),
-              child: SizedBox(
-                width: 30,
-                height: 50,
-                child: SvgPicture.asset(
-                  'assets/icons/drag_v_handle.svg',
-                  fit: BoxFit.contain,
+              padding: EdgeInsets.only(
+                top: screenHeight * 0.015,
+                bottom: screenHeight * 0.015,
+              ),
+              child: Container(
+                width: screenWidth * 0.10,   
+                height: screenHeight * 0.005, 
+                decoration: BoxDecoration(
+                  color: const Color(0xFFB1B1B1),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
 
             // 해설 선택 드롭다운 + TTS 버튼
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05), // 20/390
               child: Container(
-                width: screenWidth * (340 / 390),
-                height: 40,
+                height: screenHeight * 0.05,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF0E4DE),
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 6),
+                      padding: EdgeInsets.only(left: screenWidth * 0.02), 
                       child: Container(
-                        width: screenWidth * 0.4,
-                        height: 30,
+                        width: screenWidth * 0.34,
+                        height: screenHeight * 0.036, // 30/844
                         decoration: BoxDecoration(
                           color: const Color(0xFFA28F7D),
                           borderRadius: BorderRadius.circular(15.907),
@@ -311,52 +269,73 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           ],
                         ),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: selectedDescription,
-                            dropdownColor: const Color(0xFFEAE1DC),
-                            icon: Padding(
-                              padding: const EdgeInsets.only(right: 4.27),
-                              child: SvgPicture.asset(
-                                'assets/icons/dropdown_icon.svg',
-                                width: 20.7,
-                                height: 20.7,
+                          child: Padding(
+                            padding: EdgeInsets.only(right: screenWidth * 0.03),
+                            child: DropdownButton<String>(
+                              value: selectedDescription,
+                              dropdownColor: const Color(0xFFA28F7D),
+                              isExpanded: true,
+                              underline: const SizedBox(),
+                              icon: const SizedBox(),
+                              style: TextStyle(
+                                color: const Color(0xFFFEFDFC),
+                                fontFamily: 'Pretendard',
+                                fontSize: screenWidth * 0.036, // 14/390
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: -0.247,
                               ),
+                              borderRadius: BorderRadius.circular(20),
+                              items: descriptionTypes.map((type) {
+                                return DropdownMenuItem<String>(
+                                  value: type,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: screenWidth * 0.03), 
+                                    child: Text(type),
+                                  ),
+                                );
+                              }).toList(),
+                              selectedItemBuilder: (BuildContext context) {
+                                return descriptionTypes.map((type) {
+                                  return Row(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(left: screenWidth * 0.03),
+                                        child: Text(
+                                          type,
+                                          style: TextStyle(
+                                            color: const Color(0xFFFEFDFC),
+                                            fontFamily: 'Pretendard',
+                                            fontSize: screenWidth * 0.036, // 14/390
+                                            fontWeight: FontWeight.w500,
+                                            letterSpacing: -0.247,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: screenWidth * 0.02),
+                                      const Icon(Icons.keyboard_arrow_down, color: Color(0xFFFEFDFC)),
+                                    ],
+                                  );
+                                }).toList();
+                              },
+                              onChanged: (value) {
+                                if (value != null && value != selectedDescription) {
+                                  setState(() {
+                                    selectedDescription = value;
+                                  });
+                                  _fetchNewDescription(value);
+                                }
+                              },
                             ),
-                            style: const TextStyle(
-                              color: Color(0xFFFEFDFC),
-                              fontFamily: 'Pretendard',
-                              fontSize: 14.849,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: -0.247,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                            items: descriptionTypes.map((type) {
-                              return DropdownMenuItem<String>(
-                                value: type,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 15),
-                                  child: Text(type),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null && value != selectedDescription) {
-                                setState(() {
-                                  selectedDescription = value;
-                                });
-                                _fetchNewDescription(value);
-                              }
-                            },
                           ),
                         ),
                       ),
                     ),
                     const Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(right: 7),
+                      padding: EdgeInsets.only(right: screenWidth * 0.02), 
                       child: Container(
-                        width: 43,
-                        height: 30,
+                        width: screenWidth * 0.113, // 44/390
+                        height: screenHeight * 0.036, // 30/844
                         decoration: BoxDecoration(
                           color: const Color(0xFFA28F7D),
                           borderRadius: BorderRadius.circular(15.907),
@@ -369,10 +348,10 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                         ),
                         child: IconButton(
                           padding: EdgeInsets.zero,
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.volume_up,
-                            color: Color(0xFFFEFDFC),
-                            size: 19,
+                            color: const Color(0xFFFEFDFC),
+                            size: screenWidth * 0.049,
                           ),
                           onPressed: _playTTS,
                         ),
@@ -383,28 +362,28 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
               ),
             ),
 
-            const SizedBox(height: 18),
+            SizedBox(height: screenHeight * 0.025),
 
             // 작품 제목, 작가, 연도
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05), 
               child: Column(
                 children: [
                   Text(
                     widget.title.replaceAll('*', ''),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.black,
-                      fontSize: 20,
+                      fontSize: screenWidth * 0.05,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: screenHeight * 0.01),
                   Text(
                     '${widget.artist.replaceAll('*', '')}, ${widget.year.replaceAll('*', '')}',
-                    style: const TextStyle(
-                      color: Color(0xFFB1B1B1),
-                      fontSize: 14,
+                    style: TextStyle(
+                      color: const Color(0xFFB1B1B1),
+                      fontSize: screenWidth * 0.031, // 12/390
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
@@ -413,16 +392,16 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
               ),
             ),
 
-            const SizedBox(height: 18),
+            SizedBox(height: screenHeight * 0.03), 
 
             // 해설 설명 텍스트
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05), 
               child: isLoadingDescription
-                  ? const Center(
+                  ? Center(
                       child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: CircularProgressIndicator(
+                        padding: EdgeInsets.all(screenWidth * 0.05),
+                        child: const CircularProgressIndicator(
                           color: Colors.white,
                           strokeWidth: 3,
                         ),
@@ -430,17 +409,17 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     )
                   : Text(
                       currentDescription.replaceAll('*', ''),
-                      style: const TextStyle(
-                        color: Color(0xFF343231),
-                        fontSize: 14,
+                      style: TextStyle(
+                        color: const Color(0xFF343231),
+                        fontSize: screenWidth * 0.04,
                         height: 1.5,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.justify,
                     ),
             ),
 
-            const SizedBox(height: 100), // 하단 여유 공간
+            SizedBox(height: screenHeight * 0.12), 
           ],
         ),
       ),
