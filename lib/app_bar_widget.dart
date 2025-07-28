@@ -31,14 +31,18 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       centerTitle: centerTitle,
       leading: showBackButton
-          ? IconButton(
+        ? Padding(
+            padding: const EdgeInsets.only(left:24), // ← 원하는 값으로 변경
+            child: IconButton(
+              padding: EdgeInsets.zero,
               icon: const Icon(
                 Icons.arrow_back_ios,
                 color: Color(0xFF343231),
               ),
               onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
-            )
-          : null,
+            ),
+          )
+        : null,
       title: title != null
           ? Text(
               title!,
