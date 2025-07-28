@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'bottom_nav_bar.dart';
 import 'utils/auth_storage.dart';
+import 'describe_box.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -136,7 +137,44 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                                 const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final item = bookmarks[index];
-                              return Container(
+
+                              return GestureDetector(
+    onTap: () async {
+      if (token == null || userId == null) return;
+
+      final bookmarkId = item['bookmarkId'];
+
+      final response = await http.get(
+        Uri.parse('http://43.203.23.173:8080/bookmark/read/$bookmarkId/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DescriptionScreen(
+              title: data['title'],
+              artist: data['artist'],
+              year: '', // 북마크 데이터엔 year 없음
+              description: data['description'],
+              imagePath: '', // 사용되지 않음
+              imageUrl: data['imageUrl'],
+              scrollController: ScrollController(),
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('상세 정보 조회 실패: ${response.statusCode}')),
+        );
+      }
+    },
+                              child: Container(
                                 width: 342,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 17, vertical: 18),
@@ -184,15 +222,10 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                                                   ),
                                                 ),
                                               ),
-                                              GestureDetector(
-                                                onTap: () => _deleteBookmark(
-                                                    item['bookmarkId']),
-                                                child: const Icon(
-                                                  Icons.close,
-                                                  size: 19,
-                                                  color: Color(0xFFA28F7D),
-                                                ),
-                                              ),
+                                              IconButton(
+                    icon: const Icon(Icons.close, size: 19, color: Color(0xFFA28F7D)),
+                    onPressed: () => _deleteBookmark(item['bookmarkId']),
+                  ),
                                             ],
                                           ),
                                           const SizedBox(height: 4),
@@ -216,6 +249,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                                     ),
                                   ],
                                 ),
+                              ),
                               );
                             },
                           ),
