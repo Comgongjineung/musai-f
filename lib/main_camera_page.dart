@@ -10,6 +10,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:ui';
 import 'login_google.dart';
+import 'utils/auth_storage.dart';
 
 class MusaiHomePage extends StatefulWidget {
   const MusaiHomePage({super.key});
@@ -24,29 +25,28 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
   final GlobalKey<CameraViewState> _cameraViewKey = GlobalKey<CameraViewState>();
   //final ArtCameraController _cameraController = ArtCameraController();
 
-  // 결과 저장용 상태
-  String title = '';
-  String artist = '';
-  String year = '';
-  String description = '';
-  String imageUrl = '';
-  File? analyzedImage;
-
   Future<void> uploadImage(BuildContext context, File imageFile) async {
     print('🔍 uploadImage 시작 - 파일 경로: ${imageFile.path}');
     print('🔍 파일 크기: ${await imageFile.length()} bytes');
     
     final uri = Uri.parse("http://43.203.23.173:8080/recog/analyzeAndRegister");
     print('🔍 API 엔드포인트: $uri');
+
+    final token = await getJwtToken(); // 저장된 토큰 불러오기
+    if (token == null) {
+      print('❌ 토큰이 없습니다. 로그인 필요');
+      return;
+}
     
     var request = http.MultipartRequest("POST", uri);
+    request.headers['Authorization'] = 'Bearer $token';
     request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
     print('🔍 HTTP 요청 생성 완료');
 
     try {
       bool isTimeout = false;
       // API 호출 타임아웃 처리
-      Future.delayed(const Duration(seconds: 10), () {
+      Future.delayed(const Duration(seconds: 15), () {
         if (isRecognizing && !isTimeout && mounted) { // isRecognizing 상태로 타임아웃 체크
           isTimeout = true;
           print('⏰ API 호출 타임아웃 발생');
@@ -67,18 +67,31 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
       if (mounted) { // 위젯 마운트 상태 확인
         if (response.statusCode == 200) {
           print('✅ 작품 인식 성공');
+          final responseBody = await response.stream.bytesToString();
+  final data = json.decode(responseBody);
+
+  final title = data['gemini_result']['title'] ?? '';
+  final artist = data['gemini_result']['artist'] ?? '';
+  final year = data['gemini_result']['year'] ?? '';
+  final description = data['gemini_result']['description'] ?? '';
+  final imageUrl = data['original_image_url'] ?? '';
           // 성공 시 isRecognizing 상태 해제 및 DescribePage로 이동
           setState(() {
             isRecognizing = false;
           });
           Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DescribePage(
-                imagePath: imageFile.path,
-              ),
-            ),
-          );
+  context,
+  MaterialPageRoute(
+    builder: (context) => DescribePage(
+      imagePath: imageFile.path,
+      title: title,
+      artist: artist,
+      year: year,
+      description: description,
+      imageUrl: imageUrl,
+    ),
+  ),
+);
         } else {
           print('❌ 작품 인식 실패 - 상태 코드: ${response.statusCode}');
           print('🔍 응답 헤더: ${response.headers}');
@@ -131,11 +144,23 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
+          if (isRecognizing) {
+    print('⚠️ 인식 중에는 다시 촬영할 수 없습니다.');
+    return;
+  }
+
+  // 터치 즉시 인식 중으로 설정 (race condition 방지)
+  setState(() {
+    isRecognizing = true;
+  });
           print('🔍 터치 이벤트 발생');
           print('🔍 _cameraViewKey.currentState: ${_cameraViewKey.currentState}');
           
           if (_cameraViewKey.currentState == null) {
             print('❌ CameraView 상태가 null입니다');
+            setState(() {
+      isRecognizing = false; // 오류 발생 시 다시 false로 설정
+    });
             return;
           }
           
@@ -151,20 +176,19 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
               
               print('🔍 파일 저장 완료: ${file.path}');
               
-              // 사진 촬영 후 로딩 시작 (isRecognizing 상태 true)
-              setState(() {
-                isRecognizing = true;
-                isPhotoCaptured = true;
-              });
-
-              print('🔍 uploadImage 함수 호출 시작');
               // uploadImage 함수 호출 (API 호출 및 결과 처리)
               await uploadImage(context, file);
             } else {
               print('❌ 사진 촬영 실패: picture가 null입니다');
+              setState(() {
+        isRecognizing = false; // 실패 시 복구
+      });
             }
           } catch (e) {
             print('❌ 사진 촬영 중 오류 발생: $e');
+            setState(() {
+      isRecognizing = false; // 예외 발생 시 복구
+    });
           }
         },
         onScaleStart: (details) {

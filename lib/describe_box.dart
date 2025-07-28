@@ -230,7 +230,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       onTap: _handleBookmarkToggle,
                       child: Icon(
                         isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                        color: Colors.white,
+                        color: Color(0xFFA28F7D),
                         size: 32,
                       ),
                     ),
@@ -244,216 +244,209 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           // - 하단에서 위로 드래그하여 확장할 수 있는 작품 정보 영역
           // - 초기 크기: 화면의 38%, 최소: 38%, 최대: 85%
           DraggableScrollableSheet(
-            initialChildSize: 0.38,
-            minChildSize: 0.38,
-            maxChildSize: 0.85,
-            builder: (context, scrollController) {
-              return Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: screenWidth * ((390 - 367) / 2 / 390), // 약 11.5px 양쪽 여백
+  initialChildSize: 0.38,
+  minChildSize: 0.38,
+  maxChildSize: 0.85,
+  builder: (context, scrollController) {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: screenWidth * ((390 - 367) / 2 / 390),
+      ),
+      width: screenWidth * (367 / 390),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAF5F0),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(19.045),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromRGBO(63, 65, 70, 0.2),
+            blurRadius: 19.045,
+          ),
+        ],
+      ),
+      child: SingleChildScrollView(
+        controller: scrollController,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 드래그 핸들
+            Padding(
+              padding: const EdgeInsets.only(top: 2, bottom: 0),
+              child: SizedBox(
+                width: 30,
+                height: 50,
+                child: SvgPicture.asset(
+                  'assets/icons/drag_v_handle.svg',
+                  fit: BoxFit.contain,
                 ),
-                width: screenWidth * (367 / 390), // Figma 기준 정확한 너비 (약 94% 수준)
+              ),
+            ),
+
+            // 해설 선택 드롭다운 + TTS 버튼
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                width: screenWidth * (340 / 390),
+                height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFAF5F0),
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(19.045), // Figma 기준 정확한 값
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color.fromRGBO(63, 65, 70, 0.2),
-                      blurRadius: 19.045,
-                    ),
-                  ],
+                  color: const Color(0xFFF0E4DE),
+                  borderRadius: BorderRadius.circular(18),
                 ),
-                child: Column(
+                child: Row(
                   children: [
-                    // ===== 드래그 핸들 =====
-                    // - 사용자가 카드를 드래그할 수 있음을 나타내는 시각적 표시
-                    // - V자형 SVG 아이콘 사용 (Figma 디자인 기준)
                     Padding(
-                      padding: const EdgeInsets.only(
-                        top: 2,
-                        bottom: 0, // 드래그 핸들과 상단 컨트롤 바 사이 패딩 최소화
-                      ),
-                      child: Center(
-                        child: SizedBox(
-                          width: 30, // 1.5배 크기 (21.879 * 2)
-                          height: 50, // 1.5배 크기 (38.632 * 2)
-                          child: SvgPicture.asset(
-                            'assets/icons/drag_v_handle.svg',
-                            fit: BoxFit.contain,
+                      padding: const EdgeInsets.only(left: 6),
+                      child: Container(
+                        width: screenWidth * 0.4,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFA28F7D),
+                          borderRadius: BorderRadius.circular(15.907),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromRGBO(63, 65, 70, 0.2),
+                              blurRadius: 17.675,
+                            ),
+                          ],
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: selectedDescription,
+                            dropdownColor: const Color(0xFFEAE1DC),
+                            icon: Padding(
+                              padding: const EdgeInsets.only(right: 4.27),
+                              child: SvgPicture.asset(
+                                'assets/icons/dropdown_icon.svg',
+                                width: 20.7,
+                                height: 20.7,
+                              ),
+                            ),
+                            style: const TextStyle(
+                              color: Color(0xFFFEFDFC),
+                              fontFamily: 'Pretendard',
+                              fontSize: 14.849,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.247,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            items: descriptionTypes.map((type) {
+                              return DropdownMenuItem<String>(
+                                value: type,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 15),
+                                  child: Text(type),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null && value != selectedDescription) {
+                                setState(() {
+                                  selectedDescription = value;
+                                });
+                                _fetchNewDescription(value);
+                              }
+                            },
                           ),
                         ),
                       ),
                     ),
-                    // ===== 상단 컨트롤 바 =====
-                    // - 해설 타입 선택 드롭다운과 TTS 버튼이 있는 제어 영역
+                    const Spacer(),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.only(right: 7),
                       child: Container(
-                        width: screenWidth * (340 / 390), // Figma 기준 정확한 너비
-                        height: 40, // Figma 기준 정확한 높이
+                        width: 43,
+                        height: 30,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF0E4DE), // 상단 컨트롤 바 배경
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Row(
-                          children: [
-                            // ===== 해설 타입 선택 드롭다운 =====
-                            // - 한눈에 보는 해설, 클래식한 해설, 깊이 있는 해설 중 선택
-                            Padding(
-                              padding: const EdgeInsets.only(left: 6), // 왼쪽 여백 추가
-                              child: Container(
-                                width: 127,
-                                height: 30, // Figma 기준 정확한 크기
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFA28F7D), // 드롭다운 배경
-                                  borderRadius: BorderRadius.circular(15.907), // Figma 기준 정확한 값
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color.fromRGBO(63, 65, 70, 0.2),
-                                      blurRadius: 17.675,
-                                    ),
-                                  ],
-                                ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    value: selectedDescription,
-                                    dropdownColor: const Color(0xFFEAE1DC),
-                                    icon: Padding(
-                                      padding: const EdgeInsets.only(right: 4.27),
-                                      child: SvgPicture.asset('assets/icons/dropdown_icon.svg', width: 20.7, height: 20.7),
-                                    ),
-                                    style: const TextStyle(
-                                      color: Color(0xFFFEFDFC),
-                                      fontFamily: 'Pretendard',
-                                      fontSize: 14.849, // Figma 기준 정확한 크기
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: -0.247, // Figma 기준 정확한 값
-                                    ),
-                                     borderRadius: BorderRadius.circular(8),
-                                     items: descriptionTypes.map((type) {
-                                       return DropdownMenuItem<String>(
-                                         value: type,
-                                         child: Padding(
-                                           padding: const EdgeInsets.only(left: 15), // 왼쪽 패딩 15px 추가
-                                           child: Text(type),
-                                         ),
-                                       );
-                                     }).toList(),
-                                    onChanged: (value) {
-                                      if (value != null && value != selectedDescription) {
-                                        setState(() {
-                                          selectedDescription = value;
-                                        });
-                                        // 새로운 해설 타입으로 API 호출
-                                        _fetchNewDescription(value);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                            // ===== TTS 버튼 =====
-                            // - 텍스트를 음성으로 변환하여 읽어주는 기능
-                            Padding(
-                              padding: const EdgeInsets.only(right: 7), // 오른쪽 여백 추가
-                              child: Container(
-                                width: 43, // Figma 기준 정확한 크기
-                                height: 30, // Figma 기준 정확한 크기
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFA28F7D), // TTS 버튼 배경
-                                  borderRadius: BorderRadius.circular(15.907), // Figma 기준 정확한 값
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color.fromRGBO(63, 65, 70, 0.2),
-                                      blurRadius: 17.675,
-                                    ),
-                                  ],
-                                ),
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: const Icon(
-                                    Icons.volume_up,
-                                    color: Color(0xFFFEFDFC),
-                                    size: 19, // Figma 기준 정확한 크기
-                                  ),
-                                  onPressed: _playTTS,
-                                ),
-                              ),
+                          color: const Color(0xFFA28F7D),
+                          borderRadius: BorderRadius.circular(15.907),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromRGBO(63, 65, 70, 0.2),
+                              blurRadius: 17.675,
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    // ===== 작품 정보 헤더 =====
-                    // - 작품 제목, 작가명, 제작 연도가 표시되는 영역
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                                                     Text(
-                             widget.title.replaceAll('*', ''),
-                             style: const TextStyle(
-                               color: Colors.black,
-                               fontSize: 20,
-                               fontWeight: FontWeight.bold,
-                             ),
-                             textAlign: TextAlign.center,
-                           ),
-                           const SizedBox(height: 6),
-                           Text(
-                             '${widget.artist.replaceAll('*', '')}, ${widget.year.replaceAll('*', '')}',
-                             style: const TextStyle(
-                               color: Color(0xFFB1B1B1),
-                               fontSize: 14,
-                               fontWeight: FontWeight.w600,
-                             ),
-                             textAlign: TextAlign.center,
-                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    // ===== 작품 설명 스크롤 영역 =====
-                    // - 선택된 해설 타입에 따른 작품 설명 텍스트가 표시되는 영역
-                    // - 로딩 중일 때는 CircularProgressIndicator 표시
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: SingleChildScrollView(
-                          controller: scrollController,
-                          child: isLoadingDescription
-                              ? Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 3,
-                                    ),
-                                  ),
-                                )
-                              : Text(
-                                  currentDescription.replaceAll('*', ''),
-                                  style: const TextStyle(
-                                    color: Color(0xFF343231),
-                                    fontSize: 14,
-                                    height: 1.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.justify,
-                                ),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(
+                            Icons.volume_up,
+                            color: Color(0xFFFEFDFC),
+                            size: 19,
+                          ),
+                          onPressed: _playTTS,
                         ),
                       ),
-                                         ),
-                   ],
-                 ),
-               );
-             },
-           ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            // 작품 제목, 작가, 연도
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  Text(
+                    widget.title.replaceAll('*', ''),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '${widget.artist.replaceAll('*', '')}, ${widget.year.replaceAll('*', '')}',
+                    style: const TextStyle(
+                      color: Color(0xFFB1B1B1),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            // 해설 설명 텍스트
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: isLoadingDescription
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 3,
+                        ),
+                      ),
+                    )
+                  : Text(
+                      currentDescription.replaceAll('*', ''),
+                      style: const TextStyle(
+                        color: Color(0xFF343231),
+                        fontSize: 14,
+                        height: 1.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+            ),
+
+            const SizedBox(height: 100), // 하단 여유 공간
+          ],
+        ),
+      ),
+    );
+  },
+),
 
            // ===== 하단 네비게이션 바 =====
            // - 다른 페이지와 동일한 하단 탭 바
@@ -514,7 +507,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         return;
       }
 
-      final deleteUrl = 'http://43.203.23.173:8080/bookmark/delete/$bookmarkId/$userId';
+      final deleteUrl = 'http://43.203.23.173:8080/bookmark/delete/$bookmarkId';
       final deleteResponse = await http.delete( Uri.parse(deleteUrl),
       headers: {
     'Authorization': 'Bearer $token',
