@@ -10,7 +10,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:ui';
 import 'login_google.dart';
-import 'utils/auth_storage.dart';
 
 class MusaiHomePage extends StatefulWidget {
   const MusaiHomePage({super.key});
@@ -26,114 +25,26 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
   //final ArtCameraController _cameraController = ArtCameraController();
 
   Future<void> uploadImage(BuildContext context, File imageFile) async {
-    print('🔍 uploadImage 시작 - 파일 경로: ${imageFile.path}');
-    print('🔍 파일 크기: ${await imageFile.length()} bytes');
-    
-    final uri = Uri.parse("http://43.203.23.173:8080/recog/analyzeAndRegister");
-    print('🔍 API 엔드포인트: $uri');
+  print('🔍 uploadImage 시작 - 파일 경로: ${imageFile.path}');
+  print('🔍 파일 크기: ${await imageFile.length()} bytes');
 
-    final token = await getJwtToken(); // 저장된 토큰 불러오기
-    if (token == null) {
-      print('❌ 토큰이 없습니다. 로그인 필요');
-      return;
-}
-    
-    var request = http.MultipartRequest("POST", uri);
-    request.headers['Authorization'] = 'Bearer $token';
-    request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
-    print('🔍 HTTP 요청 생성 완료');
+  // 더 이상 여기서 API 호출 안함
+  // 바로 DescribePage로 이동만 함
+  if (!mounted) return;
 
-    try {
-      bool isTimeout = false;
-      // API 호출 타임아웃 처리
-      Future.delayed(const Duration(seconds: 15), () {
-        if (isRecognizing && !isTimeout && mounted) { // isRecognizing 상태로 타임아웃 체크
-          isTimeout = true;
-          print('⏰ API 호출 타임아웃 발생');
-          setState(() {
-            isRecognizing = false; // 타임아웃 시 로딩 상태 해제
-          });
-          showDialog(
-            context: context,
-            builder: (_) => const FailDialog(),
-          );
-        }
-      });
+  setState(() {
+    isRecognizing = false;
+  });
 
-      print('🔍 HTTP 요청 전송 시작...');
-      final response = await request.send();
-      print('🔍 HTTP 응답 수신 - 상태 코드: ${response.statusCode}');
-
-      if (mounted) { // 위젯 마운트 상태 확인
-        if (response.statusCode == 200) {
-          print('✅ 작품 인식 성공');
-          final responseBody = await response.stream.bytesToString();
-  final data = json.decode(responseBody);
-
-  final title = data['gemini_result']['title'] ?? '';
-  final artist = data['gemini_result']['artist'] ?? '';
-  final year = data['gemini_result']['year'] ?? '';
-  final description = data['gemini_result']['description'] ?? '';
-  final imageUrl = data['original_image_url'] ?? '';
-          // 성공 시 isRecognizing 상태 해제 및 DescribePage로 이동
-          setState(() {
-            isRecognizing = false;
-          });
-          Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-    builder: (context) => DescribePage(
-      imagePath: imageFile.path,
-      title: title,
-      artist: artist,
-      year: year,
-      description: description,
-      imageUrl: imageUrl,
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => DescribePage(
+        imagePath: imageFile.path,
+      ),
     ),
-  ),
-);
-        } else {
-          print('❌ 작품 인식 실패 - 상태 코드: ${response.statusCode}');
-          print('🔍 응답 헤더: ${response.headers}');
-          
-          // 응답 본문 읽기 시도
-          try {
-            final responseBody = await response.stream.bytesToString();
-            print('🔍 응답 본문: $responseBody');
-          } catch (e) {
-            print('🔍 응답 본문 읽기 실패: $e');
-          }
-          
-          // 실패 시에도 DescribePage로 이동 (서버 문제일 수 있으므로)
-          print('🔍 서버 오류로 인해 DescribePage로 이동');
-          setState(() {
-            isRecognizing = false;
-          });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DescribePage(
-                imagePath: imageFile.path,
-              ),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      print('❌ 에러 발생: $e');
-      print('🔍 에러 타입: ${e.runtimeType}');
-      // 에러 발생 시 isRecognizing 상태 해제 및 FailDialog 표시
-      if(mounted) {
-        setState(() {
-          isRecognizing = false;
-        });
-         showDialog(
-          context: context,
-          builder: (_) => const FailDialog(),
-        );
-      }
-    }
-  }
+  );
+}
 
   @override
   Widget build(BuildContext context) {
