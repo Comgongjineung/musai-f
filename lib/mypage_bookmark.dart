@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'bottom_nav_bar.dart';
 import 'utils/auth_storage.dart';
 import 'describe_box.dart';
+import 'app_bar_widget.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});
@@ -88,53 +89,39 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFDFC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFFFDFC),
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'musai',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 32,
-            color: Colors.black,
-          ),
-        ),
+      appBar: const AppBarWidget(
+        title: 'musai',
+        showBackButton: true,
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
-              const Row(
-                children: [
-                  _TabButton(text: '북마크', selected: true),
-                  SizedBox(width: 12),
-                  _TabButton(text: '티켓', selected: false),
-                ],
-              ),
-              const SizedBox(height: 28),
-              const Row(
+              SizedBox(height: screenHeight * 0.02),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _SortDropdown(label: '최신순'),
+                  _SortDropdown(label: '최신순', screenWidth: screenWidth, screenHeight: screenHeight),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.025),
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : bookmarks.isEmpty
                         ? const Center(child: Text('북마크가 없습니다.'))
                         : ListView.separated(
-                            padding: const EdgeInsets.only(bottom: 16),
+                            padding: EdgeInsets.only(bottom: screenHeight * 0.02),
                             itemCount: bookmarks.length,
                             separatorBuilder: (_, __) =>
-                                const SizedBox(height: 8),
+                                SizedBox(height: screenHeight * 0.01),
                             itemBuilder: (context, index) {
                               final item = bookmarks[index];
 
@@ -154,7 +141,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
 
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => DescriptionScreen(
@@ -165,91 +152,107 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
               imagePath: '', // 사용되지 않음
               imageUrl: data['imageUrl'],
               scrollController: ScrollController(),
+              fromBookmark: true,
             ),
           ),
         );
+
+        // 북마크 목록 새로고침
+        await _loadBookmarks();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('상세 정보 조회 실패: ${response.statusCode}')),
         );
       }
     },
-                              child: Container(
-                                width: 342,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 17, vertical: 18),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFEFDFC),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                      color: const Color(0xFFEAEAEA)),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 67,
-                                      height: 67,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(8),
-                                        image: item['imageUrl'] != null
-                                            ? DecorationImage(
-                                                image: NetworkImage(
-                                                    item['imageUrl']),
-                                                fit: BoxFit.cover,
-                                              )
-                                            : null,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 14),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  (item['title'] ?? '').replaceAll('*', ''),
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    color: Color(0xFF343231),
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                              IconButton(
-                    icon: const Icon(Icons.close, size: 19, color: Color(0xFFA28F7D)),
-                    onPressed: () => _deleteBookmark(item['bookmarkId']),
+                              child: Stack(
+  children: [
+    Container(
+      padding: EdgeInsets.symmetric(
+    horizontal: screenWidth * 0.037,
+    vertical: screenHeight * 0.022, 
+  ),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEFDFC),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFEAEAEA)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: screenWidth * 0.18,
+            height: screenHeight * 0.1,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
+              image: item['imageUrl'] != null
+                  ? DecorationImage(
+                      image: NetworkImage(item['imageUrl']),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+          ),
+          SizedBox(width: screenWidth * 0.037),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: screenWidth * 0.5,
+                  child: Text(
+                    (item['title'] ?? '').replaceAll('*', ''),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.042,
+                      height: 1.1875,
+                      color: const Color(0xFF343231),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            (item['artist'] ?? '').replaceAll('*', ''),
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF706B66),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          const Text(
-                                            '북마크 등록 날짜',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF706B66),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                ),
+                SizedBox(height: screenHeight * 0.005), 
+                SizedBox(
+                  width: screenWidth * 0.5,
+                  child:
+                  Text(
+                    (item['artist'] ?? '').replaceAll('*', ''),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.032,
+                      color: const Color(0xFF706B66),
+                    )
+                  )
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    ),
+    Positioned(
+      right: 0,
+      child: IconButton(
+        icon: Icon(Icons.close, size: screenWidth * 0.045, color: const Color(0xFFA28F7D)),
+        onPressed: () => _deleteBookmark(item['bookmarkId']),
+      ),
+    ),
+    Positioned(
+      bottom: screenHeight * 0.0225,
+      left: screenWidth * 0.2595,
+      child: Text(
+        '북마크 등록 날짜',
+        style: TextStyle(
+          fontSize: screenWidth * 0.032,
+          color: const Color(0xFF706B66),
+        ),
+      ),
+    ),
+  ],
+),
                               );
                             },
                           ),
@@ -266,13 +269,15 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 class _TabButton extends StatelessWidget {
   final String text;
   final bool selected;
-  const _TabButton({required this.text, required this.selected});
+  final double screenWidth;
+  final double screenHeight;
+  const _TabButton({required this.text, required this.selected, required this.screenWidth, required this.screenHeight});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 80,
-      height: 31,
+      width: screenWidth * 0.21,
+      height: screenHeight * 0.038,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: selected ? const Color(0xFF837670) : const Color(0xFFFEF6F2),
@@ -281,7 +286,7 @@ class _TabButton extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 16,
+          fontSize: screenWidth * 0.042,
           color:
               selected ? const Color(0xFFFEFDFC) : const Color(0xFF706B66),
           fontWeight: FontWeight.w600,
@@ -293,13 +298,15 @@ class _TabButton extends StatelessWidget {
 
 class _SortDropdown extends StatelessWidget {
   final String label;
-  const _SortDropdown({required this.label});
+  final double screenWidth;
+  final double screenHeight;
+  const _SortDropdown({required this.label, required this.screenWidth, required this.screenHeight});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 84,
-      height: 28,
+      width: screenWidth * 0.22,
+      height: screenHeight * 0.035,
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFFFFFDFC),
@@ -312,14 +319,14 @@ class _SortDropdown extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
-                color: Color(0xFF837670),
+              style: TextStyle(
+                color: const Color(0xFF837670),
                 fontWeight: FontWeight.w500,
-                fontSize: 14,
+                fontSize: screenWidth * 0.036,
               ),
             ),
-            const Icon(Icons.arrow_drop_down,
-                color: Color(0xFF837670), size: 18),
+            Icon(Icons.arrow_drop_down,
+                color: const Color(0xFF837670), size: screenWidth * 0.036),
           ],
         ),
       ),

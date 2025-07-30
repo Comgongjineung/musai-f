@@ -215,7 +215,7 @@ Widget _buildMapWrapper(double screenWidth) {
     child: Container(
               height: screenWidth * 0.12, // 44px → 반응형
       decoration: BoxDecoration(
-        color: const Color(0xFFF4F0ED),
+        color: const Color(0xFFFEF6F2),
         borderRadius: BorderRadius.circular(screenWidth * 0.05), // 20px → 반응형
       ),
       alignment: Alignment.centerLeft,
