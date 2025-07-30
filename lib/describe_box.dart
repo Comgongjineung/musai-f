@@ -13,6 +13,54 @@ import 'package:http/http.dart' as http;
 import 'utils/auth_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+// 사용자의 저장된 난이도를 가져오는 함수
+Future<String?> getUserDifficulty(int userId, String token) async {
+  try {
+    print('🔍 사용자 난이도 조회 시작: userId=$userId');
+    
+    // 로컬 저장소에서 난이도 확인 (임시 해결책)
+    final localDifficulty = await storage.read(key: 'user_difficulty');
+    if (localDifficulty != null) {
+      print('✅ 로컬에서 난이도 찾음: $localDifficulty');
+      return localDifficulty;
+    }
+    
+    // 서버에서 난이도 조회 시도 (API가 존재하는 경우)
+    try {
+      final difficultyResponse = await http.get(
+        Uri.parse('http://43.203.23.173:8080/user/difficulty/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      
+      print('난이도 조회 응답: ${difficultyResponse.statusCode}');
+      if (difficultyResponse.statusCode == 200) {
+        final data = json.decode(difficultyResponse.body);
+        print('난이도 데이터: $data');
+        final difficulty = data['defaultDifiiculty'] ?? data['level'];
+        if (difficulty != null) {
+          // 로컬에 저장
+          await storage.write(key: 'user_difficulty', value: difficulty);
+          return difficulty;
+        }
+      } else {
+        print('❌ 난이도 조회 실패: ${difficultyResponse.statusCode}');
+        print('응답 내용: ${difficultyResponse.body}');
+      }
+    } catch (e) {
+      print('❌ 서버 난이도 조회 에러: $e');
+    }
+    
+    // 기본값 반환
+    print('⚠️ 난이도 정보를 찾을 수 없어 기본값 사용: NORMAL');
+    return 'NORMAL';
+  } catch (e) {
+    print('❌ 난이도 조회 에러: $e');
+    return 'NORMAL'; // 기본값
+  }
+}
+
 class DescriptionScreen extends StatefulWidget {
   final String title;
   final String artist;
@@ -47,6 +95,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   String selectedDescription = '클래식한 해설';  // 기본값 설정
   String currentDescription = ''; // 현재 표시되는 설명
   bool isLoadingDescription = false; // 설명 로딩 상태
+  String? userDifficulty; // 사용자의 저장된 난이도
 
   final List<String> descriptionTypes = [
     '한눈에 보는 해설',
@@ -81,9 +130,48 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   Future<void> _initializeState() async {
     if (token != null && userId != null) {
       await _checkBookmarkStatus();  // 북마크 여부 확인
+      await _loadUserDifficulty();   // 사용자 난이도 로드
     }
   }
 
+  // 사용자 난이도 로드
+  Future<void> _loadUserDifficulty() async {
+    if (token != null && userId != null) {
+      print('🔄 사용자 난이도 로드 시작');
+      final difficulty = await getUserDifficulty(userId!, token!);
+      print('📊 조회된 난이도: $difficulty');
+      
+      if (mounted) {
+        setState(() {
+          userDifficulty = difficulty;
+          // 사용자의 저장된 난이도에 따라 드롭다운 기본값 설정
+          if (difficulty != null) {
+            print('🎯 난이도에 따른 드롭다운 설정: $difficulty');
+            switch (difficulty) {
+              case 'EASY':
+                selectedDescription = '한눈에 보는 해설';
+                print('✅ 쉬운 해설로 설정');
+                break;
+              case 'NORMAL':
+                selectedDescription = '클래식한 해설';
+                print('✅ 클래식한 해설로 설정');
+                break;
+              case 'HARD':
+                selectedDescription = '깊이 있는 해설';
+                print('✅ 깊이 있는 해설로 설정');
+                break;
+              default:
+                print('⚠️ 알 수 없는 난이도: $difficulty');
+            }
+          } else {
+            print('⚠️ 사용자 난이도가 null입니다. 기본값 사용');
+          }
+        });
+      }
+    } else {
+      print('❌ 토큰 또는 userId가 null입니다. token=$token, userId=$userId');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -323,14 +411,15 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                                   );
                                 }).toList();
                               },
-                              onChanged: (value) {
-                                if (value != null && value != selectedDescription) {
-                                  setState(() {
-                                    selectedDescription = value;
-                                  });
-                                  _fetchNewDescription(value);
-                                }
-                              },
+                                                             onChanged: (value) {
+                                 if (value != null && value != selectedDescription) {
+                                   setState(() {
+                                     selectedDescription = value;
+                                   });
+                                   // 선택한 해설 타입으로 새로운 설명 가져오기
+                                   _fetchNewDescription(value);
+                                 }
+                               },
                             ),
                           ),
                         ),
@@ -558,17 +647,25 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     }
   }
 
-  // 해설 타입에 따른 level 매핑
+  // 사용자의 저장된 난이도에 따른 level 매핑
   String _getLevelForDescriptionType(String descriptionType) {
+    print('🎯 난이도 매핑 시작: descriptionType=$descriptionType, userDifficulty=$userDifficulty');
+    
+    // 드롭다운에서 해설 타입을 선택한 경우, 해당 해설 타입에 맞는 난이도 사용
+    print('📝 선택된 해설 타입에 따른 난이도 매핑');
     switch (descriptionType) {
       case '한눈에 보는 해설':
+        print('📝 쉬운 해설로 매핑: 하');
         return '하';
       case '클래식한 해설':
+        print('📝 클래식한 해설로 매핑: 중');
         return '중';
       case '깊이 있는 해설':
+        print('📝 깊이 있는 해설로 매핑: 상');
         return '상';
       default:
-        return '하';
+        print('⚠️ 알 수 없는 해설 타입: $descriptionType, 기본값 사용: 중');
+        return '중';
     }
   }
 
@@ -589,12 +686,17 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     });
 
     try {
+      // 사용자의 저장된 난이도에 따른 level 결정
+      final level = _getLevelForDescriptionType(descriptionType);
+      print('🎯 선택된 난이도: $level');
+      
+      // 이미지 파일을 업로드하여 AI 서버에 전달하고 분석 결과를 반환하는 API 호출
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('http://43.203.23.173:8080/recog/analyzeAndRegister'),
       );
       request.files.add(await http.MultipartFile.fromPath('file', widget.imagePath));
-      request.fields['level'] = _getLevelForDescriptionType(descriptionType);
+      request.fields['level'] = level;
       
       // Authorization 헤더 추가
       request.headers['Authorization'] = 'Bearer $token';
@@ -602,6 +704,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
 
+      print('AI 해설 API 응답: ${response.statusCode}');
       if (response.statusCode == 200) {
         final data = json.decode(responseBody);
         final newDescription = data['gemini_result']['description'] ?? '';
@@ -610,8 +713,10 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           currentDescription = newDescription;
           isLoadingDescription = false;
         });
+        print('✅ 새로운 해설 로드 완료');
       } else {
-        print('새로운 해설 요청 실패: ${response.statusCode}');
+        print('❌ AI 해설 요청 실패: ${response.statusCode}');
+        print('응답 내용: $responseBody');
         setState(() {
           isLoadingDescription = false;
         });
@@ -622,7 +727,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         }
       }
     } catch (e) {
-      print('새로운 해설 요청 에러: $e');
+      print('❌ AI 해설 요청 에러: $e');
       setState(() {
         isLoadingDescription = false;
       });

@@ -67,11 +67,13 @@ class MyPageScreen extends StatefulWidget {
 
 class _MyPageScreenState extends State<MyPageScreen> {
   String nickname = '닉네임';
+  String dropdownValue = '클래식한 해설'; // 기본값
 
   @override
   void initState() {
     super.initState();
     _loadNickname();
+    _loadUserDifficulty(); // 사용자 난이도 로드
   }
 
   Future<void> _loadNickname() async {
@@ -79,6 +81,28 @@ class _MyPageScreenState extends State<MyPageScreen> {
     setState(() {
       nickname = name ?? '닉네임';
     });
+  }
+
+  // 사용자 난이도 로드
+  Future<void> _loadUserDifficulty() async {
+    final difficulty = await storage.read(key: 'user_difficulty');
+    if (difficulty != null) {
+      setState(() {
+        switch (difficulty) {
+          case 'EASY':
+            dropdownValue = '쉬운 해설';
+            break;
+          case 'NORMAL':
+            dropdownValue = '클래식한 해설';
+            break;
+          case 'HARD':
+            dropdownValue = '전문가 해설';
+            break;
+          default:
+            dropdownValue = '클래식한 해설';
+        }
+      });
+    }
   }
 
   @override
@@ -227,7 +251,6 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Widget _interpretationDropdown(double screenWidth, double screenHeight) {
-    String dropdownValue = '클래식한 해설';
     return StatefulBuilder(
       builder: (context, setState) {
         return Container(
@@ -273,7 +296,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
                     }
                     getUserId().then((userId) {
                       if (userId != null) {
-                        updateDifficulty(userId: userId, level: level);
+                        updateDifficulty(userId: userId, level: level).then((_) {
+                          // 로컬 저장소에도 저장
+                          storage.write(key: 'user_difficulty', value: level);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('해설 난이도가 변경되었습니다.')),
+                          );
+                        });
                       }
                     });
                   });
