@@ -187,7 +187,7 @@ class _SearchScreenState extends State<SearchScreen> {
           onPressed: () => fetchExhibitions(_controller.text),
         ),
         filled: true,
-        fillColor: const Color(0xFFF4F0ED),
+        fillColor: const Color(0xFFFEF6F2),
         contentPadding: EdgeInsets.symmetric(horizontal: width * 0.06),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(width * 0.06),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'mypage_bookmark.dart';
 import 'app_bar_widget.dart';
 import 'dart:io';
 import 'bottom_nav_bar.dart'; // 반드시 import 필요
@@ -20,6 +21,7 @@ class DescriptionScreen extends StatefulWidget {
   final String imagePath;
   final String? imageUrl;
   final ScrollController scrollController;
+  final bool fromBookmark;
 
   const DescriptionScreen({
     super.key,
@@ -30,6 +32,7 @@ class DescriptionScreen extends StatefulWidget {
     required this.imagePath,
     this.imageUrl,
     required this.scrollController,
+    this.fromBookmark = false,
   });
 
   @override
@@ -95,10 +98,17 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           AppBarWidget(
             showBackButton: true,
             onBackPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const MusaiHomePage()),
-              );
+              if (widget.fromBookmark == true) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => BookmarkScreen()),
+                );
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MusaiHomePage()),
+                );
+              }
             },
           ),
 
@@ -256,7 +266,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     Padding(
                       padding: EdgeInsets.only(left: screenWidth * 0.02), 
                       child: Container(
-                        width: screenWidth * 0.34,
+                        width: screenWidth * 0.36,
                         height: screenHeight * 0.036, // 30/844
                         decoration: BoxDecoration(
                           color: const Color(0xFFA28F7D),
@@ -270,7 +280,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: Padding(
-                            padding: EdgeInsets.only(right: screenWidth * 0.03),
+                            padding: EdgeInsets.only(right: screenWidth * 0.015, left: screenWidth * 0.03), //이것?
                             child: DropdownButton<String>(
                               value: selectedDescription,
                               dropdownColor: const Color(0xFFA28F7D),
@@ -279,10 +289,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                               icon: const SizedBox(),
                               style: TextStyle(
                                 color: const Color(0xFFFEFDFC),
-                                fontFamily: 'Pretendard',
                                 fontSize: screenWidth * 0.036, // 14/390
                                 fontWeight: FontWeight.w500,
-                                letterSpacing: -0.247,
                               ),
                               borderRadius: BorderRadius.circular(20),
                               items: descriptionTypes.map((type) {
@@ -297,22 +305,20 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                               selectedItemBuilder: (BuildContext context) {
                                 return descriptionTypes.map((type) {
                                   return Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(left: screenWidth * 0.03),
-                                        child: Text(
-                                          type,
-                                          style: TextStyle(
-                                            color: const Color(0xFFFEFDFC),
-                                            fontFamily: 'Pretendard',
-                                            fontSize: screenWidth * 0.036, // 14/390
-                                            fontWeight: FontWeight.w500,
-                                            letterSpacing: -0.247,
-                                          ),
+                                      Text(
+                                        type,
+                                        style: TextStyle(
+                                          color: const Color(0xFFFEFDFC),
+                                          fontSize: screenWidth * 0.036, // 14/390
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                      SizedBox(width: screenWidth * 0.02),
-                                      const Icon(Icons.keyboard_arrow_down, color: Color(0xFFFEFDFC)),
+                                      const Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Color(0xFFFEFDFC),
+                                      ),
                                     ],
                                   );
                                 }).toList();
