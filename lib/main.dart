@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'utils/auth_storage.dart';
 
 // flutter_local_notifications 전역 변수
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -76,22 +77,41 @@ Future<void> main() async {
   String? fcmToken = await messaging.getToken();
   print("FCM Token: $fcmToken");
 
-  // 서버에 토큰 저장
-  if (fcmToken != null) {
-    try {
-      final response = await http.post(
-        Uri.parse('https://your-api.com/fcm-token'), // 실제 서버 주소
-        body: {'token': fcmToken},
-      );
-      if (response.statusCode == 200) {
-        print("FCM 토큰 서버 저장 성공");
-      } else {
-        print("FCM 토큰 서버 저장 실패: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("서버 전송 에러: $e");
-    }
+  // FCM 토큰 서버 저장 함수
+Future<void> sendFcmTokenToServer(String fcmToken) async {
+  final jwtToken = await getJwtToken(); // JWT 토큰
+  final userId = await getUserId();     // 로그인한 사용자 ID
+
+  if (jwtToken == null || userId == null) {
+    print("❌ 로그인 정보 없음. 서버 전송 불가");
+    return;
   }
+
+  try {
+    final uri = Uri.parse('http://43.203.23.173:8080/alarm/token').replace(
+      queryParameters: {
+        'userId': userId.toString(),
+        'token': fcmToken,
+      },
+    );
+
+    final response = await http.post(
+      uri,
+      headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print("✅ FCM 토큰 서버 저장 성공");
+    } else {
+      print("⚠️ 서버 응답 오류: ${response.statusCode} ${response.body}");
+    }
+  } catch (e) {
+    print("❌ 서버 전송 에러: $e");
+  }
+}
 
   // 앱 종료 상태에서 알림 클릭 처리
   RemoteMessage? initialMessage =
