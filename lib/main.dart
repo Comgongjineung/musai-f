@@ -85,6 +85,8 @@ Future<void> sendFcmTokenToServer(String fcmToken) async {
   if (jwtToken == null || userId == null) {
     print("❌ 로그인 정보 없음. 서버 전송 불가");
     return;
+
+    
   }
 
   try {
@@ -111,6 +113,13 @@ Future<void> sendFcmTokenToServer(String fcmToken) async {
   } catch (e) {
     print("❌ 서버 전송 에러: $e");
   }
+}
+
+ if (fcmToken != null) {
+  // 1. 로컬에 저장
+  await saveFcmToken(fcmToken);
+  // 2. 서버로 전송
+  await sendFcmTokenToServer(fcmToken);
 }
 
   // 앱 종료 상태에서 알림 클릭 처리
