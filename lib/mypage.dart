@@ -90,13 +90,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
       setState(() {
         switch (difficulty) {
           case 'EASY':
-            dropdownValue = '쉬운 해설';
+            dropdownValue = '한눈에 보는 해설';
             break;
           case 'NORMAL':
             dropdownValue = '클래식한 해설';
             break;
           case 'HARD':
-            dropdownValue = '전문가 해설';
+            dropdownValue = '깊이 있는 해설';
             break;
           default:
             dropdownValue = '클래식한 해설';
@@ -272,7 +272,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   color: Color(0xFF343231),
                 ),
                 dropdownColor: Color(0xFFFEF6F2),
-                items: <String>['쉬운 해설', '클래식한 해설', '전문가 해설']
+                items: <String>['한눈에 보는 해설', '클래식한 해설', '깊이 있는 해설']
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -284,13 +284,13 @@ class _MyPageScreenState extends State<MyPageScreen> {
                     dropdownValue = newValue!;
                     String level = '';
                     switch (dropdownValue) {
-                      case '쉬운 해설':
+                      case '한눈에 보는 해설':
                         level = 'EASY';
                         break;
                       case '클래식한 해설':
                         level = 'NORMAL';
                         break;
-                      case '전문가 해설':
+                      case '깊이 있는 해설':
                         level = 'HARD';
                         break;
                     }
