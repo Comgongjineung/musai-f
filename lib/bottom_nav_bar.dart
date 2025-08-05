@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'main_camera_page.dart';
-// import 'community.dart';
+import 'community_screen.dart';
 import 'mypage.dart';
 import 'mypage_bookmark.dart';
 
@@ -99,9 +99,10 @@ class BottomNavBarWidget extends StatelessWidget {
               );
               break;
             case 2:
-              ScaffoldMessenger.of(
+              Navigator.pushReplacement(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('커뮤니티는 준비 중입니다.')));
+                MaterialPageRoute(builder: (_) => const CommunityScreen()),
+              );
               break;
             case 3:
               Navigator.pushReplacement(
