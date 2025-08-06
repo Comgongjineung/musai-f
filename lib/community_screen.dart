@@ -5,6 +5,7 @@ import 'app_bar_widget.dart';
 import 'bottom_nav_bar.dart';
 import 'utils/auth_storage.dart';
 import 'community_search_screen.dart';
+import 'community_write_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -67,6 +68,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
           posts = data.map((json) => Post.fromJson(json)).toList();
+          // 최근 게시물이 위로 오도록 정렬 (createdAt 기준 내림차순)
+          posts.sort((a, b) => DateTime.parse(b.createdAt).compareTo(DateTime.parse(a.createdAt)));
           isLoading = false;
         });
         print('✅ 게시물 로드 완료: ${posts.length}개');
@@ -171,11 +174,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
               right: 0,
               child: Center(
                 child: GestureDetector(
-                  onTap: () {
-                    // TODO: 글쓰기 페이지로 이동
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('글쓰기 기능은 준비 중입니다.')),
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CommunityWriteScreen()),
                     );
+                    // 게시물 작성 성공 시 새로고침
+                    if (result == true) {
+                      _loadPosts();
+                    }
                   },
                   child: Container(
                     width: screenWidth * 0.308, // 120px
