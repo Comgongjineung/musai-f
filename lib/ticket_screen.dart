@@ -1,230 +1,329 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'mypage.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:flutter/material.dart'; 
+import 'package:flutter_svg/flutter_svg.dart'; 
+import 'package:smooth_page_indicator/smooth_page_indicator.dart'; 
+import 'mypage.dart'; 
+import 'bottom_nav_bar.dart'; 
+import 'app_bar_widget.dart'; 
+import 'ticket_create.dart';
+import 'ticket_select_screen.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: TicketScreen(),
-  ));
-}
+class TicketScreen extends StatefulWidget { 
+  final bool fromMyPage; 
+  const TicketScreen({super.key, this.fromMyPage = false}); 
 
-class TicketScreen extends StatefulWidget {
-  final bool fromMyPage;
-  const TicketScreen({super.key, this.fromMyPage = false});
+  @override 
+  State<TicketScreen> createState() => _TicketScreenState(); 
+} 
 
-  @override
-  State<TicketScreen> createState() => _TicketScreenState();
-}
+class _TicketScreenState extends State<TicketScreen> { 
+  bool isSingleView = true; 
 
-class _TicketScreenState extends State<TicketScreen> {
-  bool isSingleView = true;
-
-  final tickets = [
-    {
-      "imageUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/0/0e/Claude_Monet_-_The_Artist's_Garden_at_Vetheuil.jpg",
-      "title": "아이와 해바라기 정원",
-      "artist": "Claude Monet",
-      "date": "2025.07.27",
-      "location": "예술의 전당",
-      "color": const Color(0xFF8DAA91), // 초록
-    },
-    {
-      "imageUrl":
-          "https://upload.wikimedia.org/wikipedia/commons/0/0e/Claude_Monet_-_The_Artist's_Garden_at_Vetheuil.jpg",
-      "title": "아이와 해바라기 정원",
-      "artist": "Claude Monet",
-      "date": "2025.07.27",
-      "location": "예술의 전당",
-      "color": const Color(0xFFF8E6A0), // 노랑
-    }
-  ];
-
- @override
-Widget build(BuildContext context) {
-  return WillPopScope(
-    onWillPop: () async {
-      if (widget.fromMyPage) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const MyPageScreen()),
-        );
-        return false; // 기본 pop 동작 막음
-      }
-      return true; // 기본 pop 허용
-    },
-    child: Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildCreateTicketButton(),
-            const SizedBox(height: 8),
-            Expanded(
-              child: isSingleView ? _buildSingleView() : _buildMultiView(),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            "musai",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 56, right: 12),
-                    child: _TicketMenu(
-                      isSingleView: isSingleView,
-                      onToggleView: () {
-                        setState(() {
-                          isSingleView = !isSingleView;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-              );
-            },
-          )
-        ],
-      ),
-    );
-  }
-
-  /// 시안에 맞춘 + 티켓 만들기 버튼 (상단 배치)
-Widget _buildCreateTicketButton() {
-  const buttonColor = Color(0xFF837670); // #837670
-
-  return Padding(
-    padding: const EdgeInsets.only(left: 16, top: 4), // 상단 정렬
-    child: InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () {
-        // TODO: 티켓 생성 페이지 이동
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // 좌우12, 상하6
-        decoration: BoxDecoration(
-          border: Border.all(color: buttonColor, width: 1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.add, size: 18, color: buttonColor),
-            SizedBox(width: 4), // 아이콘-텍스트 간격
-            Text(
-              "티켓 만들기",
-              style: TextStyle(fontSize: 14, color: buttonColor),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-  // 티켓을 한 개씩 보여주는 뷰와 여러 개씩 보여주는 뷰를 전환하는 위젯
-  Widget _buildSingleView() {
-  final PageController controller = PageController(viewportFraction: 0.8);
+  // 기본 티켓 배경색 (초록색) 
+  Color selectedColor = const Color(0xFF8DAA91); 
+  final PageController controller = PageController(viewportFraction: 0.59);
   int currentPage = 0;
 
-  return StatefulBuilder(
-    builder: (context, setState) {
-      return Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: controller,
-              itemCount: tickets.length,
-              onPageChanged: (index) {
-                setState(() => currentPage = index);
-              },
-              itemBuilder: (context, index) {
-                final ticket = tickets[index];
-                final isCurrent = index == currentPage;
-                final scale = isCurrent ? 1.0 : 0.8;
+  @override
+void initState() {
+  super.initState();
+}
 
-                return Center(
-                  child: Transform.scale(
-                    scale: scale,
-                    child: _TicketCard(
-                      imageUrl: ticket["imageUrl"] as String,
-                      title: ticket["title"] as String,
-                      artist: ticket["artist"] as String,
-                      date: ticket["date"] as String,
-                      location: ticket["location"] as String,
-                      backgroundColor: ticket["color"] as Color,
-                      textColor: index % 2 == 0 ? Colors.white : const Color(0xFF343231),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 8),
-          SmoothPageIndicator(
-            controller: controller,
-            count: tickets.length,
-            effect: WormEffect(
-              dotHeight: 6,
-              dotWidth: 6,
-              spacing: 6,
-              dotColor: const Color(0xFFB1B1B1),   // 선택 안 된 원
-              activeDotColor: const Color(0xFF706B66), // 선택된 원
-            ),
-          ),
-        ],
+@override
+void dispose() {
+  controller.dispose();
+  super.dispose();
+}
+
+  final tickets = [ 
+    { 
+      "imageAsset": "assets/images/ticket.png", 
+      "title": "아이와 해바라기 정원", 
+      "artist": "Claude Monet", 
+      "date": "2025.07.27", 
+      "location": "예술의 전당", 
+    }, 
+    { 
+      "imageAsset": "assets/images/ticket.png", 
+      "title": "아이와 해바라기 정원", 
+      "artist": "Claude Monet", 
+      "date": "2025.07.27", 
+      "location": "예술의 전당", 
+    }, 
+    { 
+      "imageAsset": "assets/images/ticket.png", 
+      "title": "아이와 해바라기 정원", 
+      "artist": "Claude Monet", 
+      "date": "2025.07.27", 
+      "location": "예술의 전당", 
+    }, 
+    { 
+      "imageAsset": "assets/images/ticket.png", 
+      "title": "아이와 해바라기 정원", 
+      "artist": "Claude Monet", 
+      "date": "2025.07.27", 
+      "location": "예술의 전당", 
+    } 
+  ]; 
+
+  @override 
+  Widget build(BuildContext context) { 
+    return WillPopScope( 
+      onWillPop: () async { 
+        if (widget.fromMyPage) { 
+          Navigator.pushReplacement( 
+            context, 
+            MaterialPageRoute(builder: (_) => const MyPageScreen()), 
+          ); 
+          return false; 
+        } 
+        return true; 
+      }, 
+      child: Scaffold( 
+        backgroundColor: const Color(0xFFFFFDFC),
+        appBar: const AppBarWidget( 
+          title: 'musai', 
+          showBackButton: true, 
+        ), 
+        body: SafeArea( 
+          child: Column( 
+            children: [ 
+              const SizedBox(height: 18), 
+              Padding( 
+  padding: const EdgeInsets.symmetric(horizontal: 16), 
+  child: Stack( 
+    alignment: Alignment.center, 
+    children: [ 
+      // 가운데: 티켓 만들기 버튼 
+      Align( 
+        alignment: Alignment.center, 
+        child: _buildCreateTicketButton(), 
+      ), 
+
+      // 오른쪽 끝: 메뉴 버튼 
+      Positioned( 
+        right: 0, 
+        child: IconButton( 
+          icon: SvgPicture.asset( 
+            'assets/images/ticket_menu.svg', 
+            width: 22, 
+            height: 22, 
+          ), 
+          onPressed: () { 
+            _showViewMenu(); 
+          }, 
+        ), 
+      ), 
+    ], 
+  ), 
+), 
+              const SizedBox(height: 40), 
+              Expanded( 
+                child: isSingleView ? _buildSingleView() : _buildMultiView(), 
+              ), 
+            ], 
+          ), 
+        ), 
+        bottomNavigationBar: const BottomNavBarWidget(currentIndex: 3), 
+      ), 
+    ); 
+  } 
+
+  // 보기 모드 전환 메뉴 
+  void _showViewMenu() { 
+    showDialog( 
+      context: context, 
+      builder: (_) => Align( 
+        alignment: Alignment.topRight, 
+        child: Padding( 
+          padding: const EdgeInsets.only(top: 70, right: 20), 
+          child: Material( 
+            color: Colors.transparent, 
+            child: Container( 
+              width: 160, 
+              decoration: BoxDecoration( 
+                color: Colors.white, 
+                borderRadius: BorderRadius.circular(8), 
+                boxShadow: [ 
+                  BoxShadow( 
+                    color: Colors.black26, 
+                    blurRadius: 8, 
+                    offset: const Offset(0, 4), 
+                  ), 
+                ], 
+              ), 
+              child: Column( 
+                mainAxisSize: MainAxisSize.min, 
+                children: [ 
+                  _menuItem( 
+                    icon: isSingleView 
+                        ? Icons.grid_view 
+                        : Icons.view_agenda, 
+                    text: isSingleView ? "여러 개씩 보기" : "한 개씩 보기", 
+                    onTap: () { 
+                      Navigator.pop(context); 
+                      setState(() { 
+                        isSingleView = !isSingleView; 
+                      }); 
+                    }, 
+                  ), 
+                ], 
+              ), 
+            ), 
+          ), 
+        ), 
+      ), 
+    ); 
+  } 
+
+  Widget _menuItem({ 
+    required IconData icon, 
+    required String text, 
+    required VoidCallback onTap, 
+  }) { 
+    return InkWell( 
+      onTap: onTap, 
+      child: Container( 
+        height: 48, 
+        padding: const EdgeInsets.symmetric(horizontal: 12), 
+        child: Row( 
+          children: [ 
+            Icon(icon, size: 20, color: const Color(0xFF837670)), 
+            const SizedBox(width: 12), 
+            Text( 
+              text, 
+              style: const TextStyle(fontSize: 14, color: Color(0xFF837670)), 
+            ), 
+          ], 
+        ), 
+      ), 
+    ); 
+  } 
+
+  Widget _buildCreateTicketButton() { 
+    const buttonColor = Color(0xFF837670); 
+    return InkWell( 
+      borderRadius: BorderRadius.circular(20), 
+     onTap: () async {
+      // 1. TicketSelectScreen 이동
+      final selectedColorFromFlow = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const TicketSelectScreen(), // 작품 선택 화면
+        ),
       );
+
+      // 2. 색상 결과가 있으면 적용
+      if (selectedColorFromFlow != null && selectedColorFromFlow is Color) {
+        setState(() {
+          selectedColor = selectedColorFromFlow;
+        });
+      }
     },
+      child: Container( 
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), 
+        decoration: BoxDecoration( 
+          border: Border.all(color: buttonColor, width: 1), 
+          borderRadius: BorderRadius.circular(16), 
+        ), 
+        child: Row( 
+          mainAxisSize: MainAxisSize.min, 
+          children: const [ 
+            Icon(Icons.add, size: 18, color: buttonColor), 
+            SizedBox(width: 4), 
+            Text( 
+              "티켓 만들기", 
+              style: TextStyle(fontSize: 14, color: buttonColor), 
+            ), 
+          ], 
+        ), 
+      ), 
+    ); 
+  } 
+
+  Widget _buildSingleView() { 
+    return Column(
+    children: [
+      Expanded(
+              child: PageView.builder( 
+                controller: controller, 
+                itemCount: tickets.length, 
+                onPageChanged: (index) { 
+                  setState(() => currentPage = index); 
+                }, 
+                itemBuilder: (context, index) { 
+                  final ticket = tickets[index]; 
+                  final isCurrent = index == currentPage; 
+                  final scale = isCurrent ? 1.0 : 0.8; 
+
+                    return Transform.scale(
+                      scale: scale, 
+                      child: TicketCard( 
+                        imageAsset: ticket["imageAsset"] as String, 
+                        title: ticket["title"] as String, 
+                        artist: ticket["artist"] as String, 
+                        date: ticket["date"] as String, 
+                        location: ticket["location"] as String, 
+                        textColor: index % 2 == 0 
+                            ? Colors.white 
+                            : const Color(0xFF343231), 
+                        backgroundColor: selectedColor, 
+                      ), 
+                  ); 
+                }, 
+              ), 
+            ), 
+            const SizedBox(height: 53), 
+            SmoothPageIndicator( 
+              controller: controller, 
+              count: tickets.length, 
+              effect: WormEffect( 
+                dotHeight: 6, 
+                dotWidth: 6, 
+                spacing: 6, 
+                dotColor: const Color(0xFFB1B1B1), 
+                activeDotColor: const Color(0xFF706B66), 
+              ), 
+            ),
+            const SizedBox(height: 37), 
+          ],
   );
 }
 
-  Widget _buildMultiView() {
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.65,
-      ),
-      itemCount: tickets.length,
-      itemBuilder: (context, index) {
-        final ticket = tickets[index];
-        return _TicketCard(
-          imageUrl: ticket["imageUrl"] as String,
-          title: ticket["title"] as String,
-          artist: ticket["artist"] as String,
-          date: ticket["date"] as String,
-          location: ticket["location"] as String,
-          backgroundColor: ticket["color"] as Color,
-          textColor: index % 2 == 0 ? Colors.white : const Color(0xFF343231),
-        );
-      },
-    );
-  }
-}
+  Widget _buildMultiView() { 
 
-class _TicketCard extends StatelessWidget {
-  final String imageUrl;
+  return GridView.builder( 
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24), 
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount( 
+      crossAxisCount: 2, 
+      mainAxisSpacing: 20.5,  // 세로 간격 추가 
+      crossAxisSpacing: 20, // 가로 간격 추가 
+      childAspectRatio: 230 / 468, // 원본 티켓 비율 유지 (0.491) 
+    ), 
+    itemCount: tickets.length, 
+    itemBuilder: (context, index) { 
+      final ticket = tickets[index]; 
+
+      // FittedBox를 사용하여 TicketCard가 그리드 셀에 맞게 조절되도록 함 
+      return FittedBox( 
+        fit: BoxFit.fill, // 셀을 꽉 채우도록 설정 
+        child: TicketCard( 
+          imageAsset: ticket["imageAsset"] as String, 
+          title: ticket["title"] as String, 
+          artist: ticket["artist"] as String, 
+          date: ticket["date"] as String, 
+          location: ticket["location"] as String, 
+           backgroundColor: selectedColor, 
+          textColor: index % 2 == 0 ? Colors.white : const Color(0xFF343231), 
+        ), 
+      ); 
+    }, 
+  ); 
+} 
+
+} 
+
+class TicketCard extends StatelessWidget {
+  final String imageAsset;
   final String title;
   final String artist;
   final String date;
@@ -232,8 +331,9 @@ class _TicketCard extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
 
-  const _TicketCard({
-    required this.imageUrl,
+  const TicketCard({
+    super.key,
+    required this.imageAsset,
     required this.title,
     required this.artist,
     required this.date,
@@ -242,139 +342,126 @@ class _TicketCard extends StatelessWidget {
     required this.textColor,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 200,
-      height: 400,
-      child: Stack(
-        children: [
-          // 티켓 배경 (SVG)
-          SvgPicture.asset(
-            'assets/images/ticket_bg.svg',
-            width: 200,
-            height: 400,
-            colorFilter: ColorFilter.mode(backgroundColor, BlendMode.srcIn),
-          ),
-          // 내용
-          Positioned.fill(
-            child: Column(
-              children: [
-                const SizedBox(height: 28),
-                Text(
-  "musai ticket",
-  style: TextStyle(fontSize: 12, color: textColor), // 변경
-),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    imageUrl,
-                    width: 190,
-                    height: 222,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-  title,
-  style: TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: textColor, // 변경
-  ),
-  textAlign: TextAlign.center,
-),
-                const SizedBox(height: 4),
-                Text(
-  artist,
-  style: TextStyle(fontSize: 14, color: textColor), // 변경
-),
-                const Spacer(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(date, style: TextStyle(fontSize: 12, color: textColor), // 변경
-),
-Text(location, style: TextStyle(fontSize: 12, color: textColor), // 변경
-),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
+  @override 
+Widget build(BuildContext context) {
+  final cardWidth = MediaQuery.of(context).size.width * 0.59;
+  final cardHeight = cardWidth * (468 / 230); // 기존 비율 유지
+  return SizedBox(
+    width: cardWidth,
+    height: cardHeight,
+    child: Stack( 
+      alignment: Alignment.center, 
+      children: [ 
+        // 배경 
+        SvgPicture.asset( 
+          'assets/images/ticket_bg.svg', 
+          width: cardWidth,
+          height: cardHeight,
+          colorFilter: ColorFilter.mode( 
+            backgroundColor, 
+            BlendMode.srcIn, 
+          ), 
+        ), 
 
-class _TicketMenu extends StatelessWidget {
-  final bool isSingleView;
-  final VoidCallback onToggleView;
-  static const menuColor = Color(0xFF837670);
+        // 바코드 & 점선 
+        SvgPicture.asset( 
+          'assets/images/ticket_details.svg', 
+          width: cardWidth * 0.83,
+          height: cardHeight * 0.9,
+        ), 
+      
 
-  const _TicketMenu({
-    required this.isSingleView,
-    required this.onToggleView,
-  });
+        // musai ticket 텍스트 
+        Positioned( 
+          top: 20, 
+          left: 0, 
+          right: 0, 
+          child: Text( 
+            "musai ticket", 
+            textAlign: TextAlign.center, 
+            style: TextStyle( 
+              fontSize: 16, 
+              fontWeight: FontWeight.w200, // extraLight 
+              color: textColor, 
+            ), 
+          ), 
+        ), 
 
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        width: 160,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _menuItem(
-              icon: isSingleView ? Icons.grid_view : Icons.view_agenda,
-              text: isSingleView ? "여러 개씩 보기" : "한 개씩 보기",
-              onTap: () {
-                Navigator.pop(context);
-                onToggleView();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+        // 이미지, 제목, 작가 
+        Positioned.fill( 
+          child: Column( 
+            crossAxisAlignment: CrossAxisAlignment.start, 
+            children: [ 
+              const SizedBox(height: 55), 
+              Padding( 
+                padding: const EdgeInsets.symmetric(horizontal: 20), 
+                child: ClipRRect( 
+                  borderRadius: BorderRadius.circular(10), 
+                  child: Image.asset( 
+                    imageAsset, 
+                    width: 190, 
+                    height: 222, 
+                    fit: BoxFit.cover, 
+                  ), 
+                ), 
+              ), 
+              const SizedBox(height: 14), 
+              Padding( 
+                padding: const EdgeInsets.only(left: 20), 
+                child: Text( 
+                  title, 
+                  style: TextStyle( 
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold, 
+                    color: textColor, 
+                  ), 
+                ), 
+              ), 
+              const SizedBox(height: 4), 
+              Padding( 
+                padding: const EdgeInsets.only(left: 20), 
+                child: Text( 
+                  artist, 
+                  style: TextStyle( 
+                    fontSize: 16, 
+                    fontWeight: FontWeight.w300, 
+                    color: textColor, 
+                  ), 
+                ), 
+              ), 
+            ], 
+          ), 
+        ), 
 
-  Widget _menuItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        height: 48,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: menuColor),
-            const SizedBox(width: 12),
-            Text(text, style: const TextStyle(fontSize: 14, color: menuColor)),
-          ],
-        ),
-      ),
-    );
-  }
+        // 날짜 & 장소 (절대 위치 → 항상 하단에 고정) 
+        Positioned( 
+          left: 19, 
+          right: 19, 
+          bottom: 56, 
+          child: Row( 
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+            children: [ 
+              Text( 
+                date, 
+                style: TextStyle( 
+                  fontSize: 12, 
+                  fontWeight: FontWeight.w300, 
+                  color: textColor, 
+                ), 
+              ), 
+              Text( 
+                location, 
+                style: TextStyle( 
+                  fontSize: 12, 
+                  fontWeight: FontWeight.w300, 
+                  color: textColor, 
+                ), 
+              ), 
+            ], 
+          ), 
+        ), 
+      ], 
+    ), 
+  ); 
+} 
 }
