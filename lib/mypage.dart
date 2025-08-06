@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'utils/auth_storage.dart';
 import 'mypage_edit.dart';
+import 'ticket_screen.dart';
 
 
 //회원 정보 수정
@@ -231,7 +232,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                // TODO: 티켓 페이지 이동
+                Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const TicketScreen(fromMyPage: true)),
+      );
               },
               child: Center(
                 child: Column(
