@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'alarm_page.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
@@ -9,6 +10,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final double? titleSize;
   final Color? titleColor;
+  final bool showNotificationIcon;
 
   const AppBarWidget({
     super.key,
@@ -20,12 +22,31 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.titleSize,
     this.titleColor,
+    this.showNotificationIcon = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
+    final List<Widget> combinedActions = [...?actions];
+    if (showNotificationIcon) {
+      combinedActions.add(
+        Padding(
+          padding: const EdgeInsets.only(right: 24),
+          child: IconButton(
+            icon: const Icon(Icons.notifications_none, size: 24, color: Color(0xFF343231)),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => AlarmPage(initialIndex: 0)),
+              );
+            },
+          ),
+        ),
+      );
+    }
+
     return AppBar(
       backgroundColor: backgroundColor ?? Colors.transparent,
       elevation: 0,
@@ -64,7 +85,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                 letterSpacing: 0,
               ),
             ),
-      actions: actions,
+      actions: combinedActions,
     );
   }
 
@@ -118,4 +139,4 @@ class CameraAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-} 
+}

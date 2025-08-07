@@ -10,6 +10,7 @@ import 'search_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'exhibition_detail_page.dart';
 import 'login_UI.dart';
+import 'alarm_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -131,7 +132,9 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     backgroundColor: const Color(0xFFFFFDFC),
-    appBar: const AppBarWidget(),
+    appBar: const AppBarWidget(
+      showNotificationIcon: true,
+    ),
     body: SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

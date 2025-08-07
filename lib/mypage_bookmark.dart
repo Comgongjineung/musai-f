@@ -108,7 +108,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _SortDropdown(label: '최신순', screenWidth: screenWidth, screenHeight: screenHeight),
+                  _SortDropdown(label: '가나다순', screenWidth: screenWidth, screenHeight: screenHeight),
                 ],
               ),
               SizedBox(height: screenHeight * 0.025),
@@ -169,8 +169,8 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   children: [
     Container(
       padding: EdgeInsets.symmetric(
-    horizontal: screenWidth * 0.037,
-    vertical: screenHeight * 0.022, 
+    horizontal: screenWidth * 0.04,
+    vertical: screenHeight * 0.02, 
   ),
       decoration: BoxDecoration(
         color: const Color(0xFFFEFDFC),
@@ -238,17 +238,6 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       child: IconButton(
         icon: Icon(Icons.close, size: screenWidth * 0.045, color: const Color(0xFFA28F7D)),
         onPressed: () => _deleteBookmark(item['bookmarkId']),
-      ),
-    ),
-    Positioned(
-      bottom: screenHeight * 0.0225,
-      left: screenWidth * 0.2595,
-      child: Text(
-        '북마크 등록 날짜',
-        style: TextStyle(
-          fontSize: screenWidth * 0.032,
-          color: const Color(0xFF706B66),
-        ),
       ),
     ),
   ],
