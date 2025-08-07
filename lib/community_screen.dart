@@ -5,6 +5,8 @@ import 'app_bar_widget.dart';
 import 'bottom_nav_bar.dart';
 import 'utils/auth_storage.dart';
 import 'community_search_screen.dart';
+import 'community_write_screen.dart';
+import 'community_detail_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -39,11 +41,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   }
 
   Future<void> _loadPosts() async {
-    print('🔍 게시물 로드 시작...');
-    print('🔍 토큰: ${token != null ? "있음" : "없음"}');
-    
     if (token == null) {
-      print('❌ 토큰이 없습니다.');
       setState(() {
         isLoading = false;
       });
@@ -51,7 +49,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
     }
 
     try {
-      print('🌐 API 호출: http://43.203.23.173:8080/post/readAll');
       final response = await http.get(
         Uri.parse('http://43.203.23.173:8080/post/readAll'),
         headers: {
@@ -60,25 +57,19 @@ class _CommunityScreenState extends State<CommunityScreen> {
         },
       );
 
-      print('📊 응답 상태 코드: ${response.statusCode}');
-      print('📊 응답 바디: ${response.body}');
-
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
           posts = data.map((json) => Post.fromJson(json)).toList();
+          posts.sort((a, b) => DateTime.parse(b.createdAt).compareTo(DateTime.parse(a.createdAt)));
           isLoading = false;
         });
-        print('✅ 게시물 로드 완료: ${posts.length}개');
       } else {
-        print('❌ 게시물 로드 실패: ${response.statusCode}');
-        print('❌ 에러 응답: ${response.body}');
         setState(() {
           isLoading = false;
         });
       }
     } catch (e) {
-      print('❌ 게시물 로드 에러: $e');
       setState(() {
         isLoading = false;
       });
@@ -107,107 +98,30 @@ class _CommunityScreenState extends State<CommunityScreen> {
           children: [
             Column(
               children: [
-                // 검색창
                 Padding(
-                  padding: EdgeInsets.only(
-                    left: screenWidth * 0.062, // 24px
-                    right: screenWidth * 0.062, // 24px
-                    top: screenWidth * 0.05,
-                    bottom: screenWidth * 0.051, // 20px
-                  ),
+                  padding: EdgeInsets.fromLTRB(screenWidth * 0.062, screenWidth * 0.05, screenWidth * 0.062, screenWidth * 0.051),
                   child: _buildSearchBar(screenWidth),
                 ),
-
-                // 게시물 목록
                 Expanded(
                   child: isLoading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            color: Color(0xFFA28F7D),
-                          ),
-                        )
+                      ? const Center(child: CircularProgressIndicator(color: Color(0xFFA28F7D)))
                       : posts.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.forum_outlined,
-                                    size: screenWidth * 0.15,
-                                    color: const Color(0xFFB1B1B1),
-                                  ),
-                                  SizedBox(height: screenHeight * 0.02),
-                                  Text(
-                                    '게시물이 없습니다',
-                                    style: TextStyle(
-                                      color: const Color(0xFFB1B1B1),
-                                      fontSize: screenWidth * 0.04,
-                                      fontFamily: 'Pretendard',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
+                          ? _buildEmptyState(screenWidth, screenHeight)
                           : ListView.builder(
                               padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.062, // 24px
-                                vertical: screenHeight * 0.021, // 18px
+                                horizontal: screenWidth * 0.062,
+                                vertical: screenHeight * 0.021,
                               ),
                               itemCount: posts.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: EdgeInsets.only(bottom: screenHeight * 0.01), // 8px
-                                  child: _buildPostCard(posts[index], screenWidth, screenHeight),
-                                );
-                              },
+                              itemBuilder: (context, index) => Padding(
+                                padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                                child: _buildPostCard(posts[index], screenWidth, screenHeight),
+                              ),
                             ),
                 ),
               ],
             ),
-            // 글쓰기 버튼
-            Positioned(
-              bottom: screenHeight * 0.028, // 24px from bottom navigation
-              left: 0,
-              right: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () {
-                    // TODO: 글쓰기 페이지로 이동
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('글쓰기 기능은 준비 중입니다.')),
-                    );
-                  },
-                  child: Container(
-                    width: screenWidth * 0.308, // 120px
-                    height: screenHeight * 0.052, // 44px
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFA28F7D),
-                      borderRadius: BorderRadius.circular(screenWidth * 0.092), // 35.82px
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.edit,
-                          color: const Color(0xFFFEFDFC),
-                          size: screenWidth * 0.051, // 20px
-                        ),
-                        SizedBox(width: screenWidth * 0.026), // 10px
-                        Text(
-                          '글쓰기',
-                          style: TextStyle(
-                            color: const Color(0xFFFEFDFC),
-                            fontSize: screenWidth * 0.051, // 20px
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Pretendard',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            _buildWriteButton(screenWidth, screenHeight),
           ],
         ),
       ),
@@ -215,164 +129,194 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  Widget _buildSearchBar(double screenWidth) => GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const CommunitySearchScreen()),
+  Widget _buildEmptyState(double screenWidth, double screenHeight) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.forum_outlined, size: screenWidth * 0.15, color: const Color(0xFFB1B1B1)),
+            SizedBox(height: screenHeight * 0.02),
+            Text('게시물이 없습니다',
+                style: TextStyle(
+                  color: const Color(0xFFB1B1B1),
+                  fontSize: screenWidth * 0.04,
+                  fontFamily: 'Pretendard',
+                )),
+          ],
+        ),
       );
-    },
-    child: Container(
-      height: screenWidth * 0.12, // 44px → 반응형
-      decoration: BoxDecoration(
-        color: const Color(0xFFFEF6F2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      alignment: Alignment.centerLeft,
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // 16px → 반응형
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              '게시물을 검색하세요',
-              style: TextStyle(
-                color: const Color(0xFFB1B1B1),
-                fontSize: screenWidth * 0.04, // 16px → 반응형
-                fontFamily: 'Pretendard',
+
+  Widget _buildSearchBar(double screenWidth) => GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CommunitySearchScreen()),
+        ),
+        child: Container(
+          height: screenWidth * 0.12,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFEF6F2),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text('게시물을 검색하세요',
+                    style: TextStyle(
+                      color: const Color(0xFFB1B1B1),
+                      fontSize: screenWidth * 0.04,
+                      fontFamily: 'Pretendard',
+                    )),
+              ),
+              Icon(Icons.search, color: const Color(0xFFB1B1B1), size: screenWidth * 0.055),
+            ],
+          ),
+        ),
+      );
+
+  Widget _buildWriteButton(double screenWidth, double screenHeight) => Positioned(
+        bottom: screenHeight * 0.028,
+        left: 0,
+        right: 0,
+        child: Center(
+          child: GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CommunityWriteScreen()),
+              );
+              if (result == true) _loadPosts();
+            },
+            child: Container(
+              width: screenWidth * 0.308,
+              height: screenHeight * 0.052,
+              decoration: BoxDecoration(
+                color: const Color(0xFFA28F7D),
+                borderRadius: BorderRadius.circular(screenWidth * 0.092),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.edit, color: const Color(0xFFFEFDFC), size: screenWidth * 0.051),
+                  SizedBox(width: screenWidth * 0.026),
+                  Text('글쓰기',
+                      style: TextStyle(
+                        color: const Color(0xFFFEFDFC),
+                        fontSize: screenWidth * 0.051,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Pretendard',
+                      )),
+                ],
               ),
             ),
           ),
-          Icon(Icons.search, color: const Color(0xFFB1B1B1), size: screenWidth * 0.055), // 22px → 반응형
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 
   Widget _buildPostCard(Post post, double screenWidth, double screenHeight) {
     return GestureDetector(
       onTap: () {
-        // TODO: 게시물 상세 페이지로 이동
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('게시물 "${post.title}" 상세보기는 준비 중입니다.')),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CommunityDetailScreen(postId: post.postId),
+          ),
         );
       },
       child: Container(
-        width: double.infinity,
         padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.041, // 16px
-          vertical: screenHeight * 0.021, // 18px
+          horizontal: screenWidth * 0.041,
+          vertical: screenHeight * 0.021,
         ),
         decoration: BoxDecoration(
           color: const Color(0xFFFEFDFC),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFEAEAEA)),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 텍스트 영역
-            Expanded(
-              child: Column(
+        child: post.image1 != null && post.image1!.isNotEmpty && post.image1 != 'string'
+            ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 제목
-                  Text(
-                    post.title,
-                    style: TextStyle(
-                      color: const Color(0xFF343231),
-                      fontSize: screenWidth * 0.04, // 16px
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Pretendard',
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(post.title,
+                            style: TextStyle(
+                              color: const Color(0xFF343231),
+                              fontSize: screenWidth * 0.04,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Pretendard',
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                        SizedBox(height: screenHeight * 0.01),
+                        Row(
+                          children: [
+                            Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                            SizedBox(width: screenWidth * 0.01),
+                            Text('${post.commentCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                            SizedBox(width: screenWidth * 0.01),
+                            Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                            SizedBox(width: screenWidth * 0.01),
+                            Text('${post.likeCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                            SizedBox(width: screenWidth * 0.01),
+                            Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                          ],
+                        ),
+                      ],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: screenHeight * 0.01), // 간격
-                  // 댓글 수, 좋아요 수, 작성일
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.chat_bubble_outline,
-                        size: screenWidth * 0.03, // 12px
-                        color: const Color(0xFFB1B1B1),
-                      ),
-                      SizedBox(width: screenWidth * 0.01), // 4px
-                      Text(
-                        '8', // mock 댓글 수
-                        style: TextStyle(
-                          color: const Color(0xFFB1B1B1),
-                          fontSize: screenWidth * 0.031, // 12px
-                          fontFamily: 'Pretendard',
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.01), // 4px
-                      Icon(
-                        Icons.favorite_outline,
-                        size: screenWidth * 0.03, // 12px
-                        color: const Color(0xFFB1B1B1),
-                      ),
-                      SizedBox(width: screenWidth * 0.01), // 4px
-                      Text(
-                        '${post.likeCount}',
-                        style: TextStyle(
-                          color: const Color(0xFFB1B1B1),
-                          fontSize: screenWidth * 0.031, // 12px
-                          fontFamily: 'Pretendard',
-                        ),
-                      ),
-                      SizedBox(width: screenWidth * 0.01), // 4px
-                      Text(
-                        _formatDate(post.createdAt),
-                        style: TextStyle(
-                          color: const Color(0xFFB1B1B1),
-                          fontSize: screenWidth * 0.031, // 12px
-                          fontFamily: 'Pretendard',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // 이미지 영역
-            SizedBox(width: screenWidth * 0.06), // 22px gap
-            Container(
-              width: screenWidth * 0.195, // 76px
-              height: screenWidth * 0.195, // 76px
-              decoration: BoxDecoration(
-                color: const Color(0xFFF4F0ED),
-                borderRadius: BorderRadius.circular(10), // 10px
-              ),
-              child: post.image1 != null && post.image1!.isNotEmpty
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(10), // 10px
+                  SizedBox(width: screenWidth * 0.06),
+                  Container(
+                    width: screenWidth * 0.195,
+                    height: screenWidth * 0.195,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F0ED),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
                       child: Image.network(
                         post.image1!,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF4F0ED),
-                              borderRadius: BorderRadius.circular(10), // 10px
-                            ),
-                            child: Icon(
-                              Icons.image_outlined,
-                              color: const Color(0xFFB1B1B1),
-                              size: screenWidth * 0.06, // 24px
-                            ),
-                          );
-                        },
+                        errorBuilder: (context, error, stackTrace) => Icon(Icons.image_outlined, color: const Color(0xFFB1B1B1), size: screenWidth * 0.06),
                       ),
-                    )
-                  : Icon(
-                      Icons.image_outlined,
-                      color: const Color(0xFFB1B1B1),
-                      size: screenWidth * 0.06, // 24px
                     ),
-            ),
-          ],
-        ),
+                  ),
+                ],
+              )
+            : Container(
+                height: screenWidth * 0.195,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(post.title,
+                        style: TextStyle(
+                          color: const Color(0xFF343231),
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Pretendard',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                    Row(
+                      children: [
+                        Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text('${post.commentCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                        SizedBox(width: screenWidth * 0.01),
+                        Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text('${post.likeCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -390,6 +334,7 @@ class Post {
   final String createdAt;
   final String updatedAt;
   final int likeCount;
+  final int commentCount;
 
   Post({
     required this.postId,
@@ -403,21 +348,21 @@ class Post {
     required this.createdAt,
     required this.updatedAt,
     required this.likeCount,
+    required this.commentCount,
   });
 
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
-      postId: json['postId'] ?? 0,
-      userId: json['userId'] ?? 0,
-      title: json['title'] ?? '',
-      content: json['content'] ?? '',
-      image1: json['image1'],
-      image2: json['image2'],
-      image3: json['image3'],
-      image4: json['image4'],
-      createdAt: json['createdAt'] ?? '',
-      updatedAt: json['updatedAt'] ?? '',
-      likeCount: json['likeCount'] ?? 0,
-    );
-  }
-} 
+  factory Post.fromJson(Map<String, dynamic> json) => Post(
+        postId: json['postId'] ?? 0,
+        userId: json['userId'] ?? 0,
+        title: json['title'] ?? '',
+        content: json['content'] ?? '',
+        image1: json['image1'],
+        image2: json['image2'],
+        image3: json['image3'],
+        image4: json['image4'],
+        createdAt: json['createdAt'] ?? '',
+        updatedAt: json['updatedAt'] ?? '',
+        likeCount: json['likeCount'] ?? 0,
+        commentCount: json['commentCount'] ?? 0,
+      );
+}
