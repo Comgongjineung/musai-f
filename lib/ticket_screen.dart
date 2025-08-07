@@ -6,6 +6,10 @@ import 'bottom_nav_bar.dart';
 import 'app_bar_widget.dart'; 
 import 'ticket_create.dart';
 import 'ticket_select_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'utils/auth_storage.dart';
+import 'package:intl/intl.dart';
 
 class TicketScreen extends StatefulWidget { 
   final bool fromMyPage; 
@@ -17,6 +21,10 @@ class TicketScreen extends StatefulWidget {
 
 class _TicketScreenState extends State<TicketScreen> { 
   bool isSingleView = true; 
+  List<Map<String, dynamic>> tickets = [];
+bool isLoading = true;
+int? userId;
+String? token;
 
   // 기본 티켓 배경색 (초록색) 
   Color selectedColor = const Color(0xFF8DAA91); 
@@ -26,6 +34,7 @@ class _TicketScreenState extends State<TicketScreen> {
   @override
 void initState() {
   super.initState();
+  _loadTickets();
 }
 
 @override
@@ -34,36 +43,45 @@ void dispose() {
   super.dispose();
 }
 
-  final tickets = [ 
-    { 
-      "imageAsset": "assets/images/ticket.png", 
-      "title": "아이와 해바라기 정원", 
-      "artist": "Claude Monet", 
-      "date": "2025.07.27", 
-      "location": "예술의 전당", 
-    }, 
-    { 
-      "imageAsset": "assets/images/ticket.png", 
-      "title": "아이와 해바라기 정원", 
-      "artist": "Claude Monet", 
-      "date": "2025.07.27", 
-      "location": "예술의 전당", 
-    }, 
-    { 
-      "imageAsset": "assets/images/ticket.png", 
-      "title": "아이와 해바라기 정원", 
-      "artist": "Claude Monet", 
-      "date": "2025.07.27", 
-      "location": "예술의 전당", 
-    }, 
-    { 
-      "imageAsset": "assets/images/ticket.png", 
-      "title": "아이와 해바라기 정원", 
-      "artist": "Claude Monet", 
-      "date": "2025.07.27", 
-      "location": "예술의 전당", 
-    } 
-  ]; 
+Future<void> _loadTickets() async {
+  token = await getJwtToken();
+  userId = await getUserId();
+
+  if (token == null || userId == null) {
+    setState(() => isLoading = false);
+    return;
+  }
+
+  final response = await http.get(
+    Uri.parse('http://43.203.23.173:8080/ticket/readAll/$userId'),
+    headers: {
+      'accept': '*/*',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data =
+        jsonDecode(utf8.decode(response.bodyBytes)) as List<dynamic>;
+    setState(() {
+      tickets = data.cast<Map<String, dynamic>>();
+      isLoading = false;
+    });
+  } else {
+    print('❌ 티켓 조회 실패: ${response.statusCode}');
+    setState(() => isLoading = false);
+  }
+}
+
+String formatDate(String? isoString) {
+  if (isoString == null || isoString.isEmpty) return '';
+  try {
+    final dt = DateTime.parse(isoString);
+    return DateFormat('yyyy.MM.dd').format(dt);
+  } catch (_) {
+    return '';
+  }
+}
 
   @override 
   Widget build(BuildContext context) { 
@@ -240,7 +258,15 @@ void dispose() {
     ); 
   } 
 
-  Widget _buildSingleView() { 
+  Widget _buildSingleView() {
+    if (isLoading) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  if (tickets.isEmpty) {
+    return const Center(child: Text('티켓이 없습니다.'));
+  }
+
     return Column(
     children: [
       Expanded(
@@ -258,11 +284,11 @@ void dispose() {
                     return Transform.scale(
                       scale: scale, 
                       child: TicketCard( 
-                        imageAsset: ticket["imageAsset"] as String, 
-                        title: ticket["title"] as String, 
-                        artist: ticket["artist"] as String, 
-                        date: ticket["date"] as String, 
-                        location: ticket["location"] as String, 
+                        ticketImage: ticket['ticketImage'] ?? '', 
+                        title: ticket['title'] ?? '', 
+  artist: ticket['artist'] ?? '', 
+  date: formatDate(ticket['createdAt'] ?? ''), 
+  location: ticket['place'] ?? '',
                         textColor: index % 2 == 0 
                             ? Colors.white 
                             : const Color(0xFF343231), 
@@ -307,11 +333,11 @@ void dispose() {
       return FittedBox( 
         fit: BoxFit.fill, // 셀을 꽉 채우도록 설정 
         child: TicketCard( 
-          imageAsset: ticket["imageAsset"] as String, 
-          title: ticket["title"] as String, 
-          artist: ticket["artist"] as String, 
-          date: ticket["date"] as String, 
-          location: ticket["location"] as String, 
+          ticketImage: ticket['ticketImage'] ?? '',
+  title: ticket['title'] ?? '',
+  artist: ticket['artist'] ?? '',
+  date: formatDate(ticket['createdAt'] ?? ''),
+  location: ticket['place'] ?? '',
            backgroundColor: selectedColor, 
           textColor: index % 2 == 0 ? Colors.white : const Color(0xFF343231), 
         ), 
@@ -323,7 +349,7 @@ void dispose() {
 } 
 
 class TicketCard extends StatelessWidget {
-  final String imageAsset;
+  final String ticketImage;
   final String title;
   final String artist;
   final String date;
@@ -333,7 +359,7 @@ class TicketCard extends StatelessWidget {
 
   const TicketCard({
     super.key,
-    required this.imageAsset,
+    required this.ticketImage,
     required this.title,
     required this.artist,
     required this.date,
@@ -346,6 +372,7 @@ class TicketCard extends StatelessWidget {
 Widget build(BuildContext context) {
   final cardWidth = MediaQuery.of(context).size.width * 0.59;
   final cardHeight = cardWidth * (468 / 230); // 기존 비율 유지
+  final screenHeight = MediaQuery.of(context).size.height;
   return SizedBox(
     width: cardWidth,
     height: cardHeight,
@@ -397,34 +424,42 @@ Widget build(BuildContext context) {
                 padding: const EdgeInsets.symmetric(horizontal: 20), 
                 child: ClipRRect( 
                   borderRadius: BorderRadius.circular(10), 
-                  child: Image.asset( 
-                    imageAsset, 
-                    width: 190, 
-                    height: 222, 
-                    fit: BoxFit.cover, 
-                  ), 
+                  child: Image.network(
+      ticketImage,
+      width: double.infinity,
+      height: screenHeight * 0.27,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        color: Colors.grey[300],
+        width: 190,
+        height: 222,
+        child: const Icon(Icons.broken_image),
+      ),
+    ),
                 ), 
               ), 
               const SizedBox(height: 14), 
               Padding( 
-                padding: const EdgeInsets.only(left: 20), 
+                padding: const EdgeInsets.symmetric(horizontal: 20), 
                 child: Text( 
                   title, 
                   style: TextStyle( 
-                    fontSize: 20, 
+                    fontSize: 18, 
                     fontWeight: FontWeight.bold, 
+                    height: 1.0,
                     color: textColor, 
                   ), 
                 ), 
               ), 
-              const SizedBox(height: 4), 
+              const SizedBox(height: 10), 
               Padding( 
-                padding: const EdgeInsets.only(left: 20), 
+                padding: const EdgeInsets.symmetric(horizontal: 21),
                 child: Text( 
                   artist, 
                   style: TextStyle( 
-                    fontSize: 16, 
-                    fontWeight: FontWeight.w300, 
+                    fontSize: 13, 
+                    fontWeight: FontWeight.w300,
+                    height: 1.0, 
                     color: textColor, 
                   ), 
                 ), 
@@ -437,14 +472,14 @@ Widget build(BuildContext context) {
         Positioned( 
           left: 19, 
           right: 19, 
-          bottom: 56, 
+          bottom: 60, 
           child: Row( 
             mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: [ 
               Text( 
                 date, 
                 style: TextStyle( 
-                  fontSize: 12, 
+                  fontSize: 11, 
                   fontWeight: FontWeight.w300, 
                   color: textColor, 
                 ), 
@@ -452,7 +487,7 @@ Widget build(BuildContext context) {
               Text( 
                 location, 
                 style: TextStyle( 
-                  fontSize: 12, 
+                  fontSize: 11, 
                   fontWeight: FontWeight.w300, 
                   color: textColor, 
                 ), 

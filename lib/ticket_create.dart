@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'ticket_screen.dart'; // TicketCard 불러오기
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'utils/auth_storage.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'dart:math';
 
 class TicketCreateScreen extends StatefulWidget {
-  final Color initialColor;
-  const TicketCreateScreen({super.key, required this.initialColor});
+  final String imageUrl;
+  final String title;
+  final String artist;
+  final String place;
+  final String createdAt; 
 
+  const TicketCreateScreen({
+    super.key,
+    required this.imageUrl,
+    required this.title,
+    required this.artist,
+    required this.place,
+    required this.createdAt,
+  });
+  
   @override
   State<TicketCreateScreen> createState() => _TicketCreateScreenState();
 }
@@ -14,19 +34,68 @@ class _TicketCreateScreenState extends State<TicketCreateScreen> {
   late Color selectedColor;
   bool isDarkText = false; // T 버튼 상태 (false=흰색 글씨, true=검은 글씨)
 
-  final List<Color> recommendedColors = [
-    const Color(0xFF8DAA91),
-    const Color(0xFF4E6C50),
-    const Color(0xFFF9D57A),
-    const Color(0xFFFCEEC8),
-    const Color(0xFF6B8FD6),
-  ];
+  List<Color> recommendedColors = [];
+  TextEditingController _placeController = TextEditingController();
+List<dynamic> searchResults = [];
+String? selectedPlace; // 최종 장소 값
+final DraggableScrollableController _sheetController = DraggableScrollableController();
+
 
   @override
   void initState() {
     super.initState();
-    selectedColor = widget.initialColor;
+    selectedColor = const Color(0xFFFFFFFF);
+    _loadRecommendedColors();
   }
+
+  String get todayDateFormatted {
+  return DateFormat('yyyy.MM.dd').format(DateTime.now());
+}
+
+  Future<void> _loadRecommendedColors() async {
+  final token = await getJwtToken();
+  final uri = Uri.parse('http://43.203.23.173:8080/api/Ticketcolor/recommend-color');
+
+  try {
+    // 1. 이미지 다운로드
+    final response = await http.get(Uri.parse(widget.imageUrl));
+    if (response.statusCode != 200) {
+      print('이미지 다운로드 실패');
+      return;
+    }
+
+    // 2. 임시 파일로 저장
+    final tempDir = await getTemporaryDirectory();
+  final random = Random().nextInt(999999);
+  final imagePath = '${tempDir.path}/ticket_$random.jpg';
+    final file = File(imagePath);
+    await file.writeAsBytes(response.bodyBytes);
+
+    // 3. multipart 요청 생성
+    final request = http.MultipartRequest('POST', uri);
+    request.headers['Authorization'] = 'Bearer $token';
+    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+
+    final streamedResponse = await request.send();
+    final responseData = await http.Response.fromStream(streamedResponse);
+
+    if (responseData.statusCode == 200) {
+      final data = jsonDecode(responseData.body);
+      final List<dynamic> palette = data['palette'];
+      setState(() {
+        recommendedColors.clear();
+        recommendedColors.addAll(
+          palette.map<Color>((rgb) => Color.fromRGBO(rgb[0], rgb[1], rgb[2], 1)),
+        );
+        selectedColor = recommendedColors.first;
+      });
+    } else {
+      print('색상 추천 실패: ${responseData.statusCode}');
+    }
+  } catch (e) {
+    print('색상 추천 예외: $e');
+  }
+}
 
   void _openColorPicker() {
     Color tempColor = selectedColor;
@@ -63,9 +132,90 @@ class _TicketCreateScreenState extends State<TicketCreateScreen> {
     );
   }
 
-  void _completeTicket() {
-    Navigator.pop(context, selectedColor); // 선택 색상 반환
+  void _completeTicket() async {
+  await _submitTicket();
+
+  // 티켓 목록 화면으로 이동
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const TicketScreen()),
+  );
+}
+
+  Future<void> _submitTicket() async {
+  final token = await getJwtToken();
+  final userId = await getUserId();
+
+  if (token == null || userId == null) {
+    print('인증 정보가 없습니다.');
+    return;
   }
+
+  final uri = Uri.parse('http://43.203.23.173:8080/ticket/add');
+
+  final response = await http.post(
+    uri,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      "ticketId": 0,
+      "userId": userId,
+      "createdAt": widget.createdAt,
+      "ticketImage": widget.imageUrl, // ← string URL
+      "title": widget.title,
+      "artist": widget.artist,
+      "place": selectedPlace ?? '',
+
+/*
+      "ticketColor": '#${selectedColor.value.toRadixString(16).substring(2)}',
+      "textColor": isDarkText ? "#000000" : "#FFFFFF",
+      */
+    }),
+  );
+
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    print("✅ 티켓 추가 성공");
+  } else {
+    print("❌ 티켓 추가 실패: ${response.statusCode}");
+    print("응답 내용: ${response.body}");
+  }
+}
+
+Future<void> _searchPlace(String query) async {
+  final token = await getJwtToken();
+  final uri = Uri.parse('http://43.203.23.173:8080/exhibition/search/place?place=$query');
+
+  try {
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'accept': '*/*',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> results = jsonDecode(utf8.decode(response.bodyBytes));
+      setState(() {
+        searchResults = results;
+      });
+
+      // 시트 자동 위로 올리기
+      _sheetController.animateTo(
+        0.6,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    } else {
+      print('전시관 검색 실패: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('전시관 검색 오류: $e');
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -125,13 +275,13 @@ class _TicketCreateScreenState extends State<TicketCreateScreen> {
           Align(
             alignment: Alignment.topCenter,
               child: Transform.scale(
-                scale: 0.875,
+                scale: 0.9,
                 child: TicketCard(
-                  imageAsset: "assets/images/ticket.png",
-                  title: "아이와 해바라기 정원",
-                  artist: "Claude Monet",
-                  date: "2025.07.27",
-                  location: "예술의 전당",
+                  ticketImage: widget.imageUrl,
+                  title: widget.title,
+                  artist: widget.artist,
+                  date: todayDateFormatted,
+                  location: selectedPlace ?? '',
                   backgroundColor: selectedColor,
                   textColor: isDarkText ? Colors.black : Colors.white,
                 ),
@@ -140,6 +290,7 @@ class _TicketCreateScreenState extends State<TicketCreateScreen> {
 
           // 하단 드래거블 시트
           DraggableScrollableSheet(
+            controller: _sheetController,
             initialChildSize: 0.35,
             minChildSize: 0.35,
             maxChildSize: 0.6,
@@ -172,10 +323,23 @@ class _TicketCreateScreenState extends State<TicketCreateScreen> {
 
                         // 검색창
                         TextField(
+                          controller: _placeController,
+  onSubmitted: (value) {
+    FocusScope.of(context).unfocus(); // 키보드 내리기
+    _searchPlace(value);
+  },
                           decoration: InputDecoration(
                             hintText: "방문했던 전시관을 검색하세요",
                             hintStyle: const TextStyle(color: Color(0xFFB1B1B1)),
-                            suffixIcon: const Icon(Icons.search, color: Color(0xFFB1B1B1)),
+                            suffixIcon: GestureDetector(
+  onTap: () {
+    FocusScope.of(context).unfocus(); // 키보드 닫기
+    _searchPlace(_placeController.text); // 현재 입력값으로 검색 실행
+  },
+  child: selectedPlace != null
+      ? const Icon(Icons.check_circle, color: Colors.green)
+      : const Icon(Icons.search, color: Color(0xFFB1B1B1)),
+),
                             filled: true,
                             fillColor: const Color(0xFFFEF6F2),
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -185,13 +349,23 @@ class _TicketCreateScreenState extends State<TicketCreateScreen> {
                             ),
                           ),
                         ),
-
+                        
                         const SizedBox(height: 36), // 검색창 ↔ 안내문구
 
-                        const Text(
-                          "💡 작품과 어울리는 티켓 색상을 추천해드려요.",
-                          style: TextStyle(fontSize: 14, color: Color(0xFF837670)),
-                        ),
+                    Row(
+  children: [
+    SvgPicture.asset(
+      'assets/images/bulb_on.svg', // 전구 아이콘
+      width: 14,
+      height: 14,
+    ),
+    const SizedBox(width: 2.5), // 아이콘 ↔ 텍스트 간격 조절
+    const Text(
+      "Tip 작품과 어울리는 티켓 색상을 추천해드려요.",
+      style: TextStyle(fontSize: 14, color: Color(0xFF837670)),
+    ),
+  ],
+),
 
                         const SizedBox(height: 12), // 안내문구 ↔ 색상 버튼
 
@@ -268,7 +442,38 @@ class _TicketCreateScreenState extends State<TicketCreateScreen> {
                           ],
                         ),
 
-                        const SizedBox(height: 28), // 마지막 여백
+                        const SizedBox(height: 30), // 마지막 여백
+                        // 검색 결과 리스트 아래 여백 추가 + Scroll 가능하도록 수정
+if (searchResults.isNotEmpty)
+  SizedBox(
+    height: 150, // 최대 높이 제한 (스크롤 영역 확보)
+    child: ListView.builder(
+      shrinkWrap: true,
+      itemCount: searchResults.length,
+      itemBuilder: (context, index) {
+        final item = searchResults[index];
+        return ListTile(
+          title: Text(item['place'] ?? ''),
+          onTap: () {
+            setState(() {
+              selectedPlace = item['place'];
+              _placeController.text = selectedPlace!;
+              searchResults.clear(); // 선택 후 리스트 숨기기
+            });
+          },
+        );
+      },
+    ),
+  ),
+
+if (_placeController.text.isNotEmpty && searchResults.isEmpty)
+  const Padding(
+    padding: EdgeInsets.only(top: 8),
+    child: Text(
+      '검색 결과가 없습니다.',
+      style: TextStyle(color: Colors.grey),
+    ),
+  ),
                       ],
                     ),
                   ),
