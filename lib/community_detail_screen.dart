@@ -23,6 +23,9 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
   String? token;
   int? userId;
   final TextEditingController _commentController = TextEditingController();
+  
+  // 사용자 정보 캐시 추가
+  final Map<int, UserInfo> _userCache = {};
 
   @override
   void initState() {
@@ -104,11 +107,53 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
         final data = json.decode(utf8.decode(response.bodyBytes));
         setState(() {
           userInfo = UserInfo.fromJson(data);
+          // 캐시에 추가
+          _userCache[postDetail!.userId] = userInfo!;
         });
       }
     } catch (e) {
       print('사용자 정보 로드 실패: $e');
     }
+  }
+
+  // 특정 사용자 정보를 가져오는 메서드 추가
+  Future<UserInfo?> _loadUserInfoById(int userId) async {
+    // 이미 캐시에 있으면 반환
+    if (_userCache.containsKey(userId)) {
+      return _userCache[userId];
+    }
+
+    if (token == null) {
+      return null;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse('http://43.203.23.173:8080/user/read/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(utf8.decode(response.bodyBytes));
+        final userInfo = UserInfo.fromJson(data);
+        
+        // 캐시에 저장
+        _userCache[userId] = userInfo;
+        
+        if (mounted) {
+          setState(() {});
+        }
+        
+        return userInfo;
+      }
+    } catch (e) {
+      print('사용자 정보 로드 실패 (userId: $userId): $e');
+    }
+    
+    return null;
   }
 
   Future<void> _loadComments() async {
@@ -186,7 +231,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       final requestBody = {
         'userId': userId ?? 0,
         'postId': widget.postId,
-        'parentCommentId': 1, // 최상위 댓글은 1로 설정 (API 명세에 따름)
+        'parentCommentId': null, // 일반 댓글은 null로 설정
         'content': _commentController.text.trim(),
       };
 
@@ -240,6 +285,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
 
       if (isLiked) {
         // 공감 취소
+        print('좋아요 취소 요청');
         final response = await http.delete(
           Uri.parse('http://43.203.23.173:8080/like/delete'),
           headers: {
@@ -248,6 +294,9 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
           },
           body: json.encode(requestBody),
         );
+
+        print('좋아요 취소 응답 상태: ${response.statusCode}');
+        print('좋아요 취소 응답 바디: ${response.body}');
 
         if (response.statusCode == 200) {
           setState(() {
@@ -269,9 +318,15 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('공감이 취소되었습니다.')),
           );
+        } else {
+          print('좋아요 취소 실패 - 상태 코드: ${response.statusCode}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('공감 취소에 실패했습니다. (${response.statusCode})')),
+          );
         }
       } else {
         // 공감 등록
+        print('좋아요 등록 요청');
         final response = await http.post(
           Uri.parse('http://43.203.23.173:8080/like/add'),
           headers: {
@@ -280,6 +335,9 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
           },
           body: json.encode(requestBody),
         );
+
+        print('좋아요 등록 응답 상태: ${response.statusCode}');
+        print('좋아요 등록 응답 바디: ${response.body}');
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           setState(() {
@@ -300,6 +358,16 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
           });
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('공감이 등록되었습니다.')),
+          );
+        } else if (response.statusCode == 400 && response.body.contains('이미 좋아요가 등록된 게시물입니다')) {
+          // 이미 좋아요가 등록되어 있는 경우
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('이미 좋아요를 누른 게시물입니다.')),
+          );
+        } else {
+          print('좋아요 등록 실패 - 상태 코드: ${response.statusCode}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('공감 등록에 실패했습니다. (${response.statusCode})')),
           );
         }
       }
@@ -508,7 +576,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
             children: [
               const Icon(Icons.chat_bubble_outline, size: 16, color: Color(0xFF837670)),
               const SizedBox(width: 4),
-              Text('댓글 ${commentPage?.content.length ?? 0}', style: const TextStyle(fontSize: 14, fontFamily: 'Pretendard', color: Color(0xFF837670))),
+              Text('댓글 ${commentPage != null ? _calculateTotalComments(commentPage!.content) : 0}', style: const TextStyle(fontSize: 14, fontFamily: 'Pretendard', color: Color(0xFF837670))),
             ],
           ),
         ),
@@ -604,70 +672,96 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
         
         ...commentPage!.content.map((comment) => Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: _buildCommentItem(comment, screenWidth, screenHeight),
+          child: _buildCommentItem(comment, screenWidth, screenHeight, 0), // 들여쓰기 레벨 0 추가
         )),
       ],
     );
   }
 
-  Widget _buildCommentItem(Comment comment, double screenWidth, double screenHeight) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFEFDFC),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEBEBEB)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 댓글 헤더
-          Row(
+  Widget _buildCommentItem(Comment comment, double screenWidth, double screenHeight, int indentLevel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: indentLevel * 20.0), // 들여쓰기
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFEFDFC),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFEBEBEB)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  '사용자 ${comment.userId}', // TODO: 사용자 정보 API로 닉네임 가져오기
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Pretendard',
-                    color: Color(0xFF343231),
-                  ),
-                ),
-              ),
+              // 댓글 헤더
               Row(
                 children: [
-                  Text(
-                    _formatTime(comment.createdAt),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Pretendard',
-                      color: Color(0xFFB1B1B1),
+                  Expanded(
+                    child: FutureBuilder<UserInfo?>(
+                      future: _loadUserInfoById(comment.userId),
+                      builder: (context, snapshot) {
+                        String displayName = '사용자 ${comment.userId}';
+                        
+                        if (snapshot.hasData && snapshot.data != null) {
+                          displayName = snapshot.data!.nickname;
+                        } else if (snapshot.hasError) {
+                          displayName = '사용자 ${comment.userId}';
+                        }
+                        
+                        return Text(
+                          displayName,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Pretendard',
+                            color: Color(0xFF343231),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.info_outline,
-                    size: 14,
-                    color: Color(0xFFB1B1B1),
+                  Row(
+                    children: [
+                      Text(
+                        _formatTime(comment.createdAt),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'Pretendard',
+                          color: Color(0xFFB1B1B1),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.info_outline,
+                        size: 14,
+                        color: Color(0xFFB1B1B1),
+                      ),
+                    ],
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              
+              // 댓글 내용
+              Text(
+                comment.content,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Pretendard',
+                  color: Color(0xFF343231),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 10),
-          
-          // 댓글 내용
-          Text(
-            comment.content,
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Pretendard',
-              color: Color(0xFF343231),
-            ),
-          ),
-        ],
-      ),
+        ),
+        
+        // 답글들 재귀적으로 표시
+        if (comment.replies.isNotEmpty)
+          ...comment.replies.map((reply) => Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: _buildCommentItem(reply, screenWidth, screenHeight, indentLevel + 1),
+          )),
+      ],
     );
   }
 
@@ -933,7 +1027,7 @@ class Comment {
   final String content;
   final String createdAt;
   final String updatedAt;
-  final List<String> replies;
+  final List<Comment> replies; // List<String>에서 List<Comment>로 변경
 
   Comment({
     required this.commentId,
@@ -948,12 +1042,12 @@ class Comment {
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     try {
-      // replies 필드 안전하게 처리
-      List<String> repliesList = [];
+      // replies 필드를 List<Comment>로 파싱
+      List<Comment> repliesList = [];
       if (json['replies'] != null) {
         if (json['replies'] is List) {
           repliesList = (json['replies'] as List)
-              .map((e) => e.toString())
+              .map((e) => Comment.fromJson(e))
               .toList();
         } else {
           print('replies가 List가 아님: ${json['replies'].runtimeType}');
@@ -986,4 +1080,14 @@ class Comment {
       );
     }
   }
+}
+
+// 총 댓글 수를 재귀적으로 계산하는 함수 추가
+int _calculateTotalComments(List<Comment> comments) {
+  int total = 0;
+  for (Comment comment in comments) {
+    total += 1; // 현재 댓글
+    total += _calculateTotalComments(comment.replies); // 답글들
+  }
+  return total;
 } 

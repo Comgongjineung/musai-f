@@ -63,6 +63,7 @@ class _CommunitySearchScreenState extends State<CommunitySearchScreen> {
 
         setState(() {
           postList = data.map((json) => Post.fromJson(json)).toList();
+          postList.sort((a, b) => DateTime.parse(b.createdAt).compareTo(DateTime.parse(a.createdAt)));
           isSearchDone = true;
         });
       } else {
@@ -190,7 +191,7 @@ class _CommunitySearchScreenState extends State<CommunitySearchScreen> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFEAEAEA)),
         ),
-        child: post.image1 != null && post.image1!.isNotEmpty
+        child: post.image1 != null && post.image1!.isNotEmpty && post.image1 != 'string'
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -213,7 +214,7 @@ class _CommunitySearchScreenState extends State<CommunitySearchScreen> {
                           children: [
                             Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
                             SizedBox(width: screenWidth * 0.01),
-                            Text('8', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                            Text('${post.commentCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
                             SizedBox(width: screenWidth * 0.01),
                             Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
                             SizedBox(width: screenWidth * 0.01),
@@ -244,33 +245,36 @@ class _CommunitySearchScreenState extends State<CommunitySearchScreen> {
                   ),
                 ],
               )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(post.title,
-                      style: TextStyle(
-                        color: const Color(0xFF343231),
-                        fontSize: screenWidth * 0.04,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Pretendard',
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis),
-                  SizedBox(height: screenHeight * 0.01),
-                  Row(
-                    children: [
-                      Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
-                      SizedBox(width: screenWidth * 0.01),
-                      Text('8', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
-                      SizedBox(width: screenWidth * 0.01),
-                      Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
-                      SizedBox(width: screenWidth * 0.01),
-                      Text('${post.likeCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
-                      SizedBox(width: screenWidth * 0.01),
-                      Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
-                    ],
-                  ),
-                ],
+            : Container(
+                height: screenWidth * 0.195,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(post.title,
+                        style: TextStyle(
+                          color: const Color(0xFF343231),
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Pretendard',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                    Row(
+                      children: [
+                        Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text('${post.commentCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                        SizedBox(width: screenWidth * 0.01),
+                        Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text('${post.likeCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                      ],
+                    ),
+                  ],
+                ),
               ),
       ),
     );
@@ -295,6 +299,7 @@ class Post {
   final String createdAt;
   final String updatedAt;
   final int likeCount;
+  final int commentCount;
 
   Post({
     required this.postId,
@@ -308,6 +313,7 @@ class Post {
     required this.createdAt,
     required this.updatedAt,
     required this.likeCount,
+    required this.commentCount,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
@@ -322,5 +328,6 @@ class Post {
         createdAt: json['createdAt'] ?? '',
         updatedAt: json['updatedAt'] ?? '',
         likeCount: json['likeCount'] ?? 0,
+        commentCount: json['commentCount'] ?? 0,
       );
 }
