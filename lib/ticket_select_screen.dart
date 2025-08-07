@@ -73,9 +73,12 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFDFC),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Color(0xFF343231)),
-          onPressed: () => Navigator.pop(context),
+        leading: Padding(
+          padding: EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.06), // 24px 기준 반응형
+          child: IconButton(
+            icon: const Icon(Icons.close, color: Color(0xFF343231)),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         title: const Text(
           "티켓 만들기",
@@ -88,11 +91,11 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 23), // 티켓 만들기 아래 간격
+            SizedBox(height: screenHeight * 0.024), // 20px 기준
             // 안내문구 + 가나다순 버튼
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -103,7 +106,7 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                       'assets/images/bulb_on.svg', // 전구 아이콘
                       width: screenWidth * 0.04,
                     ),
-                    const SizedBox(width: 5),
+                    const SizedBox(width: 4),
                     const Text(
                       "티켓으로 제작할 작품을 선택하세요.",
                       style: TextStyle(
@@ -148,7 +151,7 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: screenHeight * 0.024),
             // 작품 리스트
             Expanded(
               child: isLoading
@@ -158,7 +161,7 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                       : ListView.separated(
                           itemCount: items.length,
                           separatorBuilder: (_, __) =>
-                              SizedBox(height: screenHeight * 0.011),
+                              SizedBox(height: screenHeight * 0.01),
                           itemBuilder: (context, index) {
                             final item = items[index];
                             return GestureDetector(
@@ -177,23 +180,25 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
   );
 },
                               child: Container(
-                                width: screenWidth * 0.877, // 342 / 390
-                                height: screenHeight * 0.16,
+                                //width: screenWidth * 0.877, // 342 / 390
+                                //height: screenHeight * 0.16,
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFEFDFC),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                       color: const Color(0xFFEAEAEA)),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 18),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.04, // 16px
+                                  vertical: screenHeight * 0.0213, // 18px
+                                ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // 썸네일
                                     Container(
-                                      width: screenWidth * 0.172, // 67 / 390
-                                      height: screenHeight * 0.11,
+                                      width: screenWidth * 0.18,
+                                      height: screenHeight * 0.1,
                                       decoration: BoxDecoration(
                                         color: Colors.grey[300],
                                         borderRadius:
@@ -210,7 +215,7 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                                             : null,
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
+                                    SizedBox(width: screenWidth * 0.04), // 16px
                                     // 제목 + 작가
                                     Expanded(
                                       child: Column(
@@ -230,9 +235,7 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(
-                                              height:
-                                                  screenHeight * 0.016), // 26 / 844
+                                          SizedBox(height: screenHeight * 0.016), // 26 / 844
                                           Text(
                                             (item['artist'] ?? '')
                                                 .replaceAll('*', ''),

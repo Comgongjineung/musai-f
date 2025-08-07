@@ -219,39 +219,43 @@ Future<void> _searchPlace(String query) async {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color(0xFFB1B1B1), // 회색 배경
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60), // 높이
+        preferredSize: Size.fromHeight(screenWidth * 0.14), // 높이 (was 60)
         child: AppBar(
           backgroundColor: const Color(0xFFFFFDFC), // 상단바 배경
           elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
+          leading: Padding(
+            padding: EdgeInsets.only(left: screenWidth * 0.06),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF343231)),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
-          title: const Text(
+          title: Text(
             "티켓 만들기",
             style: TextStyle(
-              fontSize: 20,
+              fontSize: screenWidth * 0.05,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: Color(0xFF343231),
             ),
           ),
           centerTitle: true,
           actions: [
   Padding(
-    padding: const EdgeInsets.only(right: 16),
+    padding: EdgeInsets.only(right: screenWidth * 0.06),
     child: SizedBox(
       width: 52,
       height: 28,
       child: InkWell(
-        borderRadius: BorderRadius.circular(23),
+        borderRadius: BorderRadius.circular(20),
         onTap: _completeTicket,
         child: Container(
           decoration: BoxDecoration(
             color: const Color(0xFF837670),
-            borderRadius: BorderRadius.circular(23),
+            borderRadius: BorderRadius.circular(20),
           ),
           alignment: Alignment.center,
           child: const Text(
@@ -283,7 +287,7 @@ Future<void> _searchPlace(String query) async {
                   date: todayDateFormatted,
                   location: selectedPlace ?? '',
                   backgroundColor: selectedColor,
-                  textColor: isDarkText ? Colors.black : Colors.white,
+                  textColor: isDarkText ? Color(0xFF343231) : Color(0xFFFEFDFC),
                 ),
               ),
             ),
@@ -303,7 +307,7 @@ Future<void> _searchPlace(String query) async {
                 child: SingleChildScrollView(
                   controller: scrollController,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 23), // 좌우 여백 23
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -319,7 +323,7 @@ Future<void> _searchPlace(String query) async {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 40), // 시트 상단 ↔ 검색창
+                        SizedBox(height: screenWidth * 0.08), // 시트 상단 ↔ 검색창
 
                         // 검색창
                         TextField(
@@ -337,12 +341,12 @@ Future<void> _searchPlace(String query) async {
     _searchPlace(_placeController.text); // 현재 입력값으로 검색 실행
   },
   child: selectedPlace != null
-      ? const Icon(Icons.check_circle, color: Colors.green)
+      ? const Icon(Icons.check_circle, color: Color(0xFF837670))
       : const Icon(Icons.search, color: Color(0xFFB1B1B1)),
 ),
                             filled: true,
                             fillColor: const Color(0xFFFEF6F2),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06), //vertical: 12
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                               borderSide: BorderSide.none,
@@ -350,36 +354,36 @@ Future<void> _searchPlace(String query) async {
                           ),
                         ),
                         
-                        const SizedBox(height: 36), // 검색창 ↔ 안내문구
+                        SizedBox(height: screenWidth * 0.08), // 검색창 ↔ 안내문구
 
                     Row(
   children: [
     SvgPicture.asset(
       'assets/images/bulb_on.svg', // 전구 아이콘
-      width: 14,
-      height: 14,
+      width: 12,
+      height: 12,
     ),
-    const SizedBox(width: 2.5), // 아이콘 ↔ 텍스트 간격 조절
+    const SizedBox(width: 4), // 아이콘 ↔ 텍스트 간격 조절
     const Text(
       "Tip 작품과 어울리는 티켓 색상을 추천해드려요.",
-      style: TextStyle(fontSize: 14, color: Color(0xFF837670)),
+      style: TextStyle(fontSize: 12, color: Color(0xFF837670)),
     ),
   ],
 ),
 
-                        const SizedBox(height: 12), // 안내문구 ↔ 색상 버튼
+                        SizedBox(height: screenWidth * 0.03), // 안내문구 ↔ 색상 버튼
 
                         // 색상 버튼
                         Row(
                           children: [
                             for (int i = 0; i < recommendedColors.take(5).length; i++)
                               Container(
-        margin: EdgeInsets.only(right: i == 4 ? 0 : 8), // 버튼 간격만 적용
+        margin: EdgeInsets.only(right: i == 4 ? 0 : screenWidth * 0.02), // 버튼 간격만 적용 (was 8)
                                 child: GestureDetector(
                                   onTap: () => setState(() => selectedColor = recommendedColors[i]),
                                   child: Container(
-                                    width: 48,
-                                    height: 48,
+                                    width: screenWidth * 0.12, // 48
+                                    height: screenWidth * 0.12,
                                     decoration: BoxDecoration(
                                       color: recommendedColors[i],
                                       borderRadius: BorderRadius.circular(15),
@@ -391,20 +395,20 @@ Future<void> _searchPlace(String query) async {
     GestureDetector(
       onTap: _openColorPicker,
       child: Container(
-        margin: const EdgeInsets.only(left: 8), // 앞 버튼과 간격 8
-        width: 48,
-        height: 48,
+        margin: EdgeInsets.only(left: screenWidth * 0.02), // 앞 버튼과 간격 8
+        width: screenWidth * 0.12,
+        height: screenWidth * 0.12,
         decoration: BoxDecoration(
-          color: const Color(0xFFD9D9D9),
+          color: const Color(0xFFEBEBEB),
           borderRadius: BorderRadius.circular(15),
         ),
-        child: const Icon(Icons.add, size: 24, color: Color(0xFFB1B1B1)),
+        child: Icon(Icons.add, size: screenWidth * 0.06, color: Color(0xFFB1B1B1)),
       ),
     ),
   ],
 ),
 
-                        const SizedBox(height: 16), // 색상 버튼 ↔ T 버튼
+                        SizedBox(height: screenWidth * 0.04), // 색상 버튼 ↔ T 버튼
 
                         // T 버튼
                         Row(
@@ -412,37 +416,37 @@ Future<void> _searchPlace(String query) async {
                             GestureDetector(
                               onTap: () => setState(() => isDarkText = false),
                               child: Container(
-                                width: 50,
-                                height: 24,
+                                width: screenWidth * 0.125, // 50
+                                height: screenWidth * 0.06, // 24
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(30),
+                                  color: Color(0xFF343231),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
-                                child: const Text("T",
-                                    style: TextStyle(color: Colors.white, fontSize: 16)),
+                                child: Text("T",
+                                    style: TextStyle(color: Color(0xFFFEFDFC), fontSize: screenWidth * 0.04)), 
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: screenWidth * 0.02),
                             GestureDetector(
                               onTap: () => setState(() => isDarkText = true),
                               child: Container(
-                                width: 50,
-                                height: 24,
+                                width: screenWidth * 0.125,
+                                height: screenWidth * 0.06,
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(color: Colors.grey),
+                                  border: Border.all(color: Color(0xFFB1B1B1)),
                                 ),
-                                child: const Text("T",
-                                    style: TextStyle(color: Colors.black, fontSize: 16)),
+                                child: Text("T",
+                                    style: TextStyle(color: Color(0xFF343231), fontSize: screenWidth * 0.04)), 
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 30), // 마지막 여백
+                        SizedBox(height: screenWidth * 0.07), // 마지막 여백 (was 28)
                         // 검색 결과 리스트 아래 여백 추가 + Scroll 가능하도록 수정
 if (searchResults.isNotEmpty)
   SizedBox(
@@ -467,8 +471,8 @@ if (searchResults.isNotEmpty)
   ),
 
 if (_placeController.text.isNotEmpty && searchResults.isEmpty)
-  const Padding(
-    padding: EdgeInsets.only(top: 8),
+  Padding(
+    padding: EdgeInsets.only(top: screenWidth * 0.02),
     child: Text(
       '검색 결과가 없습니다.',
       style: TextStyle(color: Colors.grey),
