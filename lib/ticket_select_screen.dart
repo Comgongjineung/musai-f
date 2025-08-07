@@ -115,8 +115,8 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                   ],
                 ),
                 Container(
-                  width: 90,
-                  height: 28,
+                  width: screenWidth * 0.23,
+                  height: screenHeight * 0.035, // 20 / 844
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     border: Border.all(color: const Color(0xFF837670)),
@@ -162,23 +162,23 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                           itemBuilder: (context, index) {
                             final item = items[index];
                             return GestureDetector(
-                              onTap: () async {
-                                final selectedColor = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => TicketCreateScreen(
-                                      initialColor: const Color(0xFF8DAA91),
-                                    ),
-                                  ),
-                                );
-                                if (selectedColor != null &&
-                                    selectedColor is Color) {
-                                  Navigator.pop(context, selectedColor);
-                                }
-                              },
+                              onTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => TicketCreateScreen(
+        imageUrl: item['imageUrl'] ?? '',
+        title: item['title'] ?? '',
+        artist: item['artist'] ?? '',
+        place: '',
+        createdAt: '',
+      ),
+    ),
+  );
+},
                               child: Container(
                                 width: screenWidth * 0.877, // 342 / 390
-                                height: screenHeight * 0.145,
+                                height: screenHeight * 0.16,
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFEFDFC),
                                   borderRadius: BorderRadius.circular(20),
@@ -232,7 +232,7 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                                           ),
                                           SizedBox(
                                               height:
-                                                  screenHeight * 0.031), // 26 / 844
+                                                  screenHeight * 0.016), // 26 / 844
                                           Text(
                                             (item['artist'] ?? '')
                                                 .replaceAll('*', ''),
@@ -243,7 +243,7 @@ class _TicketSelectScreenState extends State<TicketSelectScreen> {
                                                   screenWidth * 0.032,
                                               color: const Color(0xFF706B66),
                                             ),
-                                          ),
+                                          ),// 12 / 844
                                         ],
                                       ),
                                     ),
