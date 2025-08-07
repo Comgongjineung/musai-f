@@ -111,7 +111,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: const AppBarWidget(),
+      appBar: const AppBarWidget(
+        showNotificationIcon: true,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
