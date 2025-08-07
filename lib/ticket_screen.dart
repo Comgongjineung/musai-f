@@ -105,9 +105,8 @@ String formatDate(String? isoString) {
         body: SafeArea( 
           child: Column( 
             children: [ 
-              const SizedBox(height: 18), 
-              Padding( 
-  padding: const EdgeInsets.symmetric(horizontal: 16), 
+              const SizedBox(height: 20), 
+              Padding(padding: const EdgeInsets.symmetric(horizontal: 24), 
   child: Stack( 
     alignment: Alignment.center, 
     children: [ 
@@ -160,7 +159,7 @@ String formatDate(String? isoString) {
               width: 160, 
               decoration: BoxDecoration( 
                 color: Colors.white, 
-                borderRadius: BorderRadius.circular(8), 
+                borderRadius: BorderRadius.circular(20), 
                 boxShadow: [ 
                   BoxShadow( 
                     color: Colors.black26, 
@@ -241,7 +240,7 @@ String formatDate(String? isoString) {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), 
         decoration: BoxDecoration( 
           border: Border.all(color: buttonColor, width: 1), 
-          borderRadius: BorderRadius.circular(16), 
+          borderRadius: BorderRadius.circular(20), 
         ), 
         child: Row( 
           mainAxisSize: MainAxisSize.min, 
@@ -250,7 +249,7 @@ String formatDate(String? isoString) {
             SizedBox(width: 4), 
             Text( 
               "티켓 만들기", 
-              style: TextStyle(fontSize: 14, color: buttonColor), 
+              style: TextStyle(fontSize: 14.85, fontWeight: FontWeight.w400, color: buttonColor), 
             ), 
           ], 
         ), 
@@ -370,9 +369,10 @@ class TicketCard extends StatelessWidget {
 
   @override 
 Widget build(BuildContext context) {
-  final cardWidth = MediaQuery.of(context).size.width * 0.59;
-  final cardHeight = cardWidth * (468 / 230); // 기존 비율 유지
+  final screenWidth = MediaQuery.of(context).size.width;
   final screenHeight = MediaQuery.of(context).size.height;
+  final cardWidth = screenWidth * 0.64;
+  final cardHeight = cardWidth * (468 / 230); // 기존 비율 유지
   return SizedBox(
     width: cardWidth,
     height: cardHeight,
@@ -392,22 +392,22 @@ Widget build(BuildContext context) {
 
         // 바코드 & 점선 
         SvgPicture.asset( 
-          'assets/images/ticket_details.svg', 
-          width: cardWidth * 0.83,
-          height: cardHeight * 0.9,
+          'assets/images/ticket_detail.svg',  //규격이 안맞아서 새로 svg 만들었습니다.
+          width: cardWidth, 
+          height: cardHeight 
         ), 
       
 
         // musai ticket 텍스트 
         Positioned( 
-          top: 20, 
+          top: screenWidth * 0.04, 
           left: 0, 
           right: 0, 
           child: Text( 
             "musai ticket", 
             textAlign: TextAlign.center, 
             style: TextStyle( 
-              fontSize: 16, 
+              fontSize: screenWidth * 0.04, 
               fontWeight: FontWeight.w200, // extraLight 
               color: textColor, 
             ), 
@@ -419,9 +419,9 @@ Widget build(BuildContext context) {
           child: Column( 
             crossAxisAlignment: CrossAxisAlignment.start, 
             children: [ 
-              const SizedBox(height: 55), 
+              SizedBox(height: screenHeight * 0.054), //48px 
               Padding( 
-                padding: const EdgeInsets.symmetric(horizontal: 20), 
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05), 
                 child: ClipRRect( 
                   borderRadius: BorderRadius.circular(10), 
                   child: Image.network(
@@ -438,26 +438,30 @@ Widget build(BuildContext context) {
     ),
                 ), 
               ), 
-              const SizedBox(height: 14), 
+              SizedBox(height: screenHeight * 0.012), 
               Padding( 
-                padding: const EdgeInsets.symmetric(horizontal: 20), 
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05), 
                 child: Text( 
-                  title, 
+                  title.replaceAll('*', ''), 
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle( 
-                    fontSize: 18, 
-                    fontWeight: FontWeight.bold, 
+                    fontSize: screenWidth * 0.045, 
+                    fontWeight: FontWeight.w600, 
                     height: 1.0,
                     color: textColor, 
                   ), 
                 ), 
               ), 
-              const SizedBox(height: 10), 
+              SizedBox(height: screenHeight * 0.005), 
               Padding( 
-                padding: const EdgeInsets.symmetric(horizontal: 21),
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                 child: Text( 
-                  artist, 
+                  artist.replaceAll('*', ''), 
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle( 
-                    fontSize: 13, 
+                    fontSize: screenWidth * 0.035, 
                     fontWeight: FontWeight.w300,
                     height: 1.0, 
                     color: textColor, 
@@ -470,16 +474,16 @@ Widget build(BuildContext context) {
 
         // 날짜 & 장소 (절대 위치 → 항상 하단에 고정) 
         Positioned( 
-          left: 19, 
-          right: 19, 
-          bottom: 60, 
+          left: screenWidth * 0.05, 
+          right: screenWidth * 0.05, 
+          bottom: screenHeight * 0.064, 
           child: Row( 
             mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: [ 
               Text( 
                 date, 
                 style: TextStyle( 
-                  fontSize: 11, 
+                  fontSize: screenWidth * 0.03, 
                   fontWeight: FontWeight.w300, 
                   color: textColor, 
                 ), 
@@ -487,7 +491,7 @@ Widget build(BuildContext context) {
               Text( 
                 location, 
                 style: TextStyle( 
-                  fontSize: 11, 
+                  fontSize: screenWidth * 0.03, 
                   fontWeight: FontWeight.w300, 
                   color: textColor, 
                 ), 
