@@ -323,39 +323,7 @@ Future<void> _searchPlace(String query) async {
                             ),
                           ),
                         ),
-                        SizedBox(height: screenWidth * 0.08), // 시트 상단 ↔ 검색창
-
-                        // 검색창
-                        TextField(
-                          controller: _placeController,
-  onSubmitted: (value) {
-    FocusScope.of(context).unfocus(); // 키보드 내리기
-    _searchPlace(value);
-  },
-                          decoration: InputDecoration(
-                            hintText: "방문했던 전시관을 검색하세요",
-                            hintStyle: const TextStyle(color: Color(0xFFB1B1B1)),
-                            suffixIcon: GestureDetector(
-  onTap: () {
-    FocusScope.of(context).unfocus(); // 키보드 닫기
-    _searchPlace(_placeController.text); // 현재 입력값으로 검색 실행
-  },
-  child: selectedPlace != null
-      ? const Icon(Icons.check_circle, color: Color(0xFF837670))
-      : const Icon(Icons.search, color: Color(0xFFB1B1B1)),
-),
-                            filled: true,
-                            fillColor: const Color(0xFFFEF6F2),
-                            contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06), //vertical: 12
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        
-                        SizedBox(height: screenWidth * 0.08), // 검색창 ↔ 안내문구
-
+                        SizedBox(height: screenWidth * 0.08), // 시트 상단 ↔ 안내 문구
                     Row(
   children: [
     SvgPicture.asset(
@@ -446,7 +414,37 @@ Future<void> _searchPlace(String query) async {
                           ],
                         ),
 
-                        SizedBox(height: screenWidth * 0.07), // 마지막 여백 (was 28)
+SizedBox(height: screenWidth * 0.07), // 버튼 ↔ 검색창 간 여백
+// 검색창
+                        TextField(
+                          controller: _placeController,
+  onSubmitted: (value) {
+    FocusScope.of(context).unfocus(); // 키보드 내리기
+    _searchPlace(value);
+  },
+                          decoration: InputDecoration(
+                            hintText: "방문했던 전시관을 검색하세요",
+                            hintStyle: const TextStyle(color: Color(0xFFB1B1B1)),
+                            suffixIcon: GestureDetector(
+  onTap: () {
+    FocusScope.of(context).unfocus(); // 키보드 닫기
+    _searchPlace(_placeController.text); // 현재 입력값으로 검색 실행
+  },
+  child: selectedPlace != null
+      ? const Icon(Icons.check_circle, color: Color(0xFF837670))
+      : const Icon(Icons.search, color: Color(0xFFB1B1B1)),
+),
+                            filled: true,
+                            fillColor: const Color(0xFFFEF6F2),
+                            contentPadding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06), //vertical: 12
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        
+                        SizedBox(height: screenWidth * 0.04), // 검색창 ↔ 검색목록 여백
                         // 검색 결과 리스트 아래 여백 추가 + Scroll 가능하도록 수정
 if (searchResults.isNotEmpty)
   SizedBox(
@@ -474,7 +472,7 @@ if (_placeController.text.isNotEmpty && searchResults.isEmpty)
   Padding(
     padding: EdgeInsets.only(top: screenWidth * 0.02),
     child: Text(
-      '검색 결과가 없습니다.',
+      '전시관이 선택되었습니다.',
       style: TextStyle(color: Colors.grey),
     ),
   ),

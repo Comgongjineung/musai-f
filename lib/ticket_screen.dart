@@ -453,7 +453,7 @@ Widget build(BuildContext context) {
                   ), 
                 ), 
               ), 
-              SizedBox(height: screenHeight * 0.005), 
+              SizedBox(height: screenHeight * 0.006), 
               Padding( 
                 padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
                 child: Text( 
@@ -476,7 +476,7 @@ Widget build(BuildContext context) {
         Positioned( 
           left: screenWidth * 0.05, 
           right: screenWidth * 0.05, 
-          bottom: screenHeight * 0.064, 
+          bottom: screenHeight * 0.072, 
           child: Row( 
             mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: [ 
