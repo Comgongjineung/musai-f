@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'app_bar_widget.dart';
 import 'utils/auth_storage.dart';
+import 'community_write_screen.dart'; // CommunityWriteScreen 추가
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CommunityDetailScreen extends StatefulWidget {
   final int postId;
@@ -223,7 +225,11 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
   }
 
   Future<void> _submitComment() async {
-    if (token == null || _commentController.text.trim().isEmpty) {
+    await _submitCommentWithParentId(_commentController.text.trim(), null);
+  }
+
+  Future<void> _submitCommentWithParentId(String content, int? parentCommentId) async {
+    if (token == null || content.isEmpty) {
       return;
     }
 
@@ -231,8 +237,8 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       final requestBody = {
         'userId': userId ?? 0,
         'postId': widget.postId,
-        'parentCommentId': null, // 일반 댓글은 null로 설정
-        'content': _commentController.text.trim(),
+        'parentCommentId': parentCommentId, // 답글인 경우 부모 댓글 ID, 일반 댓글인 경우 null
+        'content': content,
       };
 
       print('댓글 작성 요청: ${json.encode(requestBody)}');
@@ -251,9 +257,11 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       print('댓글 작성 응답 바디: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        _commentController.clear();
+        if (parentCommentId == null) {
+          _commentController.clear();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('댓글이 성공적으로 작성되었습니다.')),
+          SnackBar(content: Text(parentCommentId == null ? '댓글이 성공적으로 작성되었습니다.' : '답글이 성공적으로 작성되었습니다.')),
         );
         // 서버가 댓글을 처리할 시간을 주기 위해 잠시 대기
         await Future.delayed(const Duration(milliseconds: 500));
@@ -261,13 +269,13 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
         await _loadComments();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('댓글 작성에 실패했습니다.')),
+          SnackBar(content: Text(parentCommentId == null ? '댓글 작성에 실패했습니다.' : '답글 작성에 실패했습니다.')),
         );
       }
     } catch (e) {
       print('댓글 작성 실패: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('댓글 작성 중 오류가 발생했습니다.')),
+        SnackBar(content: Text(parentCommentId == null ? '댓글 작성 중 오류가 발생했습니다.' : '답글 작성 중 오류가 발생했습니다.')),
       );
     }
   }
@@ -397,6 +405,868 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
     }
   }
 
+  // 메뉴 액션 처리 메서드
+  void _handleMenuAction(String action) {
+    switch (action) {
+      case 'edit':
+        _showEditDialog();
+        break;
+      case 'delete':
+        _showDeleteConfirmDialog();
+        break;
+      case 'report':
+        _showReportDialog();
+        break;
+    }
+  }
+
+  // 댓글 메뉴 액션 처리 메서드
+  void _handleCommentMenuAction(String action, Comment comment) {
+    switch (action) {
+      case 'reply_comment':
+        _showReplyCommentDialog(comment);
+        break;
+      case 'edit_comment':
+        _showEditCommentDialog(comment);
+        break;
+      case 'delete_comment':
+        _showDeleteCommentConfirmDialog(comment);
+        break;
+    }
+  }
+
+  // 수정하기 다이얼로그
+  void _showEditDialog() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CommunityWriteScreen(
+          postId: widget.postId,
+          initialTitle: postDetail?.title,
+          initialContent: postDetail?.content,
+        ),
+      ),
+    ).then((result) {
+      // 수정이 완료되면 게시물 정보를 새로고침
+      if (result == true) {
+        _loadPostDetail();
+        _loadComments();
+      }
+    });
+  }
+
+  // 수정하기 댓글 다이얼로그
+  void _showEditCommentDialog(Comment comment) {
+    final TextEditingController editController = TextEditingController(text: comment.content);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 280,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.edit,
+                size: 52,
+                color: Color(0xFFC06062),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '댓글을 수정해보세요!',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              // 댓글 수정 입력 필드
+              Container(
+                width: double.infinity,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF6F2),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextField(
+                  controller: editController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: '댓글을 입력하세요...',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Pretendard',
+                      color: Color(0xFFB1B1B1),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (editController.text.trim().isNotEmpty) {
+                          Navigator.of(context).pop();
+                          _updateComment(comment.commentId, editController.text.trim());
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '수정하기',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 댓글 수정 메서드
+  Future<void> _updateComment(int commentId, String content) async {
+    if (token == null) {
+      print('❌ 토큰이 없어서 댓글을 수정할 수 없습니다.');
+      return;
+    }
+
+    print('🔍 댓글 수정 시작...');
+    print('🔍 수정할 댓글 ID: $commentId');
+    print('🔍 수정할 내용: $content');
+    print('🔍 토큰: ${token != null ? "있음" : "없음"}');
+    print('🔍 사용자 ID: $userId');
+
+    try {
+      final requestBody = {
+        'content': content,
+      };
+
+      final response = await http.put(
+        Uri.parse('http://43.203.23.173:8080/comment/update/$commentId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+        },
+        body: json.encode(requestBody),
+      );
+
+      print('📊 댓글 수정 응답 상태 코드: ${response.statusCode}');
+      print('📊 댓글 수정 응답 바디: ${response.body}');
+      print('📊 댓글 수정 응답 헤더: ${response.headers}');
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('댓글이 수정되었습니다.')),
+        );
+        _loadComments(); // 댓글 목록 새로고침
+      } else if (response.statusCode == 403) {
+        print('❌ 403 Forbidden - 권한이 없습니다.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('댓글을 수정할 권한이 없습니다.')),
+        );
+      } else if (response.statusCode == 404) {
+        print('❌ 404 Not Found - 댓글을 찾을 수 없습니다.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('댓글을 찾을 수 없습니다.')),
+        );
+      } else {
+        print('❌ 댓글 수정 실패 - 상태 코드: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('댓글 수정에 실패했습니다. (${response.statusCode})')),
+        );
+      }
+    } catch (e) {
+      print('❌ 댓글 수정 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('댓글 수정 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  // 답글 다이얼로그
+  void _showReplyCommentDialog(Comment comment) {
+    final TextEditingController replyController = TextEditingController();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 280,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.reply,
+                size: 52,
+                color: Color(0xFFC06062),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '댓글에 답글을 달아보세요!',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              // 답글 입력 필드
+              Container(
+                width: double.infinity,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF6F2),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextField(
+                  controller: replyController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: '답글을 입력하세요...',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Pretendard',
+                      color: Color(0xFFB1B1B1),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (replyController.text.trim().isNotEmpty) {
+                          Navigator.of(context).pop();
+                          _submitCommentWithParentId(replyController.text.trim(), comment.commentId);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '답글 작성',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 삭제 확인 다이얼로그
+  void _showDeleteConfirmDialog() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 230,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
+              const SizedBox(height: 8),
+              const Text(
+                '정말로 이 게시물을 삭제하시겠습니까?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                '삭제하면 복구할 수 없습니다.',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF706B66),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _deletePost();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '삭제',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 삭제 확인 댓글 다이얼로그
+  void _showDeleteCommentConfirmDialog(Comment comment) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 230,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
+              const SizedBox(height: 8),
+              const Text(
+                '정말로 이 댓글을 삭제하시겠습니까?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                '삭제하면 복구할 수 없습니다.',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF706B66),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _deleteComment(comment.commentId);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '삭제',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 신고하기 다이얼로그
+  void _showReportDialog() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 230,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
+              const SizedBox(height: 8),
+              const Text(
+                '게시물을 신고하시겠습니까?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                '신고 기능은 아직 개발 중입니다.',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF706B66),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '확인',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 신고하기 댓글 다이얼로그
+  void _showReportCommentDialog(Comment comment) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 230,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
+              const SizedBox(height: 8),
+              const Text(
+                '댓글을 신고하시겠습니까?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                '신고 기능은 아직 개발 중입니다.',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF706B66),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '확인',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 게시물 삭제 메서드
+  Future<void> _deletePost() async {
+    if (token == null) {
+      print('❌ 토큰이 없어서 삭제할 수 없습니다.');
+      return;
+    }
+
+    print('🔍 게시물 삭제 시작...');
+    print('🔍 삭제할 게시물 ID: ${widget.postId}');
+    print('🔍 토큰: ${token != null ? "있음" : "없음"}');
+    print('🔍 사용자 ID: $userId');
+    print('🔍 게시물 작성자 ID: ${postDetail?.userId}');
+    print('🔍 현재 사용자와 게시물 작성자가 같은가?: ${postDetail?.userId == userId}');
+
+    // 게시물 작성자가 아닌 경우 삭제 불가
+    if (postDetail?.userId != userId) {
+      print('❌ 게시물 작성자가 아니므로 삭제할 수 없습니다.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('자신이 작성한 게시물만 삭제할 수 있습니다.')),
+      );
+      return;
+    }
+
+    try {
+      final requestBody = {
+        'postId': widget.postId,
+        'userId': userId,
+      };
+
+      final response = await http.delete(
+        Uri.parse('http://43.203.23.173:8080/post/delete/${widget.postId}'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+        },
+        body: json.encode(requestBody),
+      );
+
+      print('📊 삭제 응답 상태 코드: ${response.statusCode}');
+      print('📊 삭제 응답 바디: ${response.body}');
+      print('📊 삭제 응답 헤더: ${response.headers}');
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('게시물이 삭제되었습니다.')),
+        );
+        Navigator.of(context).pop(); // 상세 페이지에서 나가기
+      } else if (response.statusCode == 403) {
+        print('❌ 403 Forbidden - 권한이 없습니다.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('게시물을 삭제할 권한이 없습니다.')),
+        );
+      } else if (response.statusCode == 404) {
+        print('❌ 404 Not Found - 게시물을 찾을 수 없습니다.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('게시물을 찾을 수 없습니다.')),
+        );
+      } else {
+        print('❌ 삭제 실패 - 상태 코드: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('게시물 삭제에 실패했습니다. (${response.statusCode})')),
+        );
+      }
+    } catch (e) {
+      print('❌ 게시물 삭제 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('게시물 삭제 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  // 댓글 삭제 메서드
+  Future<void> _deleteComment(int commentId) async {
+    if (token == null) {
+      print('❌ 토큰이 없어서 댓글을 삭제할 수 없습니다.');
+      return;
+    }
+
+    print('🔍 댓글 삭제 시작...');
+    print('🔍 삭제할 댓글 ID: $commentId');
+    print('🔍 토큰: ${token != null ? "있음" : "없음"}');
+    print('🔍 사용자 ID: $userId');
+
+    try {
+      final response = await http.delete(
+        Uri.parse('http://43.203.23.173:8080/comment/delete/$commentId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+        },
+      );
+
+      print('📊 댓글 삭제 응답 상태 코드: ${response.statusCode}');
+      print('📊 댓글 삭제 응답 바디: ${response.body}');
+      print('📊 댓글 삭제 응답 헤더: ${response.headers}');
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('댓글이 삭제되었습니다.')),
+        );
+        _loadComments(); // 댓글 목록 새로고침
+      } else if (response.statusCode == 403) {
+        print('❌ 403 Forbidden - 권한이 없습니다.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('댓글을 삭제할 권한이 없습니다.')),
+        );
+      } else if (response.statusCode == 404) {
+        print('❌ 404 Not Found - 댓글을 찾을 수 없습니다.');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('댓글을 찾을 수 없습니다.')),
+        );
+      } else {
+        print('❌ 댓글 삭제 실패 - 상태 코드: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('댓글 삭제에 실패했습니다. (${response.statusCode})')),
+        );
+      }
+    } catch (e) {
+      print('❌ 댓글 삭제 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('댓글 삭제 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _commentController.dispose();
@@ -429,8 +1299,91 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               icon: const Icon(Icons.more_vert, color: Color(0xFF343231)),
-              onPressed: () {
-                // TODO: 더보기 메뉴
+              onPressed: () async {
+                final currentUserId = await getUserId();
+                if (currentUserId == null || !context.mounted) return;
+
+                // 화면 크기 가져오기
+                final screenSize = MediaQuery.of(context).size;
+                
+                // 메뉴 크기 (대략적인 값)
+                const double menuWidth = 120.0;
+                const double menuHeight = 150.0;
+                
+                // 메뉴 위치 계산 (오른쪽 상단에 표시)
+                double left = screenSize.width - menuWidth - 20; // 오른쪽에서 20px 여백
+                double top = kToolbarHeight + 20; // AppBar 아래에서 20px
+                
+                // 화면 경계 체크 및 조정
+                if (left < 0) {
+                  left = 20; // 왼쪽 여백 확보
+                }
+                
+                if (top + menuHeight > screenSize.height) {
+                  top = screenSize.height - menuHeight - 20; // 아래쪽 여백 확보
+                }
+                
+                final selected = await showMenu(
+                  context: context,
+                  position: RelativeRect.fromLTRB(
+                    left,
+                    top,
+                    screenSize.width - left - menuWidth,
+                    screenSize.height - top - menuHeight,
+                  ),
+                  color: const Color(0xFFFEF6F2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  items: postDetail?.userId == currentUserId
+                      ? [
+                          // 내가 쓴 글인 경우
+                          PopupMenuItem<String>(
+                            value: 'edit',
+                            child: Center(
+                              child: Text(
+                                '수정하기',
+                                style: TextStyle(
+                                  color: Color(0xFF343231),
+                                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          PopupMenuItem<String>(
+                            value: 'delete',
+                            child: Center(
+                              child: Text(
+                                '삭제하기',
+                                style: TextStyle(
+                                  color: Color(0xFF343231),
+                                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ]
+                      : [
+                          // 다른 사람이 쓴 글인 경우
+                          PopupMenuItem<String>(
+                            value: 'report',
+                            child: Center(
+                              child: Text(
+                                '신고하기',
+                                style: TextStyle(
+                                  color: Color(0xFF343231),
+                                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                );
+
+                if (selected != null) {
+                  _handleMenuAction(selected);
+                }
               },
             ),
           ),
@@ -746,6 +1699,123 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                         size: 14,
                         color: Color(0xFFB1B1B1),
                       ),
+                      // 삭제되지 않은 댓글에만 더보기 버튼 표시
+                      if (!comment.isDeleted) ...[
+                        const SizedBox(width: 8),
+                        // 더보기 버튼
+                        Builder(
+                          builder: (context) => GestureDetector(
+                            onTap: () async {
+                              final currentUserId = await getUserId();
+                              if (currentUserId == null || !context.mounted) return;
+
+                              // 더보기 버튼의 정확한 위치를 찾기
+                              final RenderBox button = context.findRenderObject() as RenderBox;
+                              final buttonPosition = button.localToGlobal(Offset.zero);
+                              
+                              // 화면 크기 가져오기
+                              final screenSize = MediaQuery.of(context).size;
+                              
+                              // 메뉴 크기 (대략적인 값)
+                              const double menuWidth = 120.0;
+                              const double menuHeight = 150.0;
+                              
+                              // 메뉴 위치 계산 (버튼 바로 왼쪽 위에 표시)
+                              double left = buttonPosition.dx - menuWidth - 5; // 버튼 왼쪽에 표시
+                              double top = buttonPosition.dy - menuHeight + 125; // 버튼 아래?
+                              
+                              // 화면 경계 체크 및 조정
+                              if (left < 0) {
+                                left = buttonPosition.dx + 5; // 버튼 오른쪽에 표시
+                              }
+                              
+                              if (top < 0) {
+                                top = buttonPosition.dy + button.size.height + 5; // 버튼 아래로 표시
+                              }
+                              
+                              final selected = await showMenu(
+                                context: context,
+                                position: RelativeRect.fromLTRB(
+                                  left,
+                                  top,
+                                  screenSize.width - left - menuWidth,
+                                  screenSize.height - top - menuHeight,
+                                ),
+                                color: const Color(0xFFFEF6F2),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                items: comment.userId == currentUserId
+                                  ? [
+                                      // 내가 쓴 댓글인 경우
+                                      PopupMenuItem<String>(
+                                        value: 'reply_comment',
+                                        child: Center(
+                                          child: Text(
+                                            '답글달기',
+                                            style: TextStyle(
+                                              color: Color(0xFF343231),
+                                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'edit_comment',
+                                        child: Center(
+                                          child: Text(
+                                            '수정하기',
+                                            style: TextStyle(
+                                              color: Color(0xFF343231),
+                                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'delete_comment',
+                                        child: Center(
+                                          child: Text(
+                                            '삭제하기',
+                                            style: TextStyle(
+                                              color: Color(0xFF343231),
+                                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ]
+                                  : [
+                                      // 다른 사람이 쓴 댓글인 경우
+                                      PopupMenuItem<String>(
+                                        value: 'reply_comment',
+                                        child: Center(
+                                          child: Text(
+                                            '답글달기',
+                                            style: TextStyle(
+                                              color: Color(0xFF343231),
+                                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                            );
+
+                            if (selected != null) {
+                              _handleCommentMenuAction(selected, comment);
+                            }
+                          },
+                          child: const Icon(
+                            Icons.more_vert,
+                            size: 16,
+                            color: Color(0xFFB1B1B1),
+                          ),
+                        ),
+                        ),
+                      ],
                     ],
                   ),
                 ],
@@ -754,11 +1824,12 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
               
               // 댓글 내용
               Text(
-                comment.content,
-                style: const TextStyle(
+                comment.isDeleted ? '삭제된 댓글입니다.' : comment.content,
+                style: TextStyle(
                   fontSize: 14,
                   fontFamily: 'Pretendard',
-                  color: Color(0xFF343231),
+                  color: comment.isDeleted ? const Color(0xFFB1B1B1) : const Color(0xFF343231),
+                  fontStyle: comment.isDeleted ? FontStyle.italic : FontStyle.normal,
                 ),
               ),
             ],
@@ -1038,6 +2109,7 @@ class Comment {
   final String createdAt;
   final String updatedAt;
   final List<Comment> replies; // List<String>에서 List<Comment>로 변경
+  final bool isDeleted; // 삭제 상태 추가
 
   Comment({
     required this.commentId,
@@ -1048,6 +2120,7 @@ class Comment {
     required this.createdAt,
     required this.updatedAt,
     required this.replies,
+    this.isDeleted = false, // 기본값은 false
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -1073,6 +2146,7 @@ class Comment {
         createdAt: json['createdAt'] ?? '',
         updatedAt: json['updatedAt'] ?? '',
         replies: repliesList,
+        isDeleted: json['isDeleted'] ?? false, // 삭제 상태 파싱
       );
     } catch (e) {
       print('Comment.fromJson 오류: $e');
@@ -1087,6 +2161,7 @@ class Comment {
         createdAt: '',
         updatedAt: '',
         replies: [],
+        isDeleted: false,
       );
     }
   }
