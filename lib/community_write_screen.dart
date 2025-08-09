@@ -5,7 +5,16 @@ import 'utils/auth_storage.dart';
 import 'community_screen.dart';
 
 class CommunityWriteScreen extends StatefulWidget {
-  const CommunityWriteScreen({super.key});
+  final int? postId; // 수정 모드일 때 사용
+  final String? initialTitle; // 수정 모드일 때 사용
+  final String? initialContent; // 수정 모드일 때 사용
+  
+  const CommunityWriteScreen({
+    super.key, 
+    this.postId, 
+    this.initialTitle, 
+    this.initialContent,
+  });
 
   @override
   State<CommunityWriteScreen> createState() => _CommunityWriteScreenState();
@@ -26,6 +35,12 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
 
   Future<void> _initialize() async {
     await _loadAuthInfo();
+    if (widget.initialTitle != null) {
+      _titleController.text = widget.initialTitle!;
+    }
+    if (widget.initialContent != null) {
+      _contentController.text = widget.initialContent!;
+    }
   }
 
   Future<void> _loadAuthInfo() async {
@@ -62,52 +77,65 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
         );
         return;
       }
-      
+
+      final isEditMode = widget.postId != null;
       final requestBody = {
-        'postId': 0,
-        'userId': userId ?? 0,
         'title': _titleController.text.trim(),
         'content': _contentController.text.trim(),
         'image1': 'string',
         'image2': 'string',
         'image3': 'string',
         'image4': 'string',
-        'createdAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
-        'likeCount': 0,
       };
 
-      print('🔍 게시물 작성 시작...');
+      print('🔍 ${isEditMode ? "게시물 수정" : "게시물 작성"} 시작...');
       print('🔍 토큰: ${token != null ? "있음" : "없음"}');
       print('🔍 사용자 ID: $userId');
       print('📤 요청 바디: ${json.encode(requestBody)}');
 
-      final response = await http.post(
-        Uri.parse('http://43.203.23.173:8080/post/add'),
-        headers: {
-          'accept': '*/*',
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(requestBody),
-      );
+      final response = isEditMode
+          ? await http.put(
+              Uri.parse('http://43.203.23.173:8080/post/update/${widget.postId}'),
+              headers: {
+                'accept': '*/*',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token',
+              },
+              body: json.encode(requestBody),
+            )
+          : await http.post(
+              Uri.parse('http://43.203.23.173:8080/post/add'),
+              headers: {
+                'accept': '*/*',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer $token',
+              },
+              body: json.encode({
+                ...requestBody,
+                'postId': 0,
+                'userId': userId ?? 0,
+                'createdAt': DateTime.now().toIso8601String(),
+                'updatedAt': DateTime.now().toIso8601String(),
+                'likeCount': 0,
+              }),
+            );
 
       print('📊 응답 상태 코드: ${response.statusCode}');
       print('📊 응답 바디: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('게시물이 성공적으로 작성되었습니다.')),
+          SnackBar(content: Text(isEditMode ? '게시물이 성공적으로 수정되었습니다.' : '게시물이 성공적으로 작성되었습니다.')),
         );
         // 성공 결과와 함께 이전 화면으로 돌아가기
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('게시물 작성에 실패했습니다. (${response.statusCode})')),
+          SnackBar(content: Text('${isEditMode ? "게시물 수정" : "게시물 작성"}에 실패했습니다. (${response.statusCode})')),
         );
       }
     } catch (e) {
-      print('❌ 게시물 작성 에러: $e');
+      print('❌ ${widget.postId != null ? "게시물 수정" : "게시물 작성"} 에러: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('오류가 발생했습니다: $e')),
       );
@@ -151,7 +179,7 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
                 right: 0,
                 child: Center(
                   child: Text(
-                    '글쓰기',
+                    widget.postId != null ? '수정하기' : '글쓰기',
                     style: TextStyle(
                       fontSize: screenWidth * (20 / 390),
                       fontWeight: FontWeight.bold,
