@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'alarm_page.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
@@ -11,6 +12,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final double? titleSize;
   final Color? titleColor;
   final bool showNotificationIcon;
+  final bool showSettingsIcon;
+  final VoidCallback? onSettingsPressed;
 
   const AppBarWidget({
     super.key,
@@ -23,29 +26,13 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.titleSize,
     this.titleColor,
     this.showNotificationIcon = false,
+    this.showSettingsIcon = false,
+    this.onSettingsPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
-    final List<Widget> combinedActions = [...?actions];
-    if (showNotificationIcon) {
-      combinedActions.add(
-        Padding(
-          padding: const EdgeInsets.only(right: 24),
-          child: IconButton(
-            icon: const Icon(Icons.notifications_none, size: 24, color: Color(0xFF343231)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => AlarmPage(initialIndex: 0)),
-              );
-            },
-          ),
-        ),
-      );
-    }
 
     return AppBar(
       backgroundColor: backgroundColor ?? Colors.transparent,
@@ -53,7 +40,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: centerTitle,
       leading: showBackButton
         ? Padding(
-            padding: const EdgeInsets.only(left:24), // ← 원하는 값으로 변경
+            padding: const EdgeInsets.only(left:24), 
             child: IconButton(
               padding: EdgeInsets.zero,
               icon: const Icon(
@@ -85,7 +72,25 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
                 letterSpacing: 0,
               ),
             ),
-      actions: combinedActions,
+      actions: [
+        if (showNotificationIcon)
+          Padding(
+            padding: const EdgeInsets.only(right: 24),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => AlarmPage(initialIndex: 0)),
+                );
+              },
+              child: SvgPicture.asset(
+                'assets/icons/notification.svg',
+                width: 20,
+                height: 20,
+              ),
+            ),
+          ),
+      ],
     );
   }
 

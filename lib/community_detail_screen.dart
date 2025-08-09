@@ -413,16 +413,26 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFFDFC),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        leading: Padding(
+          padding: EdgeInsets.only(left: screenWidth * 0.06),
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF343231)),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {
-              // TODO: 더보기 메뉴
-            },
+          Padding(
+            padding: EdgeInsets.only(right: screenWidth * 0.04),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(Icons.more_vert, color: Color(0xFF343231)),
+              onPressed: () {
+                // TODO: 더보기 메뉴
+              },
+            ),
           ),
         ],
       ),
@@ -435,13 +445,13 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                     children: [
                       Expanded(
                         child: SingleChildScrollView(
-                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.041),
+                          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // 사용자 정보
                               _buildUserInfo(screenWidth, screenHeight),
-                              SizedBox(height: screenHeight * 0.02),
+                              SizedBox(height: screenHeight * 0.03),
                               
                                                              // 본문
                                _buildPostContent(screenWidth, screenHeight),
@@ -542,13 +552,13 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
             color: const Color(0xFF343231),
           ),
         ),
-        SizedBox(height: screenHeight * 0.02),
+        SizedBox(height: screenHeight * 0.012),
         
         // 내용
         Text(
           postDetail!.content,
           style: TextStyle(
-            fontSize: screenWidth * 0.041,
+            fontSize: screenWidth * 0.04,
             fontFamily: 'Pretendard',
             color: const Color(0xFF343231),
             height: 1.5,
@@ -567,8 +577,8 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF837670), width: 0.928),
-            borderRadius: BorderRadius.circular(15.907),
+            border: Border.all(color: const Color(0xFF837670), width: 1),
+            borderRadius: BorderRadius.circular(20),
             color: const Color(0xFFFFFDFC),
           ),
           child: Row(
@@ -576,7 +586,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
             children: [
               const Icon(Icons.chat_bubble_outline, size: 16, color: Color(0xFF837670)),
               const SizedBox(width: 4),
-              Text('댓글 ${commentPage != null ? _calculateTotalComments(commentPage!.content) : 0}', style: const TextStyle(fontSize: 14, fontFamily: 'Pretendard', color: Color(0xFF837670))),
+              Text('댓글 ${commentPage != null ? _calculateTotalComments(commentPage!.content) : 0}', style: const TextStyle(fontSize: 16, fontFamily: 'Pretendard', color: Color(0xFF837670))),
             ],
           ),
         ),
@@ -587,8 +597,8 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFF837670), width: 0.928),
-              borderRadius: BorderRadius.circular(15.907),
+              border: Border.all(color: const Color(0xFF837670), width: 1),
+              borderRadius: BorderRadius.circular(20),
               color: const Color(0xFFFFFDFC),
             ),
             child: Row(
@@ -597,15 +607,15 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                 Icon(
                   isLiked ? Icons.favorite : Icons.favorite_border,
                   size: 16,
-                  color: isLiked ? Colors.red : const Color(0xFF837670),
+                  color: isLiked ? Color(0xFFC46567) : const Color(0xFF837670),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   '공감 ${postDetail!.likeCount}',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontFamily: 'Pretendard',
-                    color: isLiked ? Colors.red : const Color(0xFF837670),
+                    color: isLiked ? Color(0xFFC46567) : const Color(0xFF837670),
                   ),
                 ),
               ],
@@ -646,7 +656,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
             child: Text(
               '아직 댓글이 없습니다.',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 fontFamily: 'Pretendard',
                 color: Color(0xFFB1B1B1),
               ),

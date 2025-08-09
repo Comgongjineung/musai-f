@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'bottom_nav_bar.dart';
-import 'app_bar_widget.dart';
+import 'alarm_page.dart';
 import 'mypage_bookmark.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'utils/auth_storage.dart';
 import 'mypage_edit.dart';
 import 'ticket_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart'; 
 
 
 //회원 정보 수정
@@ -58,6 +59,50 @@ Future<void> updateDifficulty({
   }
 }
 
+//알림 설정 API 호출 함수 (전시회 추천 알림)
+Future<void> updateExhibitionAlarm(int userId, bool allowRAlarm) async {
+  final url = Uri.parse('http://43.203.23.173:8080/user/alarm/recog/$userId');
+  final token = await getJwtToken();
+  final response = await http.put(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'userId': userId,
+      'allowRAlarm': allowRAlarm,
+    }),
+  );
+  if (response.statusCode == 200) {
+    print('전시회 추천 알림 설정 완료');
+  } else {
+    print('전시회 추천 알림 설정 실패: ${response.statusCode}');
+  }
+}
+
+//알림 설정 API 호출 함수 (커뮤니티 알림)
+Future<void> updateCommunityAlarm(int userId, bool allowCAlarm) async {
+  final url = Uri.parse('http://43.203.23.173:8080/user/alarm/community/$userId');
+  final token = await getJwtToken();
+  final response = await http.put(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'userId': userId,
+      'allowCAlarm': allowCAlarm,
+    }),
+  );
+  if (response.statusCode == 200) {
+    print('커뮤니티 알림 설정 완료');
+  } else {
+    print('커뮤니티 알림 설정 실패: ${response.statusCode}');
+  }
+}
+
 //화면 디자인
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -69,12 +114,15 @@ class MyPageScreen extends StatefulWidget {
 class _MyPageScreenState extends State<MyPageScreen> {
   String nickname = '닉네임';
   String dropdownValue = '클래식한 해설'; // 기본값
+  bool _exhibitionAlarm = false; // 전시회 추천 알림
+  bool _communityAlarm = false;  // 커뮤니티 알림
 
   @override
   void initState() {
     super.initState();
     _loadNickname();
     _loadUserDifficulty(); // 사용자 난이도 로드
+    _loadAlarmStates();
   }
 
   Future<void> _loadNickname() async {
@@ -106,13 +154,103 @@ class _MyPageScreenState extends State<MyPageScreen> {
     }
   }
 
+  Future<void> _loadAlarmStates() async {
+    final r = await storage.read(key: 'allow_r_alarm');
+    final c = await storage.read(key: 'allow_c_alarm');
+    setState(() {
+      _exhibitionAlarm = (r == 'true');
+      _communityAlarm = (c == 'true');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: const AppBarWidget(
-        showNotificationIcon: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          'musai',
+          style: TextStyle(
+            color: const Color(0xFF343231),
+            fontSize: screenWidth * 0.08,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Pretendard',
+            letterSpacing: 0,
+          ),
+        ),
+        actions: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => AlarmPage(initialIndex: 0)),
+                  );
+                },
+                child: SvgPicture.asset(
+                  'assets/icons/notification.svg',
+                  width: 20,
+                  height: 20,
+                ),
+              ),
+              //const SizedBox(width: 4),
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: IconButton(
+                  icon: const Icon(Icons.more_vert, size: 24, color: Color(0xFF343231)),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                  onPressed: () async {
+                    final userId = await getUserId();
+                    if (userId == null || !context.mounted) return;
+
+                    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+                    final selected = await showMenu(
+                      context: context,
+                      position: RelativeRect.fromLTRB(
+                        overlay.size.width - 20,
+                        kToolbarHeight + 20,
+                        20,
+                        0,
+                      ),
+                      color: const Color(0xFFFEF6F2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      items: [
+                        PopupMenuItem<String>(
+                          value: 'withdraw',
+                          child: Center(
+                            child: Text(
+                              '회원 탈퇴',
+                              style: TextStyle(
+                                color: Color(0xFF343231),
+                                fontSize: MediaQuery.of(context).size.width * 0.04,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+
+                    if (selected == 'withdraw') {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => WithdrawConfirmDialog(userId: userId),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -164,8 +302,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
           ),
         ),
         SizedBox(height: screenHeight * 0.01),
-        Text(nickname, style: TextStyle(fontSize: screenWidth * 0.051, fontWeight: FontWeight.w500)),
-        SizedBox(height: screenHeight * 0.015),
+        Text(nickname, style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w500)),
+        SizedBox(height: screenHeight * 0.012),
         Container(
           width: screenWidth * 0.27,
           height: screenHeight * 0.035,
@@ -334,7 +472,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              // TODO: Navigate to written posts page
+              //작성한 글로 이동
+              //Navigator.push(context, MaterialPageRoute(builder: (_) => const UserPostsScreen()));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -347,7 +486,8 @@ class _MyPageScreenState extends State<MyPageScreen> {
           SizedBox(height: screenHeight * 0.015),
           GestureDetector(
             onTap: () {
-              // TODO: Navigate to written comments page
+              //작성한 댓글로 이동
+              //Navigator.push(context, MaterialPageRoute(builder: (_) => const UserCommentedPostsScreen()));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -363,10 +503,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 
   Widget _notificationSwitches(double screenWidth, double screenHeight) {
-    bool exhibitionAlarm = false;
-    bool communityAlarm = false;
     return StatefulBuilder(
-      builder: (context, setState) {
+      builder: (context, setSBState) {
+        // setSBState는 내부 스위치 애니메이션만 빠르게 갱신용, 실제 상태는 setState와 함께 유지 보수
         return Container(
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.01),
           decoration: BoxDecoration(
@@ -383,10 +522,15 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   Transform.scale(
                     scale: 0.95,
                     child: Switch(
-                      value: exhibitionAlarm,
+                      value: _exhibitionAlarm,
                       onChanged: (bool value) {
-                        setState(() {
-                          exhibitionAlarm = value;
+                        setState(() { _exhibitionAlarm = value; });
+                        setSBState(() {});
+                        getUserId().then((userId) {
+                          if (userId != null) {
+                            updateExhibitionAlarm(userId, value);
+                            storage.write(key: 'allow_r_alarm', value: value.toString());
+                          }
                         });
                       },
                       activeTrackColor: Color(0xFFC06062),
@@ -402,10 +546,15 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   Transform.scale(
                     scale: 0.95,
                     child: Switch(
-                      value: communityAlarm,
+                      value: _communityAlarm,
                       onChanged: (bool value) {
-                        setState(() {
-                          communityAlarm = value;
+                        setState(() { _communityAlarm = value; });
+                        setSBState(() {});
+                        getUserId().then((userId) {
+                          if (userId != null) {
+                            updateCommunityAlarm(userId, value);
+                            storage.write(key: 'allow_c_alarm', value: value.toString());
+                          }
                         });
                       },
                       activeTrackColor: Color(0xFFC06062),
@@ -418,6 +567,112 @@ class _MyPageScreenState extends State<MyPageScreen> {
           ),
         );
       },
+    );
+  }
+}
+// 회원 탈퇴 확인 다이얼로그 및 API 함수
+class WithdrawConfirmDialog extends StatelessWidget {
+  final int userId;
+  const WithdrawConfirmDialog({super.key, required this.userId});
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        height: 230,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Color(0xFFFEFDFC),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
+            SizedBox(height: 8),
+            Text(
+              '정말 탈퇴하시겠습니까?',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF343231),
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              '탈퇴하면 이전 기록을 복구할 수 없습니다.',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF706B66),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 28),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: screenWidth * 0.33,
+                  height: screenHeight * 0.05,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await _withdrawUser(userId, context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFC06062),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Text('네', style: TextStyle(color: Color(0xFFFEFDFC), fontSize: screenWidth * 0.04)),
+                  ),
+                ),
+                SizedBox(width: screenWidth * 0.015),
+                SizedBox(
+                  width: screenWidth * 0.33,
+                  height: screenHeight * 0.05,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFB1B1B1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Text('아니오', style: TextStyle(color: Color(0xFFFEFDFC), fontSize: screenWidth * 0.04)),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _withdrawUser(int userId, BuildContext context) async {
+  final token = await getJwtToken();
+  final response = await http.delete(
+    Uri.parse('http://43.203.23.173:8080/user/delete/$userId'),
+    headers: {
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    await storage.deleteAll();
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('회원 탈퇴 실패: ${response.statusCode}')),
     );
   }
 }

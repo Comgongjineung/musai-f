@@ -99,7 +99,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.fromLTRB(screenWidth * 0.062, screenWidth * 0.05, screenWidth * 0.062, screenWidth * 0.051),
+                  padding: EdgeInsets.fromLTRB(screenWidth * 0.06, screenWidth * 0.03, screenWidth * 0.06, screenWidth * 0.03),
                   child: _buildSearchBar(screenWidth),
                 ),
                 Expanded(
@@ -109,8 +109,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           ? _buildEmptyState(screenWidth, screenHeight)
                           : ListView.builder(
                               padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.062,
-                                vertical: screenHeight * 0.021,
+                                horizontal: screenWidth * 0.06,
+                                vertical: screenHeight * 0.02,
                               ),
                               itemCount: posts.length,
                               itemBuilder: (context, index) => Padding(
@@ -190,8 +190,16 @@ class _CommunityScreenState extends State<CommunityScreen> {
               width: screenWidth * 0.308,
               height: screenHeight * 0.052,
               decoration: BoxDecoration(
-                color: const Color(0xFFA28F7D),
+                color: const Color(0xFF837670),
                 borderRadius: BorderRadius.circular(screenWidth * 0.092),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0x66665E5E).withOpacity(0.3),
+                    offset: Offset(0, 0),
+                    blurRadius: 23.88,
+                    spreadRadius: 0,
+                  ),
+                ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -203,7 +211,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         color: const Color(0xFFFEFDFC),
                         fontSize: screenWidth * 0.051,
                         fontWeight: FontWeight.w600,
-                        fontFamily: 'Pretendard',
                       )),
                 ],
               ),
@@ -224,8 +231,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
       },
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.041,
-          vertical: screenHeight * 0.021,
+          horizontal: screenWidth * 0.04,
+          vertical: screenHeight * 0.02,
         ),
         decoration: BoxDecoration(
           color: const Color(0xFFFEFDFC),
@@ -253,15 +260,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         SizedBox(height: screenHeight * 0.01),
                         Row(
                           children: [
-                            Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                            Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFF706B66)),
                             SizedBox(width: screenWidth * 0.01),
-                            Text('${post.commentCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                            Text('${post.commentCount}', style: TextStyle(color: const Color(0xFF706B66), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
                             SizedBox(width: screenWidth * 0.01),
-                            Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                            Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFF706B66)),
                             SizedBox(width: screenWidth * 0.01),
-                            Text('${post.likeCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                            Text('${post.likeCount}', style: TextStyle(color: const Color(0xFF706B66), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
                             SizedBox(width: screenWidth * 0.01),
-                            Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                            Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFF706B66), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
                           ],
                         ),
                       ],
@@ -303,15 +310,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         overflow: TextOverflow.ellipsis),
                     Row(
                       children: [
-                        Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                        Icon(Icons.chat_bubble_outline, size: screenWidth * 0.03, color: const Color(0xFF706B66)),
                         SizedBox(width: screenWidth * 0.01),
-                        Text('${post.commentCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                        Text('${post.commentCount}', style: TextStyle(color: const Color(0xFF706B66), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
                         SizedBox(width: screenWidth * 0.01),
-                        Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFFB1B1B1)),
+                        Icon(Icons.favorite_outline, size: screenWidth * 0.03, color: const Color(0xFF706B66)),
                         SizedBox(width: screenWidth * 0.01),
-                        Text('${post.likeCount}', style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                        Text('${post.likeCount}', style: TextStyle(color: const Color(0xFF706B66), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
                         SizedBox(width: screenWidth * 0.01),
-                        Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFFB1B1B1), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
+                        Text(_formatDate(post.createdAt), style: TextStyle(color: const Color(0xFF706B66), fontSize: screenWidth * 0.031, fontFamily: 'Pretendard')),
                       ],
                     ),
                   ],

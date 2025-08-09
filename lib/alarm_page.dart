@@ -94,7 +94,7 @@ class _AlarmPageState extends State<AlarmPage> {
     if (token == null) return;
 
     final response = await http.delete(
-      Uri.parse('http://43.203.23.173:8080/alarm/delete/$alarmId'),
+      Uri.parse('http://43.203.23.173:8080/alarm/$alarmId'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -110,7 +110,7 @@ class _AlarmPageState extends State<AlarmPage> {
   Future<void> _deleteAllAlarms() async {
     if (token == null) return;
     final response = await http.delete(
-      Uri.parse('http://43.203.23.173:8080/alarm/delete/all'),
+      Uri.parse('http://43.203.23.173:8080/alarm/all/$userId'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
