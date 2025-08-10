@@ -9,6 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:flutter/rendering.dart';
+import 'package:http_parser/http_parser.dart';
 
 class TicketCreateScreen extends StatefulWidget {
   final String imageUrl;
@@ -33,6 +37,8 @@ class TicketCreateScreen extends StatefulWidget {
 class _TicketCreateScreenState extends State<TicketCreateScreen> {
   late Color selectedColor;
   bool isDarkText = false; // T 버튼 상태 (false=흰색 글씨, true=검은 글씨)
+  final GlobalKey _captureKey = GlobalKey();     // 캡처용 키
+  bool _saving = false;                          // 저장 로딩
 
   List<Color> recommendedColors = [];
   TextEditingController _placeController = TextEditingController();
@@ -44,7 +50,7 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
   @override
   void initState() {
     super.initState();
-    selectedColor = const Color(0xFFFFFFFF);
+    selectedColor = const Color(0xFF212121);
     _loadRecommendedColors();
   }
 
@@ -54,7 +60,11 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
 
   Future<void> _loadRecommendedColors() async {
   final token = await getJwtToken();
-  final uri = Uri.parse('http://43.203.23.173:8080/api/Ticketcolor/recommend-color');
+  if (token == null) {
+    print('❌ 토큰 없음');
+    return;
+  }
+  final uri = Uri.parse('http://43.203.23.173:8080/ticket/color');
 
   try {
     // 1. 이미지 다운로드
@@ -81,6 +91,8 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
 
     if (responseData.statusCode == 200) {
       final data = jsonDecode(responseData.body);
+      print('🎨 색상 추천 응답: $data');
+
       final List<dynamic> palette = data['palette'];
       setState(() {
         recommendedColors.clear();
@@ -119,9 +131,9 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
             child: const Text("적용"),
             onPressed: () {
               setState(() {
-                selectedColor = tempColor;
+                selectedColor = tempColor.withOpacity(1.0);
                 if (!recommendedColors.contains(tempColor)) {
-                  recommendedColors.add(tempColor);
+                  recommendedColors.add(tempColor.withOpacity(1.0)); // 팔레트에도 불투명으로
                 }
               });
               Navigator.pop(context);
@@ -133,16 +145,36 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
   }
 
   void _completeTicket() async {
-  await _submitTicket();
+  try {
+    setState(() => _saving = true);
 
-  // 티켓 목록 화면으로 이동
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const TicketScreen()),
-  );
+    // 1) PNG 캡처
+    final png = await _captureTicketPng(pixelRatio: 2.0);
+
+    // 2) 서버 업로드 → URL 획득
+    final ticketPngUrl = await _uploadTicketPng(png);
+
+    // 3) 티켓 등록 (ticketImage = PNG URL)
+    await _submitTicket(ticketPngUrl);
+
+    // 4) 티켓 목록 화면으로 이동
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const TicketScreen()),
+    );
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('티켓 저장/업로드 실패: $e')),
+    );
+  } finally {
+    if (mounted) setState(() => _saving = false);
+  }
 }
 
-  Future<void> _submitTicket() async {
+
+  Future<void> _submitTicket(String ticketPngUrl) async {
   final token = await getJwtToken();
   final userId = await getUserId();
 
@@ -163,15 +195,10 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
       "ticketId": 0,
       "userId": userId,
       "createdAt": widget.createdAt,
-      "ticketImage": widget.imageUrl, // ← string URL
+      "ticketImage": ticketPngUrl,
       "title": widget.title,
       "artist": widget.artist,
       "place": selectedPlace ?? '',
-
-/*
-      "ticketColor": '#${selectedColor.value.toRadixString(16).substring(2)}',
-      "textColor": isDarkText ? "#000000" : "#FFFFFF",
-      */
     }),
   );
 
@@ -216,6 +243,42 @@ Future<void> _searchPlace(String query) async {
   }
 }
 
+Future<Uint8List> _captureTicketPng({double pixelRatio = 2.0}) async {
+  final boundary = _captureKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+  final ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+  final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  return byteData!.buffer.asUint8List();
+}
+
+Future<String> _uploadTicketPng(Uint8List pngBytes) async {
+  final token = await getJwtToken();
+  if (token == null) throw Exception('토큰 없음');
+
+  final uri = Uri.parse('http://43.203.23.173:8080/ticket/upload');
+
+  final req = http.MultipartRequest('POST', uri)
+    ..headers['accept'] = '*/*'
+    ..headers['Authorization'] = 'Bearer $token'
+    ..files.add(
+      http.MultipartFile.fromBytes(
+        'file',
+        pngBytes,
+        filename: 'ticket.png',
+        contentType: MediaType('image', 'png'),
+      ),
+    );
+
+  final streamed = await req.send();
+  final res = await http.Response.fromStream(streamed);
+
+  if (res.statusCode == 200) {
+    // 서버가 순수 문자열(URL) 반환하므로 따옴표/공백 정리
+    return res.body.trim().replaceAll('"', '');
+  }
+  throw Exception('업로드 실패: ${res.statusCode} ${res.body}');
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -251,14 +314,20 @@ Future<void> _searchPlace(String query) async {
       height: 28,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        onTap: _completeTicket,
+        onTap: _saving ? null : _completeTicket, // 연타 방지
         child: Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF837670),
+            color: _saving ? const Color(0xFFB1B1B1) : const Color(0xFF837670),
             borderRadius: BorderRadius.circular(20),
           ),
           alignment: Alignment.center,
-          child: const Text(
+          child: _saving
+          ? const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            )                             // 로딩 표시
+          : const Text(
             "완료",
             style: TextStyle(
               color: Colors.white,
@@ -278,8 +347,10 @@ Future<void> _searchPlace(String query) async {
           // 티켓 미리보기
           Align(
             alignment: Alignment.topCenter,
-              child: Transform.scale(
+            child: Transform.scale(
                 scale: 0.9,
+            child: RepaintBoundary(            // 추가
+    key: _captureKey,    
                 child: TicketCard(
                   ticketImage: widget.imageUrl,
                   title: widget.title,
@@ -287,9 +358,10 @@ Future<void> _searchPlace(String query) async {
                   date: todayDateFormatted,
                   location: selectedPlace ?? '',
                   backgroundColor: selectedColor,
-                  textColor: isDarkText ? Color(0xFF343231) : Color(0xFFFEFDFC),
+  textColor: isDarkText ? const Color(0xFF343231) : const Color(0xFFFEFDFC),
                 ),
               ),
+            ),
             ),
 
           // 하단 드래거블 시트
@@ -348,7 +420,7 @@ Future<void> _searchPlace(String query) async {
                               Container(
         margin: EdgeInsets.only(right: i == 4 ? 0 : screenWidth * 0.02), // 버튼 간격만 적용 (was 8)
                                 child: GestureDetector(
-                                  onTap: () => setState(() => selectedColor = recommendedColors[i]),
+                                  onTap: () => setState(() => selectedColor = recommendedColors[i].withOpacity(1.0)),
                                   child: Container(
                                     width: screenWidth * 0.12, // 48
                                     height: screenWidth * 0.12,
