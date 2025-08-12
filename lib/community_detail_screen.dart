@@ -1408,6 +1408,12 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                               
                                                              // 본문
                                _buildPostContent(screenWidth, screenHeight),
+                               SizedBox(height: screenHeight * 0.03),
+                               
+                               // 이미지 갤러리
+                               if (postDetail!.image1 != null && postDetail!.image1!.isNotEmpty && postDetail!.image1 != 'string')
+                                 _buildImageGallery(screenWidth, screenHeight),
+                               
                                SizedBox(height: screenHeight * 0.06),
                                
                                // 댓글/공감 버튼
@@ -1519,6 +1525,188 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildImageGallery(double screenWidth, double screenHeight) {
+    // 이미지가 있는 필드들을 찾기
+    final List<String> images = [];
+    if (postDetail!.image1 != null && postDetail!.image1!.isNotEmpty && postDetail!.image1 != 'string') {
+      images.add(postDetail!.image1!);
+    }
+    if (postDetail!.image2 != null && postDetail!.image2!.isNotEmpty && postDetail!.image2 != 'string') {
+      images.add(postDetail!.image2!);
+    }
+    if (postDetail!.image3 != null && postDetail!.image3!.isNotEmpty && postDetail!.image3 != 'string') {
+      images.add(postDetail!.image3!);
+    }
+    if (postDetail!.image4 != null && postDetail!.image4!.isNotEmpty && postDetail!.image4 != 'string') {
+      images.add(postDetail!.image4!);
+    }
+
+    if (images.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return SizedBox(
+      height: screenWidth * 0.32, // 이미지 크기를 키움 (0.25 -> 0.32)
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: images.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () => _showFullScreenImage(images[index]),
+            child: Container(
+              width: screenWidth * 0.32, // 이미지 크기를 키움 (0.25 -> 0.32)
+              height: screenWidth * 0.32,
+              margin: EdgeInsets.only(
+                right: index < images.length - 1 ? screenWidth * 0.02 : 0,
+              ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFEBEBEB)),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _buildDetailImageWidget(images[index]),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDetailImageWidget(String imageData) {
+    // Base64 데이터인지 URL인지 판단
+    if (imageData.startsWith('data:image/') || imageData.startsWith('/9j/') || imageData.startsWith('iVBORw0KGgo')) {
+      // Base64 데이터인 경우
+      try {
+        return Image.memory(
+          base64Decode(imageData),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: const Color(0xFFF4F0ED),
+            child: const Icon(
+              Icons.image_outlined,
+              color: Color(0xFFB1B1B1),
+              size: 32,
+            ),
+          ),
+        );
+      } catch (e) {
+        print('❌ Base64 이미지 디코딩 실패: $e');
+        return Container(
+          color: const Color(0xFFF4F0ED),
+          child: const Icon(
+            Icons.image_outlined,
+            color: Color(0xFFB1B1B1),
+            size: 32,
+          ),
+        );
+      }
+    } else if (imageData.startsWith('http://') || imageData.startsWith('https://')) {
+      // URL인 경우
+      return Image.network(
+        imageData,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: const Color(0xFFF4F0ED),
+          child: const Icon(
+            Icons.image_outlined,
+            color: Color(0xFFB1B1B1),
+            size: 32,
+          ),
+        ),
+      );
+    } else {
+      // 기타 경우 (파일명 등)
+      return Container(
+        color: const Color(0xFFF4F0ED),
+        child: const Icon(
+          Icons.image_outlined,
+          color: Color(0xFFB1B1B1),
+          size: 32,
+        ),
+      );
+    }
+  }
+
+  void _showFullScreenImage(String imageData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              child: _buildFullScreenImageWidget(imageData),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFullScreenImageWidget(String imageData) {
+    // Base64 데이터인지 URL인지 판단
+    if (imageData.startsWith('data:image/') || imageData.startsWith('/9j/') || imageData.startsWith('iVBORw0KGgo')) {
+      // Base64 데이터인 경우
+      try {
+        return Image.memory(
+          base64Decode(imageData),
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: Colors.black,
+            child: const Icon(
+              Icons.image_outlined,
+              color: Colors.white,
+              size: 64,
+            ),
+          ),
+        );
+      } catch (e) {
+        print('❌ Base64 이미지 디코딩 실패: $e');
+        return Container(
+          color: Colors.black,
+          child: const Icon(
+            Icons.image_outlined,
+            color: Colors.white,
+            size: 64,
+          ),
+        );
+      }
+    } else if (imageData.startsWith('http://') || imageData.startsWith('https://')) {
+      // URL인 경우
+      return Image.network(
+        imageData,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: Colors.black,
+          child: const Icon(
+            Icons.image_outlined,
+            color: Colors.white,
+            size: 64,
+          ),
+        ),
+      );
+    } else {
+      // 기타 경우 (파일명 등)
+      return Container(
+        color: Colors.black,
+        child: const Icon(
+          Icons.image_outlined,
+          color: Colors.white,
+          size: 64,
+        ),
+      );
+    }
   }
 
   Widget _buildInteractionButtons(double screenWidth, double screenHeight) {
