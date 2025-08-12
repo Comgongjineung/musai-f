@@ -171,7 +171,43 @@ class _CommunitySearchScreenState extends State<CommunitySearchScreen> {
     );
   }
 
+  Widget _buildImageWidget(String imageData) {
+    // Base64 데이터인지 URL인지 판단
+    if (imageData.startsWith('data:image/') || imageData.startsWith('/9j/') || imageData.startsWith('iVBORw0KGgo')) {
+      // Base64 데이터인 경우
+      try {
+        return Image.memory(
+          base64Decode(imageData),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Icon(Icons.image_outlined, color: const Color(0xFFB1B1B1), size: 24),
+        );
+      } catch (e) {
+        print('❌ Base64 이미지 디코딩 실패: $e');
+        return Icon(Icons.image_outlined, color: const Color(0xFFB1B1B1), size: 24);
+      }
+    } else if (imageData.startsWith('http://') || imageData.startsWith('https://')) {
+      // URL인 경우
+      return Image.network(
+        imageData,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Icon(Icons.image_outlined, color: const Color(0xFFB1B1B1), size: 24),
+      );
+    } else {
+      // 기타 경우 (파일명 등)
+      return Icon(Icons.image_outlined, color: const Color(0xFFB1B1B1), size: 24);
+    }
+  }
+
   Widget _buildPostCard(Post post, double screenWidth, double screenHeight) {
+    // 디버깅: 이미지 데이터 출력
+    print('🔍 검색 게시물 ${post.postId} 이미지 정보:');
+    print('  - image1: ${post.image1}');
+    print('  - image1 길이: ${post.image1?.length ?? 0}');
+    print('  - image1 null 여부: ${post.image1 == null}');
+    print('  - image1 빈 문자열 여부: ${post.image1?.isEmpty ?? true}');
+    print('  - image1 "string" 여부: ${post.image1 == "string"}');
+    print('  - image1 시작 부분: ${post.image1?.substring(0, post.image1!.length > 50 ? 50 : post.image1!.length)}');
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -191,7 +227,7 @@ class _CommunitySearchScreenState extends State<CommunitySearchScreen> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFEAEAEA)),
         ),
-        child: post.image1 != null && post.image1!.isNotEmpty && post.image1 != 'string'
+        child: post.image1 != null && post.image1!.isNotEmpty && post.image1 != 'string' && post.image1!.length > 10
             ? Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -236,11 +272,7 @@ class _CommunitySearchScreenState extends State<CommunitySearchScreen> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(screenWidth * 0.026),
-                      child: Image.network(
-                        post.image1!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Icon(Icons.image_outlined, color: const Color(0xFFB1B1B1), size: screenWidth * 0.06),
-                      ),
+                      child: _buildImageWidget(post.image1!),
                     ),
                   ),
                 ],
