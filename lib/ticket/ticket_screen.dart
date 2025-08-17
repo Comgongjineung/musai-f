@@ -6,12 +6,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:http/http.dart' as http;
-import 'mypage.dart';
-import 'bottom_nav_bar.dart';
-import 'app_bar_widget.dart';
+import '../mypage/mypage.dart';
+import '../bottom_nav_bar.dart';
+import '../app_bar_widget.dart';
 import 'ticket_create.dart';
 import 'ticket_select_screen.dart';
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 import 'package:flutter/gestures.dart';
 
 // 3초 롱프레스 전용 인식기

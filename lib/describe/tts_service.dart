@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 
 class TTSService {
   static const String _baseUrl = 'http://43.203.23.173:8080/tts/synthesize';

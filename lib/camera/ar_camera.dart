@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
-import 'app_bar_widget.dart';
+import '../app_bar_widget.dart';
 
 class ARViewPage extends StatefulWidget {
   const ARViewPage({Key? key}) : super(key: key);

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'bottom_nav_bar.dart';
-import 'utils/auth_storage.dart';
-import 'describe_box.dart';
-import 'app_bar_widget.dart';
+import '../bottom_nav_bar.dart';
+import '../utils/auth_storage.dart';
+import '../describe/describe_box.dart';
+import '../app_bar_widget.dart';
 
 class BookmarkScreen extends StatefulWidget {
   const BookmarkScreen({super.key});

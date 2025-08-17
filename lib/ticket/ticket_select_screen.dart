@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'ticket_create.dart';
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 
 class TicketSelectScreen extends StatefulWidget {
   const TicketSelectScreen({super.key});

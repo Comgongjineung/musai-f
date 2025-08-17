@@ -4,7 +4,7 @@ import 'ticket_screen.dart'; // TicketCard 불러오기
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
