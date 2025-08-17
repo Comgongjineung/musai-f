@@ -156,7 +156,18 @@ Future<void> _openShareSheet(BuildContext context) async {
                   child: const Icon(Icons.chat_bubble, size: 20, color: Colors.black),
                   onTap: () async {
                     Navigator.of(context).pop();
-                    await _shareToKakao(imageUrl);
+                    final originUrl = _getCurrentTicketImageUrl();
+  if (originUrl == null) return;
+
+  // 파일명만 추출
+  final fileName = originUrl.split('/').last;
+
+  // 깔끔한 공유용 URL
+  final sharePageUrl  = 'https://musai-ticket-share.vercel.app/s/$fileName';
+                    await _shareToKakao(
+    s3ImageUrl: originUrl,
+    shareUrl: sharePageUrl,
+  );
                   },
                 ),
                 const SizedBox(width: 25), // ← 아이콘 간 간격
@@ -280,21 +291,24 @@ Future<void> _showUrlBottomSheet(BuildContext context, String url) async {
   );
 }
 
-Future<void> _shareToKakao(String imageUrl) async {
-  final Uri img = Uri.parse(imageUrl); // https 권장
-  final Uri web = img;
+Future<void> _shareToKakao({
+  required String s3ImageUrl,
+  required String shareUrl,
+}) async {
+  final Uri image = Uri.parse(s3ImageUrl);   // <-- 썸네일은 꼭 '이미지' URL
+  final Uri link  = Uri.parse(shareUrl);     // <-- 클릭 시 열릴 Vercel 페이지
 
   final template = FeedTemplate(
     content: Content(
-      title: '티켓을 공유합니다',
-      imageUrl: img,
-      link: Link(webUrl: web, mobileWebUrl: web),
-      description: '티켓 이미지를 공유했습니다.',
+      title: 'Musai Ticket',
+      imageUrl: image,                        // S3 PNG
+      link: Link(webUrl: link, mobileWebUrl: link), // Vercel 페이지
+      description: '소중한 순간을 담은 Musai 티켓을 공유합니다.',
     ),
     buttons: [
       Button(
         title: '이미지 보기',
-        link: Link(webUrl: web, mobileWebUrl: web),
+        link: Link(webUrl: link, mobileWebUrl: link),
       ),
     ],
   );
