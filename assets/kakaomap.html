@@ -264,38 +264,28 @@ function onLocationSuccess(position) {
         return;
       }
 
-      let customOverlay = new kakao.maps.CustomOverlay({ zIndex: 20 });
+      let customOverlay = new kakao.maps.CustomOverlay({ zIndex: 20, clickable: true });
 
-      nearby.forEach(place => {
-  nearby.forEach(place => {
-  const size = new kakao.maps.Size(32, 32);
-  const offset = new kakao.maps.Point(16, 16); // 정중앙 앵커
+  nearby.forEach((place) => {
+  const pos = new kakao.maps.LatLng(place.y, place.x);
+
+  const size = new kakao.maps.Size(70, 70);
+  const offset = new kakao.maps.Point(35, 35);
 
   const marker = new kakao.maps.Marker({
     map,
-    position: new kakao.maps.LatLng(place.y, place.x),
+    position: pos,
     title: place.name,
     image: new kakao.maps.MarkerImage(
-      'https://img.icons8.com/ios/100/2c7dff/museum.png', // 파란색 아이콘
+      'https://img.icons8.com/ios/100/2c7dff/museum.png',
       size,
       { offset }
     )
   });
-});
 
         const content = document.createElement('div');
         content.innerHTML = `
-          <div style="
-            background: #f5f5dc;
-            padding: 20px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            font-family: 'Inter', sans-serif;
-            max-width: 500px;
-            max-height: 300px;
-            font-size: 25px;
-            line-height: 2.5;
-          ">
+          <div style="background:#f5f5dc; padding:20px 20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.2); font-family:'Inter',sans-serif; max-width:500px; max-height:300px; font-size:25px; line-height:2.5; pointer-events:auto;">
             <div><strong>이름:</strong> ${place.name}</div>
             ${place.tel ? `<div><strong>전화번호:</strong> ${place.tel}</div>` : ''}
             ${place.url ? `<div><strong>홈페이지</strong><br><a href="${place.url}" target="_blank" style="color: #0066cc; text-decoration: underline; cursor: pointer;">${place.url}</a></div>` : ''}
@@ -308,7 +298,11 @@ function onLocationSuccess(position) {
           linkElement.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            const url = this.getAttribute('href');
+            let url = this.getAttribute('href') || '';
+ // 스킴 보정: http/https 없으면 https로 붙이기
+if (!/^https?:\/\//i.test(url)) {
+ url = 'https://' + url.replace(/^\/+/, '');
+}
             if (window.flutter_inappwebview) {
               window.flutter_inappwebview.callHandler('openLink', url);
             } else {
@@ -320,6 +314,7 @@ function onLocationSuccess(position) {
           event.stopPropagation(); // 말풍선 클릭 시 오버레이 닫기 방지
 });
 
+// 마커 클릭 → 오버레이 열기
         kakao.maps.event.addListener(marker, 'click', () => {
           customOverlay.setMap(null);
           customOverlay.setContent(content);
@@ -365,8 +360,8 @@ function deg2rad(deg) {
         title: '현재 위치',
         image: new kakao.maps.MarkerImage(
           'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-          new kakao.maps.Size(50, 50),
-          { offset: new kakao.maps.Point(15, 15) }
+          new kakao.maps.Size(70, 70),
+          { offset: new kakao.maps.Point(35, 35) }
         )
       });
 

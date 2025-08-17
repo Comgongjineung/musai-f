@@ -13,6 +13,7 @@ import '../login/login_UI.dart';
 import '../alarm_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../utils/auth_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -134,11 +135,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _initLocationAndFetch() async {
   // 권한/서비스 체크는 기존 다이얼로그 로직 그대로 사용
-  final permission = await Geolocator.checkPermission();
+  var permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
     await Geolocator.requestPermission();
   }
+  if (permission == LocationPermission.deniedForever) {
+    if (mounted) {
+      setState(() {
+        _nearestError = '설정에서 위치 권한을 허용해주세요.';
+        _loadingNearest = false; // 무한로딩 방지
+      });
+    }
+    _showPermissionDeniedDialog();
+    return;
+  }
+  
+   // 위치 서비스 꺼짐
   if (await Geolocator.isLocationServiceEnabled() == false) {
+    if (mounted) {
+      setState(() {
+        _nearestError = '기기의 위치 서비스가 꺼져 있어요.';
+        _loadingNearest = false; // 무한로딩 방지
+      });
+    }
     _showLocationServiceDisabledDialog();
     return;
   }
@@ -159,15 +178,35 @@ Future<void> _fetchNearest(double lat, double lng) async {
     _loadingNearest = true;
     _nearestError = null;
   });
+  final token = await getJwtToken();
+  if (token == null || token.isEmpty) {
+    if (mounted) {
+      setState(() {
+        _nearestError = '로그인이 필요합니다.';
+        _loadingNearest = false; // 무한로딩 방지
+      });
+    }
+    return;
+  }
 
   final uri = Uri.parse(
     'http://43.203.23.173:8080/exhibition/nearest?latitude=$lat&longitude=$lng',
   );
 
   try {
-    final res = await http.get(uri, headers: {'accept': '*/*'});
+    final res = await http
+        .get(
+          uri,
+          headers: {
+            'accept': '*/*',
+            'Authorization': 'Bearer $token',
+          },
+        )
+        .timeout(const Duration(seconds: 15)); // 타임아웃
     if (res.statusCode == 200) {
-      final List data = jsonDecode(res.body);
+      final decoded = utf8.decode(res.bodyBytes);
+      final List data = jsonDecode(decoded);
+
       final list = data.map((e) => Exhibition.fromJson(e as Map<String, dynamic>)).toList();
       setState(() {
         _nearest = list.take(3).toList(); // 3개만
@@ -190,6 +229,7 @@ Future<void> _fetchNearest(double lat, double lng) async {
   @override
 Widget build(BuildContext context) {
   final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
 
   return Scaffold(
     backgroundColor: const Color(0xFFFFFDFC),
@@ -231,34 +271,33 @@ Widget build(BuildContext context) {
 Expanded(
   child: SingleChildScrollView(
     padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06)
-        .copyWith(bottom: 10), // ⬅️ 맨 아래 여백 10
+        .copyWith(bottom: 10), // ⬅맨 아래 여백 10
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 주변 전시 3개 카드
         if (_loadingNearest)
-          Padding(
-            padding: EdgeInsets.only(top: screenWidth * 0.02),
-            child: const Center(child: CircularProgressIndicator()),
-          )
-        else if (_nearestError != null)
-          Padding(
-            padding: EdgeInsets.only(top: screenWidth * 0.02),
-            child: Text(_nearestError!, style: const TextStyle(color: Colors.redAccent)),
-          )
-        else
-          _NearestListCard(
-            items: _nearest.take(3).toList(),
-            screenWidth: screenWidth,
-            onTap: (e) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ExhibitionDetailPage(exhibition: e),
-                ),
-              );
-            },
-          ),
+  Padding(
+    padding: EdgeInsets.only(top: screenWidth * 0.02),
+    child: const Center(child: CircularProgressIndicator()),
+  )
+else if (_nearestError != null)
+  Padding(
+    padding: EdgeInsets.only(top: screenWidth * 0.02),
+    child: Text(_nearestError!, style: const TextStyle(color: Colors.redAccent)),
+  )
+else
+  _NearestListCard(
+      items: _nearest.take(3).toList(),
+      screenWidth: screenWidth,
+      screenHeight: screenHeight,
+      onTap: (e) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => ExhibitionDetailPage(exhibition: e)),
+        );
+      },
+    ),
 
         SizedBox(height: screenWidth * 0.06),
 
@@ -291,7 +330,7 @@ Expanded(
 
 Widget _buildMapWrapper(double screenWidth) {
   return SizedBox(
-    height: screenWidth * 0.6, // 195px → 반응형
+    height: screenWidth * 0.6,
     child: _mapContainer(BoxConstraints(maxWidth: screenWidth), screenWidth),
   );
 }
@@ -343,7 +382,7 @@ Widget _buildMapWrapper(double screenWidth) {
 
   // 지도 컨테이너 위젯 (InAppWebView 포함)
   Widget _mapContainer(BoxConstraints constraints, double screenWidth) => SizedBox(
-    height: constraints.maxWidth * 0.6, // 195px → 반응형
+    height: screenWidth * 0.6,
     child: ClipRRect(
       borderRadius: BorderRadius.circular(screenWidth * 0.05), // 20px → 반응형
       child: Stack(
@@ -427,38 +466,6 @@ Widget _buildMapWrapper(double screenWidth) {
       ),
     ),
   );
-
-  // 액션 버튼 행 위젯
-  Widget _actionRow(BoxConstraints constraints) {
-    final icons = [
-      Icons.grid_view,
-      Icons.palette_outlined,
-      Icons.image_outlined,
-      Icons.add,
-    ];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: List.generate(icons.length * 2 - 1, (i) {
-        if (i.isOdd) {
-          // 간격 삽입
-          return SizedBox(width: constraints.maxWidth * 0.02); // 8px → 반응형
-        } else {
-          final index = i ~/ 2;
-          final isPlus = index == 3;
-          return Container(
-            width: constraints.maxWidth * 0.18, // 69px → 반응형
-            height: constraints.maxWidth * 0.11, // 43px → 반응형
-            decoration: BoxDecoration(
-              color: isPlus ? const Color(0xB2A28F7D) : const Color(0xFFA28F7D),
-              borderRadius: BorderRadius.circular(constraints.maxWidth * 0.08), // 30px → 반응형
-            ),
-            child: Icon(icons[index], color: const Color(0xFFFEFDFC), size: constraints.maxWidth * 0.07), // 28px → 반응형
-          );
-        }
-      }),
-    );
-  }
 
   // 추천 목록 위젯
   Widget _recommendationList(BoxConstraints constraints, double screenWidth) {
@@ -630,11 +637,13 @@ class RecommendationCard extends StatelessWidget {
 class _NearestListCard extends StatelessWidget {
   final List<Exhibition> items;
   final double screenWidth;
+  final double screenHeight;
   final void Function(Exhibition e) onTap;
 
   const _NearestListCard({
     required this.items,
     required this.screenWidth,
+    required this.screenHeight,
     required this.onTap,
     super.key,
   });
@@ -642,7 +651,9 @@ class _NearestListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sw = screenWidth;
+
     return Container(
+      // 높이 고정 제거 (내용만큼 자동)
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(sw * 0.04), // ~16px
@@ -656,98 +667,115 @@ class _NearestListCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        children: List.generate(items.length, (i) {
-          final e = items[i];
-          final showDivider = i != items.length - 1;
-          return InkWell(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(i == 0 ? sw * 0.04 : 0),
-              topRight: Radius.circular(i == 0 ? sw * 0.04 : 0),
-              bottomLeft: Radius.circular(i == items.length - 1 ? sw * 0.04 : 0),
-              bottomRight: Radius.circular(i == items.length - 1 ? sw * 0.04 : 0),
-            ),
-            onTap: () => onTap(e),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: sw * 0.04, // 16
-                vertical: sw * 0.035,  // 14
+  children: List.generate(items.length, (idx) {
+    final e = items[idx];
+    return InkWell(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(idx == 0 ? sw * 0.04 : 0),
+        topRight: Radius.circular(idx == 0 ? sw * 0.04 : 0),
+        bottomLeft: Radius.circular(idx == items.length - 1 ? sw * 0.04 : 0),
+        bottomRight: Radius.circular(idx == items.length - 1 ? sw * 0.04 : 0),
+      ),
+      onTap: () => onTap(e),
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: idx == 0 ? screenHeight * (16 / 844) : 10,
+          bottom: idx == items.length - 1 ? screenHeight * (16 / 844) : 10,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: sw * 0.06,
+              child: Text(
+                '${idx + 1}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontWeight: FontWeight.w600,
+                  fontSize: sw * 0.043,
+                  color: const Color(0xFF706B66),
+                ),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 번호
-                  SizedBox(
-                    width: sw * 0.06,
-                    child: Text(
-                      '${i + 1}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Pretendard',
-                        fontWeight: FontWeight.w600,
-                        fontSize: sw * 0.043,
-                        color: const Color(0xFF706B66),
-                      ),
+                  Text(
+                    _decodeHtml(e.title).replaceAll('<to be continued>', ''),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.w600,
+                      fontSize: sw * 0.04,
+                      color: const Color(0xFF2E2A27),
                     ),
                   ),
-                  SizedBox(width: sw * 0.02),
-
-                  // 제목 + 장소
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 제목 한 줄
-                        Text(
-                          e.title,
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      const Icon(Icons.place_outlined, size: 16, color: Color(0xFFB1B1B1)),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          _decodeHtml(e.place),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w700,
-                            fontSize: sw * 0.042,
-                            color: const Color(0xFF2E2A27),
+                            fontWeight: FontWeight.w500,
+                            fontSize: sw * 0.03,
+                            color: const Color(0xFFB1B1B1),
                           ),
                         ),
-                        SizedBox(height: sw * 0.006),
-                        Row(
-                          children: [
-                            const Icon(Icons.place_outlined, size: 16, color: Color(0xFFB1B1B1)),
-                            SizedBox(width: sw * 0.01),
-                            Expanded(
-                              child: Text(
-                                e.place,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontFamily: 'Pretendard',
-                                  fontSize: sw * 0.034,
-                                  color: const Color(0xFFB1B1B1),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-
-                  Icon(Icons.chevron_right, size: sw * 0.07, color: const Color(0xFFB1B1B1)),
                 ],
               ),
             ),
-          ).withBottomDivider(showDivider);
-        }),
+            Icon(Icons.chevron_right, size: sw * 0.07, color: const Color(0xFFB1B1B1)),
+          ],
+        ),
       ),
+    );
+  }),
+),
     );
   }
 }
 
-extension _DivExt on Widget {
-  Widget withBottomDivider(bool show) => Column(
-        children: [
-          this,
-          if (show)
-            const Divider(height: 1, thickness: 1, color: Color(0xFFF0ECE9)),
-        ],
-      );
+String _decodeHtml(String s) {
+  var out = s
+      .replaceAll('&#39;', "'")
+      .replaceAll('&amp;', '&')
+      .replaceAll('&quot;', '"')
+      .replaceAll('&lt;', '<')
+      .replaceAll('&gt;', '>')
+      .replaceAll('&nbsp;', ' ');
+
+  // 숫자 엔티티 처리: &#NNNN; 형태
+  out = out.replaceAllMapped(RegExp(r'&#(\d+);'), (m) {
+    final code = int.tryParse(m.group(1) ?? '');
+    if (code == null) return m.group(0)!;
+    return String.fromCharCode(code);
+  });
+
+  // 16진수 엔티티 &#xHHHH;
+  out = out.replaceAllMapped(RegExp(r'&#x([0-9A-Fa-f]+);'), (m) {
+    final code = int.tryParse(m.group(1)!, radix: 16);
+    if (code == null) return m.group(0)!;
+    return String.fromCharCode(code);
+  });
+
+    // 특정 꼬리 문자열 제거
+  out = out.replaceAll('<to be continued>', '');
+
+  return out;
 }
