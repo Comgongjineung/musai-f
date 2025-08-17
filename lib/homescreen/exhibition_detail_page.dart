@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'bottom_nav_bar.dart';
-import 'app_bar_widget.dart';
+import '../bottom_nav_bar.dart';
+import '../app_bar_widget.dart';
 import 'package:intl/intl.dart';
 
 class Exhibition {

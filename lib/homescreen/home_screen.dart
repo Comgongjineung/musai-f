@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart';
-import 'bottom_nav_bar.dart';
-import 'app_bar_widget.dart';
-import 'secrets.dart'; // secrets.dart 파일에서 kakaoMapKey를 가져옵니다.
+import '../bottom_nav_bar.dart';
+import '../app_bar_widget.dart';
+import '../secrets.dart'; // secrets.dart 파일에서 kakaoMapKey를 가져옵니다.
 import 'dart:io';
 import 'search_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'exhibition_detail_page.dart';
-import 'login_UI.dart';
-import 'alarm_page.dart';
+import '../login/login_UI.dart';
+import '../alarm_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -134,6 +134,7 @@ Widget build(BuildContext context) {
     backgroundColor: const Color(0xFFFFFDFC),
     appBar: const AppBarWidget(
       showNotificationIcon: true,
+      showBackButton: false,
     ),
     body: SafeArea(
       child: Column(

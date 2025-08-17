@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'mypage_bookmark.dart';
-import 'app_bar_widget.dart';
+import '../mypage/mypage_bookmark.dart';
+import '../app_bar_widget.dart';
 import 'dart:io';
-import 'bottom_nav_bar.dart';
+import '../bottom_nav_bar.dart';
 import 'dart:convert';
 import 'tts_service.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'main_camera_page.dart';
+import '../camera/main_camera_page.dart';
 import 'package:http/http.dart' as http;
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 
 // 사용자의 저장된 난이도를 가져오는 함수
 Future<String?> getUserDifficulty(int userId, String token) async {

@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'dart:io'; // File 클래스 사용을 위해 추가
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img; // 이미지 압축용
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 import 'community_screen.dart';
 
 class CommunityWriteScreen extends StatefulWidget {

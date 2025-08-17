@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'bottom_nav_bar.dart';
-import 'app_bar_widget.dart';
+import '../bottom_nav_bar.dart';
+import '../app_bar_widget.dart';
 import 'exhibition_detail_page.dart';
 import 'package:intl/intl.dart';
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 
 // 상태별 태그 색상 함수
 Color getTagBgColor(String status) {

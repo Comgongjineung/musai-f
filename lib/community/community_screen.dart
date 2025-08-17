@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'app_bar_widget.dart';
-import 'bottom_nav_bar.dart';
-import 'utils/auth_storage.dart';
+import '../app_bar_widget.dart';
+import '../bottom_nav_bar.dart';
+import '../utils/auth_storage.dart';
 import 'community_search_screen.dart';
 import 'community_write_screen.dart';
 import 'community_detail_screen.dart';

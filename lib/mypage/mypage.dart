@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'bottom_nav_bar.dart';
-import 'alarm_page.dart';
+import '../bottom_nav_bar.dart';
+import '../alarm_page.dart';
 import 'mypage_bookmark.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'utils/auth_storage.dart';
+import '../utils/auth_storage.dart';
 import 'mypage_edit.dart';
-import 'ticket_screen.dart';
+import '../ticket/ticket_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart'; 
 
 

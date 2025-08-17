@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login_profile.dart';
-import 'utils/auth_storage.dart';
+import '../login/login_profile.dart';
+import '../utils/auth_storage.dart';
 
 
 Future<bool?> showEditProfileDialog(BuildContext context) {

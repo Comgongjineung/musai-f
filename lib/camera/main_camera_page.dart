@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'camera_view.dart';
-import 'fail_dialog.dart';
-import 'describe_page.dart';
-import 'bottom_nav_bar.dart';
-import 'ar_camera.dart';
+import '../describe/describe_page.dart';
+import '../bottom_nav_bar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'dart:convert';
 import 'dart:ui';
-import 'login_google.dart';
 
 class MusaiHomePage extends StatefulWidget {
   const MusaiHomePage({super.key});

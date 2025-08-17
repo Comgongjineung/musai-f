@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'main_camera_page.dart';
-import 'community_screen.dart';
-import 'mypage.dart';
-import 'mypage_bookmark.dart';
+import 'homescreen/home_screen.dart';
+import 'camera/main_camera_page.dart';
+import 'community/community_screen.dart';
+import 'mypage/mypage.dart';
+import 'mypage/mypage_bookmark.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
   final int currentIndex;
