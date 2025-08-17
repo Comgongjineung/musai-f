@@ -3,6 +3,8 @@ import 'homescreen/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:io' show Platform;
 import 'alarm.dart';
+import '../secrets.dart';
+import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
 
 
 Future<void> main() async {
@@ -19,6 +21,10 @@ Future<void> main() async {
     await initializeNotifications();
     await setupFirebaseMessaging();
   }
+
+  KakaoSdk.init(
+    nativeAppKey: kakaoURLKey,   // secrets.dart에서 가져옴
+  );
 }
 
 class MusaiApp extends StatelessWidget {

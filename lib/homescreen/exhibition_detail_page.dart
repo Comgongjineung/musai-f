@@ -12,6 +12,7 @@ class Exhibition {
   final String realmName;
   final String thumbnail;
   final int seqnum;
+  final String? placeUrl;
 
   Exhibition({
     required this.exhiId,
@@ -22,6 +23,7 @@ class Exhibition {
     required this.realmName,
     required this.thumbnail,
     required this.seqnum,
+    this.placeUrl,
   });
 
   factory Exhibition.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class Exhibition {
       realmName: json['realmName'] ?? '',
       thumbnail: json['thumbnail'] ?? '',
       seqnum: json['seqnum'] ?? 0,
+      placeUrl: json['placeUrl'] ?? '',
     );
   }
 }

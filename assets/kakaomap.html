@@ -257,7 +257,7 @@ function onLocationSuccess(position) {
         return { name, x, y, tel, url, distance };
       }).filter(p => !isNaN(p.x) && !isNaN(p.y))
         .sort((a, b) => a.distance - b.distance)
-        .slice(0, 7);
+        .slice(0, 10);
 
       if (nearby.length === 0) {
         showMessage('주변 10km 이내에 전시관이 없습니다.');
@@ -267,16 +267,21 @@ function onLocationSuccess(position) {
       let customOverlay = new kakao.maps.CustomOverlay({ zIndex: 20 });
 
       nearby.forEach(place => {
+  nearby.forEach(place => {
+  const size = new kakao.maps.Size(32, 32);
+  const offset = new kakao.maps.Point(16, 16); // 정중앙 앵커
+
   const marker = new kakao.maps.Marker({
     map,
     position: new kakao.maps.LatLng(place.y, place.x),
     title: place.name,
     image: new kakao.maps.MarkerImage(
-      './assets/images/museum.png', // 다운로드한 아이콘 경로
-      new kakao.maps.Size(100, 100),
-      { offset: new kakao.maps.Point(14, 14) }
+      'https://img.icons8.com/ios/100/2c7dff/museum.png', // 파란색 아이콘
+      size,
+      { offset }
     )
   });
+});
 
         const content = document.createElement('div');
         content.innerHTML = `

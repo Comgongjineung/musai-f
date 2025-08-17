@@ -95,4 +95,9 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+
+    <!-- 카카오톡 설치 여부 확인을 위한 queries -->
+    <queries>
+        <package android:name="com.kakao.talk" />
+    </queries>
 </manifest>

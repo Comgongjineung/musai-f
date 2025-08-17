@@ -13,6 +13,10 @@ import 'ticket_create.dart';
 import 'ticket_select_screen.dart';
 import '../utils/auth_storage.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
+import 'package:kakao_flutter_sdk_share/kakao_flutter_sdk_share.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 // 3초 롱프레스 전용 인식기
 class _DelayedLongPressRecognizer extends LongPressGestureRecognizer {
@@ -39,6 +43,17 @@ class _TicketScreenState extends State<TicketScreen> {
   Color selectedColor = const Color(0xFF8DAA91);
   final PageController controller = PageController(viewportFraction: 0.59);
   int currentPage = 0;
+
+  String? _getCurrentTicketImageUrl() {
+  if (tickets.isEmpty) return null;
+
+  final idx = isSingleView ? currentPage : 0; // 멀티뷰면 우선 첫 카드
+  if (idx < 0 || idx >= tickets.length) return null;
+
+  final t = tickets[idx];
+  final url = (t['ticketImage'] ?? '').toString().trim();
+  return url.isEmpty ? null : url;
+}
 
   @override
   void initState() {
@@ -92,6 +107,217 @@ class _TicketScreenState extends State<TicketScreen> {
       return '';
     }
   }
+
+Future<void> _openShareSheet(BuildContext context) async {
+  final imageUrl = _getCurrentTicketImageUrl();
+  if (imageUrl == null) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('공유할 티켓 이미지가 없어요.')),
+      );
+    }
+    return;
+  }
+
+  showDialog(
+  context: context,
+  barrierDismissible: true,
+  barrierColor: Colors.black.withOpacity(0.45),
+  builder: (_) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final dialogWidth = screenWidth * 241 / 390;
+    final dialogHeight = screenHeight * 260 / 844;
+    final cancelWidth = screenWidth * 144 / 390;
+    final cancelHeight = screenHeight * 40 / 844;
+
+    return Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: SizedBox(
+        width: dialogWidth,
+        height: dialogHeight,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(height: 36),
+            const Text(
+              '티켓을 친구들과 공유해봐요!',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _ShareSquareButton(
+                  background: const Color(0xFFFFE812),
+                  label: '카카오톡',
+                  child: const Icon(Icons.chat_bubble, size: 20, color: Colors.black),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _shareToKakao(imageUrl);
+                  },
+                ),
+                const SizedBox(width: 25), // ← 아이콘 간 간격
+                _ShareSquareButton(
+                  background: const Color(0xFF8B7E74),
+                  label: 'URL',
+                  labelColor: Colors.black,
+                  child: const Icon(Icons.link, size: 20, color: Colors.white),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await _showUrlBottomSheet(context, imageUrl);
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: cancelWidth,
+              height: cancelHeight,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFFB1B1B1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  '취소',
+                  style: TextStyle(
+                    color: Color(0xFFFEFDFC),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500, // medium
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 36),
+          ],
+        ),
+      ),
+    );
+  },
+);
+}
+
+Future<void> _showUrlBottomSheet(BuildContext context, String url) async {
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: false,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (_) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40, height: 4,
+              decoration: BoxDecoration(
+                color: Colors.black12, borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text('공유 링크', style: TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF6F6F6),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      url,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: '복사',
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: url));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('링크가 복사되었어요')),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.copy),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => Share.share(url), // 설치된 앱 목록 공유 시트
+                icon: const Icon(Icons.ios_share),
+                label: const Text('앱으로 공유하기'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(44),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Future<void> _shareToKakao(String imageUrl) async {
+  final Uri img = Uri.parse(imageUrl); // https 권장
+  final Uri web = img;
+
+  final template = FeedTemplate(
+    content: Content(
+      title: '티켓을 공유합니다',
+      imageUrl: img,
+      link: Link(webUrl: web, mobileWebUrl: web),
+      description: '티켓 이미지를 공유했습니다.',
+    ),
+    buttons: [
+      Button(
+        title: '이미지 보기',
+        link: Link(webUrl: web, mobileWebUrl: web),
+      ),
+    ],
+  );
+
+  try {
+    final available = await ShareClient.instance.isKakaoTalkSharingAvailable();
+    if (available) {
+      final Uri uri = await ShareClient.instance.shareDefault(template: template);
+      await ShareClient.instance.launchKakaoTalk(uri);
+    } else {
+      final Uri uri = await WebSharerClient.instance.makeDefaultUrl(template: template);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  } catch (e, st) {
+    debugPrint('Kakao share error: $e\n$st');
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('카카오 공유에 실패했어요.')),
+      );
+    }
+  }
+}
+
 
   Future<bool> _deleteTicket(int ticketId) async {
     token ??= await getJwtToken();
@@ -192,33 +418,37 @@ Widget _deletableTicketWrapper({
                           alignment: Alignment.center,
                           child: _buildCreateTicketButton(),
                         ),
-                        // 오른쪽 끝: 메뉴 버튼
-                        Positioned(
-                          right: 0,
-                          child: IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/images/ticket_menu.svg',
-                              width: 22,
-                              height: 22,
-                            ),
-                            onPressed: _showViewMenu,
-                          ),
-                        ),
+                         // 오른쪽 끝: 공유 + 메뉴 버튼
+Positioned(
+  right: 0,
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      // 공유 아이콘
+      IconButton(
+        onPressed: () => _openShareSheet(context),
+        icon: SvgPicture.asset(
+          'assets/images/share.svg', // ← share.svg 경로
+          width: 20,
+          height: 20,
+        ),
+      ),
+      // 기존 메뉴 아이콘
+      IconButton(
+        icon: SvgPicture.asset(
+          'assets/images/ticket_menu.svg',
+          width: 22,
+          height: 22,
+        ),
+        onPressed: _showViewMenu,
+      ),
+    ],
+  ),
+),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15),
-
-// 안내 문구 추가
-const Text(
-  '티켓을 3초간 꾹 누르시면 해당 티켓이 삭제됩니다.',
-  style: TextStyle(
-    fontSize: 10,
-    color: Colors.grey,
-  ),
-  textAlign: TextAlign.center,
-),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 40),
                   Expanded(
                     child:
                         isSingleView ? _buildSingleView() : _buildMultiView(),
@@ -640,3 +870,52 @@ class _PngTicket extends StatelessWidget {
     );
   }
 }
+
+class _ShareSquareButton extends StatelessWidget {
+  final Widget child;
+  final String label;
+  final Color background;
+  final Color? labelColor;
+  final VoidCallback onTap;
+
+  const _ShareSquareButton({
+    required this.child,
+    required this.label,
+    required this.background,
+    required this.onTap,
+    this.labelColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 52, height: 52,
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: child,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: labelColor ?? const Color(0xFF4B4B4B),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+

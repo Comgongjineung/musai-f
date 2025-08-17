@@ -11,6 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'exhibition_detail_page.dart';
 import '../login/login_UI.dart';
 import '../alarm_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,11 +23,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   InAppWebViewController? webViewController;
+  List<Exhibition> _nearest = [];
+  bool _loadingNearest = true;
+  String? _nearestError;
 
   @override
   void initState() {
     super.initState();
     _requestLocationPermission(); // 앱 시작 시 위치 권한 요청 및 GPS 활성화 확인
+    _initLocationAndFetch();
   }
 
   // 위치 권한 요청 및 GPS 활성화 확인 함수 (Geolocator만 사용)
@@ -126,6 +132,61 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _initLocationAndFetch() async {
+  // 권한/서비스 체크는 기존 다이얼로그 로직 그대로 사용
+  final permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    await Geolocator.requestPermission();
+  }
+  if (await Geolocator.isLocationServiceEnabled() == false) {
+    _showLocationServiceDisabledDialog();
+    return;
+  }
+
+  try {
+    final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    await _fetchNearest(pos.latitude, pos.longitude);
+  } catch (e) {
+    setState(() {
+      _nearestError = '위치 조회 실패: $e';
+      _loadingNearest = false;
+    });
+  }
+}
+
+Future<void> _fetchNearest(double lat, double lng) async {
+  setState(() {
+    _loadingNearest = true;
+    _nearestError = null;
+  });
+
+  final uri = Uri.parse(
+    'http://43.203.23.173:8080/exhibition/nearest?latitude=$lat&longitude=$lng',
+  );
+
+  try {
+    final res = await http.get(uri, headers: {'accept': '*/*'});
+    if (res.statusCode == 200) {
+      final List data = jsonDecode(res.body);
+      final list = data.map((e) => Exhibition.fromJson(e as Map<String, dynamic>)).toList();
+      setState(() {
+        _nearest = list.take(3).toList(); // 3개만
+        _loadingNearest = false;
+      });
+    } else {
+      setState(() {
+        _nearestError = '서버 오류: ${res.statusCode}';
+        _loadingNearest = false;
+      });
+    }
+  } catch (e) {
+    setState(() {
+      _nearestError = '네트워크 오류: $e';
+      _loadingNearest = false;
+    });
+  }
+}
+
   @override
 Widget build(BuildContext context) {
   final screenWidth = MediaQuery.of(context).size.width;
@@ -162,26 +223,53 @@ Widget build(BuildContext context) {
                 SizedBox(height: screenWidth * 0.02),
                 _buildMapWrapper(screenWidth),
                 SizedBox(height: screenWidth * 0.04),
-                _actionRow(BoxConstraints(maxWidth: screenWidth)),
-                SizedBox(height: screenWidth * 0.06),
-                _sectionTitle('Recommendation', screenWidth),
               ],
             ),
           ),
 
-          // 추천 카드만 스크롤 가능
-          Expanded(
-                          child: Padding(
-                padding: EdgeInsets.only(
-                  left: screenWidth * 0.06,
-                  top: screenWidth * 0.02,
+          // 전체 섹션 스크롤 가능
+Expanded(
+  child: SingleChildScrollView(
+    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06)
+        .copyWith(bottom: 10), // ⬅️ 맨 아래 여백 10
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 주변 전시 3개 카드
+        if (_loadingNearest)
+          Padding(
+            padding: EdgeInsets.only(top: screenWidth * 0.02),
+            child: const Center(child: CircularProgressIndicator()),
+          )
+        else if (_nearestError != null)
+          Padding(
+            padding: EdgeInsets.only(top: screenWidth * 0.02),
+            child: Text(_nearestError!, style: const TextStyle(color: Colors.redAccent)),
+          )
+        else
+          _NearestListCard(
+            items: _nearest.take(3).toList(),
+            screenWidth: screenWidth,
+            onTap: (e) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ExhibitionDetailPage(exhibition: e),
                 ),
-              child: _recommendationList(
-                BoxConstraints(maxWidth: screenWidth),
-                screenWidth,
-              ),
-            ),
+              );
+            },
           ),
+
+        SizedBox(height: screenWidth * 0.06),
+
+        // Recommendation 섹션
+        _sectionTitle('Recommendation', screenWidth),
+        SizedBox(height: screenWidth * 0.02),
+        _recommendationList(BoxConstraints(maxWidth: screenWidth), screenWidth),
+      ],
+    ),
+  ),
+),
         ],
       ),
     ),
@@ -203,7 +291,7 @@ Widget build(BuildContext context) {
 
 Widget _buildMapWrapper(double screenWidth) {
   return SizedBox(
-    height: screenWidth * 0.52, // 195px → 반응형
+    height: screenWidth * 0.6, // 195px → 반응형
     child: _mapContainer(BoxConstraints(maxWidth: screenWidth), screenWidth),
   );
 }
@@ -255,7 +343,7 @@ Widget _buildMapWrapper(double screenWidth) {
 
   // 지도 컨테이너 위젯 (InAppWebView 포함)
   Widget _mapContainer(BoxConstraints constraints, double screenWidth) => SizedBox(
-    height: constraints.maxWidth * 0.52, // 195px → 반응형
+    height: constraints.maxWidth * 0.6, // 195px → 반응형
     child: ClipRRect(
       borderRadius: BorderRadius.circular(screenWidth * 0.05), // 20px → 반응형
       child: Stack(
@@ -537,4 +625,129 @@ class RecommendationCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _NearestListCard extends StatelessWidget {
+  final List<Exhibition> items;
+  final double screenWidth;
+  final void Function(Exhibition e) onTap;
+
+  const _NearestListCard({
+    required this.items,
+    required this.screenWidth,
+    required this.onTap,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final sw = screenWidth;
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(sw * 0.04), // ~16px
+        border: Border.all(color: const Color(0xFFF0ECE9)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: List.generate(items.length, (i) {
+          final e = items[i];
+          final showDivider = i != items.length - 1;
+          return InkWell(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(i == 0 ? sw * 0.04 : 0),
+              topRight: Radius.circular(i == 0 ? sw * 0.04 : 0),
+              bottomLeft: Radius.circular(i == items.length - 1 ? sw * 0.04 : 0),
+              bottomRight: Radius.circular(i == items.length - 1 ? sw * 0.04 : 0),
+            ),
+            onTap: () => onTap(e),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: sw * 0.04, // 16
+                vertical: sw * 0.035,  // 14
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 번호
+                  SizedBox(
+                    width: sw * 0.06,
+                    child: Text(
+                      '${i + 1}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w600,
+                        fontSize: sw * 0.043,
+                        color: const Color(0xFF706B66),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: sw * 0.02),
+
+                  // 제목 + 장소
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 제목 한 줄
+                        Text(
+                          e.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: 'Pretendard',
+                            fontWeight: FontWeight.w700,
+                            fontSize: sw * 0.042,
+                            color: const Color(0xFF2E2A27),
+                          ),
+                        ),
+                        SizedBox(height: sw * 0.006),
+                        Row(
+                          children: [
+                            const Icon(Icons.place_outlined, size: 16, color: Color(0xFFB1B1B1)),
+                            SizedBox(width: sw * 0.01),
+                            Expanded(
+                              child: Text(
+                                e.place,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontFamily: 'Pretendard',
+                                  fontSize: sw * 0.034,
+                                  color: const Color(0xFFB1B1B1),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Icon(Icons.chevron_right, size: sw * 0.07, color: const Color(0xFFB1B1B1)),
+                ],
+              ),
+            ),
+          ).withBottomDivider(showDivider);
+        }),
+      ),
+    );
+  }
+}
+
+extension _DivExt on Widget {
+  Widget withBottomDivider(bool show) => Column(
+        children: [
+          this,
+          if (show)
+            const Divider(height: 1, thickness: 1, color: Color(0xFFF0ECE9)),
+        ],
+      );
 }
