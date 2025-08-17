@@ -164,10 +164,10 @@ class _AlarmPageState extends State<AlarmPage> {
                           key: Key(alarm['alarmId'].toString()),
                           endActionPane: ActionPane(
                             motion: const ScrollMotion(),
-                            extentRatio: 185 / screenWidth,
+                            extentRatio: 200 / screenWidth,
                             children: [
                               Container(
-                                width: screenWidth * 0.20, 
+                                width: screenWidth * 0.2, 
                                 decoration: const BoxDecoration(
                                   borderRadius: BorderRadius.only(
                                     topRight: Radius.circular(20),
@@ -191,7 +191,7 @@ class _AlarmPageState extends State<AlarmPage> {
                                 ),
                               ),
                               Container(
-                                width: screenWidth * 0.20, 
+                                width: screenWidth * 0.2, 
                                 decoration: const BoxDecoration(
                                   borderRadius: BorderRadius.only(
                                     topRight: Radius.circular(20),

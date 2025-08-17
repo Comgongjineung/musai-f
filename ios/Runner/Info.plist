@@ -74,6 +74,7 @@
 	  <dict>
 	    <key>CFBundleURLSchemes</key>
 	    <array>
+			<string>kakao051f7f01df5452d72c9fd74d42e11209</string>		<!-- Kakao 네이티브앱키 -->
 	      <string>40d335903b3e49454e6045336e765012</string>
 		  <string>com.googleusercontent.apps.951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn</string>
 	    </array>
@@ -85,6 +86,13 @@
 	<array>
 	    <string>google</string>
 	    <string>com.googleusercontent.apps.951832016031-irkuvgtrgq1cotf6qlrlbda9rcf9dcnn</string>
+
+		<!-- KakaoTalk 공유/연동용 -->
+    	<string>kakaokompassauth</string>
+    	<string>kakaolink</string>
+    	<string>kakaotalk</string>
 	</array>
 </dict>
 </plist>
+
+
