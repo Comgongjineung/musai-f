@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:musai_f/login/login_kakao.dart';
-import 'login_google.dart';
+import 'package:musai_f/login/login_google.dart';
 
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});

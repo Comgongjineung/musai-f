@@ -48,7 +48,6 @@ app.*.map.json
 /ios/Runner/GoogleService-Info.plist
 
 /lib/secrets.dart
-/lib/login_google.dart
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 lib/login/login_google.dart
