@@ -51,5 +51,4 @@ app.*.map.json
 /lib/login_google.dart
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
-lib/login_google.dart
-android/app/google-services.json
+lib/login/login_google.dart
