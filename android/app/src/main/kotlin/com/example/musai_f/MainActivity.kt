@@ -6,6 +6,7 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import com.unity3d.player.UnityPlayerGameActivity
+import com.unity3d.player.UnityPlayer
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.musai_f/unity_ar"
@@ -32,6 +33,15 @@ class MainActivity : FlutterActivity() {
                         result.success(true)
                     } catch (e: Exception) {
                         result.success(false)
+                    }
+                }
+                "sendJwtToken" -> {
+                    try {
+                        val token = call.arguments as? String ?: ""
+                        UnityPlayer.UnitySendMessage("ARCamera", "SetJwtToken", token)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("UNITY_SEND_ERROR", "Failed to send JWT to Unity", e.message)
                     }
                 }
                 else -> {

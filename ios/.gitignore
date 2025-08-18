@@ -32,3 +32,25 @@ Runner/GeneratedPluginRegistrant.*
 !default.mode2v3
 !default.pbxuser
 !default.perspectivev3
+
+# Unity iOS build artifacts
+Unity/Libraries/
+Unity/Classes/
+Unity/GeneratedFiles/
+Unity/Libraries/libiPhone-lib.a
+
+# Additional Unity ignores
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+
+*.unityproj
+*.pidb
+*.suo
+*.user
+*.userprefs
+*.unitypackage
