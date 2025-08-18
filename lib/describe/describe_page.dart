@@ -8,6 +8,7 @@ import '../camera/success_dialog.dart';
 import '../camera/fail_dialog.dart';
 import 'describe_box.dart';
 import '../utils/auth_storage.dart';
+import 'package:flutter/services.dart';
 
 class DescribePage extends StatefulWidget {
   final String imagePath;
@@ -29,11 +30,27 @@ class _DescribePageState extends State<DescribePage> {
   Timer? _retryTimer;
   bool _isDisposed = false;
 
+  // Unity 토큰 전달용 채널
+  static const MethodChannel _unityChannel = MethodChannel('com.example.musai_f/unity_ar');
+
+  Future<void> _sendJwtToUnity(String? token) async {
+    if (token == null || token.isEmpty) {
+      debugPrint('[AR] JWT Token 비어있음');
+      return;
+    }
+    try {
+      await _unityChannel.invokeMethod('setJwtToken', token);
+      debugPrint('[AR] JWT Token 유니티로 전송 성공 (length=${token.length})');
+    } catch (e) {
+      debugPrint('[AR] JWT Token 유니티로 전송 실패: $e');
+    }
+  }
+
   void _safeSetState(VoidCallback fn) {
     if (mounted) {
       setState(fn);
     } else {
-      debugPrint('🔕 [DescribePage] skip setState because unmounted');
+      //debugPrint('🔕 [DescribePage] skip setState because unmounted');
     }
   }
 
@@ -46,6 +63,7 @@ class _DescribePageState extends State<DescribePage> {
   Future<void> _startRecognition() async {
     final uri = Uri.parse("http://43.203.23.173:8080/recog/analyze");
     final token = await getJwtToken();
+    await _sendJwtToUnity(token);
     if (token == null) {
       _showFailure();
       return;
@@ -148,18 +166,18 @@ class _DescribePageState extends State<DescribePage> {
   Future<void> _updateAIPoints(String targetId, String imageUrl) async {
     try {
       if (targetId.isEmpty) {
-        print('❌ 좌표 업데이트 실패: targetId 비어있음');
+        print('좌표 업데이트 실패: targetId 비어있음');
         return;
       }
       if (imageUrl.isEmpty) {
-        print('❌ 좌표 업데이트 실패: imageUrl 비어있음');
+        print('좌표 업데이트 실패: imageUrl 비어있음');
         return;
       }
 
       // 원본 이미지 다시 다운로드 (서버는 파일 바이너리를 요구)
       final imgRes = await http.get(Uri.parse(imageUrl));
       if (imgRes.statusCode != 200) {
-        print('❌ 좌표 업데이트 실패: 이미지 다운로드 실패 (${imgRes.statusCode})');
+        print('좌표 업데이트 실패: 이미지 다운로드 실패 (${imgRes.statusCode})');
         return;
       }
       final imageBytes = imgRes.bodyBytes;
@@ -194,13 +212,13 @@ class _DescribePageState extends State<DescribePage> {
           });
           print('✅ 메타데이터 업데이트 성공: ${decoded.length}개 포인트');
         } else {
-          print('⚠️ 업데이트 응답 형식이 리스트가 아님: $body');
+          print('업데이트 응답 형식이 리스트가 아님: $body');
         }
       } else {
-        print('❌ 좌표 업데이트 실패 - 상태코드: $code, body: $body');
+        print('좌표 업데이트 실패 - 상태코드: $code, body: $body');
       }
     } catch (e) {
-      print('❌ 좌표 업데이트 예외: $e');
+      print('좌표 업데이트 예외: $e');
     }
   }
 
