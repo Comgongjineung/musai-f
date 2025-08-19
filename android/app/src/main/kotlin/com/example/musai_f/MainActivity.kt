@@ -35,7 +35,7 @@ class MainActivity : FlutterActivity() {
                         result.success(false)
                     }
                 }
-                "sendJwtToken" -> {
+                "SetJwtToken" -> {
                     try {
                         val token = call.arguments as? String ?: ""
                         UnityPlayer.UnitySendMessage("ARCamera", "SetJwtToken", token)

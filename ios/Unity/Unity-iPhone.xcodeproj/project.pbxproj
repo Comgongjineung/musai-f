@@ -13,6 +13,7 @@
 		28F5F1FABC4B857791668320 /* VuforiaShare.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8ADE3D39AC24C8D928BDBC74 /* VuforiaShare.mm */; };
 		2EBB80B22E52249500AAC957 /* VuforiaEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EBB80AC2E52249500AAC957 /* VuforiaEngine.framework */; platformFilter = ios; };
 		2EBB80B32E52249500AAC957 /* UnityDriver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EBB80AB2E52249500AAC957 /* UnityDriver.framework */; platformFilter = ios; };
+		2ED6A6922E53931F0047264C /* Data in Resources */ = {isa = PBXBuildFile; fileRef = AA31BF961B55660D0013FB1B /* Data */; };
 		415674EFD2EC187355BC05B1 /* LaunchScreen-iPhoneLandscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 1E24B93E9D27D99850693BAF /* LaunchScreen-iPhoneLandscape.png */; };
 		475B26F38A3A652C6174529D /* IUnityInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 679ACDCF6D14CA6FE6F81479 /* IUnityInterface.h */; };
 		5623C57617FDCB0800090B9E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -1513,6 +1514,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2ED6A6922E53931F0047264C /* Data in Resources */,
 				91C1EB5F348833EAD02A7E9A /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
