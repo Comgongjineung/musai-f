@@ -65,6 +65,7 @@ class DescriptionScreen extends StatefulWidget {
   final String description;
   final String imagePath;
   final String? imageUrl;
+  final String? style;
   final ScrollController scrollController;
   final bool fromBookmark;
 
@@ -76,6 +77,7 @@ class DescriptionScreen extends StatefulWidget {
     required this.description,
     required this.imagePath,
     this.imageUrl,
+    this.style,
     required this.scrollController,
     this.fromBookmark = false,
   });
@@ -108,6 +110,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     super.initState();
     // 초기 설명 설정
     currentDescription = widget.description;
+    print('🎭 DescriptionScreen 초기화 - style 값: ${widget.style}');
+    print('🎭 DescriptionScreen 초기화 - title: ${widget.title}');
+    print('🎭 DescriptionScreen 초기화 - artist: ${widget.artist}');
     _initialize();
   }
 
@@ -480,6 +485,17 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  // 예술사조 표시
+                  SizedBox(height: screenHeight * 0.01),
+                  Text(
+                    '예술사조: ${widget.style != null && widget.style!.isNotEmpty ? widget.style!.replaceAll('*', '') : '미상'}',
+                    style: TextStyle(
+                      color: const Color(0xFF8B7355),
+                      fontSize: screenWidth * 0.028, // 11/390
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ),
@@ -552,6 +568,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           'artist': widget.artist,
           'description': widget.description,
           'imageUrl': widget.imageUrl ?? '',
+          'style': widget.style ?? '', // 예술사조 추가
         }),
       );
 
@@ -614,6 +631,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       widget.title,
       widget.artist,
       widget.year,
+      '예술사조: ${widget.style != null && widget.style!.isNotEmpty ? widget.style!.replaceAll('*', '') : '미상'}',
       currentDescription,
     ].where((e) => e != null && e.isNotEmpty).join(', ');
     ttsText = ttsText.replaceAll('*', '');
@@ -690,7 +708,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       // 이미지 파일을 업로드하여 AI 서버에 전달하고 분석 결과를 반환하는 API 호출
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://43.203.23.173:8080/recog/analyzeAndRegister'),
+        Uri.parse('http://43.203.23.173:8080/recog/analyze'),
       );
       request.files.add(await http.MultipartFile.fromPath('file', widget.imagePath));
       request.fields['level'] = level;
@@ -702,8 +720,14 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       final responseBody = await response.stream.bytesToString();
 
       print('AI 해설 API 응답: ${response.statusCode}');
+      print('🔍 API 응답 전체 데이터: $responseBody');
+      
       if (response.statusCode == 200) {
         final data = json.decode(responseBody);
+        print('📊 파싱된 JSON 데이터: $data');
+        print('🎨 gemini_result: ${data['gemini_result']}');
+        print('🎭 style 값: ${data['gemini_result']?['style']}');
+        
         final newDescription = data['gemini_result']['description'] ?? '';
         
         setState(() {
