@@ -45,14 +45,15 @@ import UnityFramework
 
     channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
       switch call.method {
-      case "sendJwtToUnity":
+      case "SetJwtToken":
         guard let token = call.arguments as? String, !token.isEmpty else {
           print("[iOS] 유니티에 전달할 토큰이 잘못됨")
           result(FlutterError(code: "INVALID_TOKEN", message: "JWT must be a non-empty String", details: nil))
           return
         }
-        // Ensure Unity is initialized before sending the token
+        // 엔진 초기화 후 실행
         self.initUnity()
+        self.ufw?.showUnityWindow()
 
         if let ufw = self.ufw {
           ufw.sendMessageToGO(withName: "ARCamera",

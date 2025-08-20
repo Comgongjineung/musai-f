@@ -29,22 +29,7 @@ class _DescribePageState extends State<DescribePage> {
 
   Timer? _retryTimer;
   bool _isDisposed = false;
-
-  // Unity 토큰 전달용 채널
-  static const MethodChannel _unityChannel = MethodChannel('com.example.musai_f/unity_ar');
-
-  Future<void> _sendJwtToUnity(String? token) async {
-    if (token == null || token.isEmpty) {
-      debugPrint('[AR] JWT Token 비어있음');
-      return;
-    }
-    try {
-      await _unityChannel.invokeMethod('setJwtToken', token);
-      debugPrint('[AR] JWT Token 유니티로 전송 성공 (length=${token.length})');
-    } catch (e) {
-      debugPrint('[AR] JWT Token 유니티로 전송 실패: $e');
-    }
-  }
+  String? _jwtToken;
 
   void _safeSetState(VoidCallback fn) {
     if (mounted) {
@@ -63,7 +48,7 @@ class _DescribePageState extends State<DescribePage> {
   Future<void> _startRecognition() async {
     final uri = Uri.parse("http://43.203.23.173:8080/recog/analyze");
     final token = await getJwtToken();
-    await _sendJwtToUnity(token);
+    _jwtToken = token; // 나중에 Describe 화면에서 AR 버튼을 누를 때 사용
     if (token == null) {
       _showFailure();
       return;
@@ -253,6 +238,8 @@ class _DescribePageState extends State<DescribePage> {
             imageUrl: _artData!['imageUrl'],
             style: _artData!['style'], // 예술사조 추가
             scrollController: ScrollController(),
+            // ⚠️ Describe 화면에서 AR 버튼 탭 시 이 토큰으로 _unityChannel.invokeMethod('SetJwtToken', token) 하세요.
+            jwtToken: _jwtToken,
           ),
         ),
       );

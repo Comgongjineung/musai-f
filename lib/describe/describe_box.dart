@@ -9,6 +9,7 @@ import 'package:audioplayers/audioplayers.dart';
 import '../camera/main_camera_page.dart';
 import 'package:http/http.dart' as http;
 import '../utils/auth_storage.dart';
+import 'package:flutter/services.dart';
 
 // 사용자의 저장된 난이도를 가져오는 함수
 Future<String?> getUserDifficulty(int userId, String token) async {
@@ -65,6 +66,7 @@ class DescriptionScreen extends StatefulWidget {
   final String description;
   final String imagePath;
   final String? imageUrl;
+  final String? jwtToken;
   final String? style;
   final ScrollController scrollController;
   final bool fromBookmark;
@@ -77,6 +79,7 @@ class DescriptionScreen extends StatefulWidget {
     required this.description,
     required this.imagePath,
     this.imageUrl,
+    this.jwtToken,
     this.style,
     required this.scrollController,
     this.fromBookmark = false,
@@ -87,6 +90,22 @@ class DescriptionScreen extends StatefulWidget {
 }
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
+  static const MethodChannel _unityChannel = MethodChannel('com.example.musai_f/unity_ar');
+
+  Future<void> _sendJwtToUnity() async {
+    final token = widget.jwtToken;
+    if (token == null || token.isEmpty) {
+      debugPrint('[AR] jwtToken 없음 — Unity 전송 스킵');
+      return;
+    }
+    try {
+      await _unityChannel.invokeMethod('SetJwtToken', token);
+      debugPrint('[AR] JWT 토큰 Unity로 전송 성공: $token');
+    } catch (e) {
+      debugPrint('[AR] JWT 토큰 Unity 전송 실패: $e');
+    }
+  }
+
   String? token;
   int? userId;
   bool isBookmarked = false;
@@ -139,16 +158,16 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   // 사용자 난이도 로드
   Future<void> _loadUserDifficulty() async {
     if (token != null && userId != null) {
-      print('🔄 사용자 난이도 로드 시작');
+      print('사용자 난이도 로드 시작');
       final difficulty = await getUserDifficulty(userId!, token!);
-      print('📊 조회된 난이도: $difficulty');
+      print('조회된 난이도: $difficulty');
       
       if (mounted) {
         setState(() {
           userDifficulty = difficulty;
           // 사용자의 저장된 난이도에 따라 드롭다운 기본값 설정
           if (difficulty != null) {
-            print('🎯 난이도에 따른 드롭다운 설정: $difficulty');
+            print('난이도에 따른 드롭다운 설정: $difficulty');
             switch (difficulty) {
               case 'EASY':
                 selectedDescription = '한눈에 보는 해설';
@@ -163,15 +182,15 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                 print('✅ 깊이 있는 해설로 설정');
                 break;
               default:
-                print('⚠️ 알 수 없는 난이도: $difficulty');
+                print('알 수 없는 난이도: $difficulty');
             }
           } else {
-            print('⚠️ 사용자 난이도가 null입니다. 기본값 사용');
+            print('사용자 난이도가 null입니다. 기본값 사용');
           }
         });
       }
     } else {
-      print('❌ 토큰 또는 userId가 null입니다. token=$token, userId=$userId');
+      print('토큰 또는 userId가 null입니다. token=$token, userId=$userId');
     }
   }
 
@@ -251,27 +270,32 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     top: screenHeight * 0.02,
                     left: 0,
                     right: 0,
-                    child: Center(
-                      child: Container(
-                        width: screenWidth * 0.15, 
-                        height: screenHeight * 0.04, 
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEFDFC), // 흰색 배경
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color.fromRGBO(102, 94, 94, 0.3),
-                              blurRadius: 20,
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'AR',
-                            style: TextStyle(
-                              color: Color(0xFF343231),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                    child: GestureDetector(
+                      onTap: () async {
+                        await _sendJwtToUnity();
+                      },
+                      child: Center(
+                        child: Container(
+                          width: screenWidth * 0.15,
+                          height: screenHeight * 0.04,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFEFDFC),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromRGBO(102, 94, 94, 0.3),
+                                blurRadius: 20,
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'AR',
+                              style: TextStyle(
+                                color: Color(0xFF343231),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
