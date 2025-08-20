@@ -18,6 +18,41 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   bool isLoading = true;
   String? token;
   int? userId;
+  String? selectedStyle; // 선택된 예술사조
+  bool isStyleExpanded = false; // 예술사조 필터 확장 여부
+  
+  // 예술사조 목록 (한글 순서대로 정렬)
+  final List<String> artStyles = [
+    '고대 미술',
+    '남아시아',
+    '동남아시아',
+    '동아시아',
+    '로코코',
+    '르네상스',
+    '바로크',
+    '사실주의',
+    '서아시아 / 중동',
+    '신고전주의',
+    '아르누보',
+    '인상주의',
+    '입체주의',
+    '중세 미술',
+    '중앙아시아',
+    '추상표현주의',
+    '초현실주의',
+    '팝아트',
+    '표현주의',
+    '현대미술',
+    '후기 인상주의',
+    '미상'
+  ];
+
+  // 예술사조 버튼 폭 계산
+  double _styleButtonWidth(String style) {
+    if (style == '서아시아 / 중동') return 66;
+    final int charCount = style.replaceAll(' ', '').length;
+    return charCount <= 4 ? 58 : 62;
+  }
 
   @override
   void initState() {
@@ -63,8 +98,19 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       return;
     }
 
+    String url;
+    if (selectedStyle != null) {
+      // 예술사조별 조회
+      url = 'http://43.203.23.173:8080/bookmark/readAll/$userId/${Uri.encodeComponent(selectedStyle!)}';
+      print('🎨 예술사조별 북마크 조회: $selectedStyle');
+    } else {
+      // 전체 조회
+      url = 'http://43.203.23.173:8080/bookmark/readAll/$userId';
+      print('📚 전체 북마크 조회');
+    }
+
     final response = await http.get(
-      Uri.parse('http://43.203.23.173:8080/bookmark/readAll/$userId'),
+      Uri.parse(url),
       headers: {
         'accept': '*/*',
         'Authorization': 'Bearer $token',
@@ -87,6 +133,102 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     }
   }
 
+  // 예술사조 필터 UI 빌드
+  Widget _buildStyleFilter(double screenWidth, double screenHeight) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 첫 줄: 처음 5개 + 우측 V 아이콘(고정)
+        SizedBox(
+          height: 24,
+          child: Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: artStyles
+                      .take(5)
+                      .map((style) => _buildStyleButton(style))
+                      .toList(),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isStyleExpanded = !isStyleExpanded;
+                  });
+                },
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Center(
+                    child: Icon(
+                      isStyleExpanded
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                      color: const Color(0xFF837670),
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 둘째 줄: 확장 시 나머지 사조들 표시
+        if (isStyleExpanded) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: artStyles
+                .skip(5)
+                .map((style) => _buildStyleButton(style))
+                .toList(),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // 개별 예술사조 버튼 빌드
+  Widget _buildStyleButton(String style) {
+    final isSelected = selectedStyle == style;
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            selectedStyle = null; // 선택 해제
+          } else {
+            selectedStyle = style; // 새로운 선택
+          }
+        });
+        _loadBookmarks(); // 북마크 다시 로드
+      },
+      child: Container(
+        width: _styleButtonWidth(style),
+        height: 24,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF837670) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF837670)),
+        ),
+        child: Text(
+          style,
+          style: TextStyle(
+            fontSize: 12,
+            color: isSelected ? Colors.white : const Color(0xFF837670),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -104,14 +246,11 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: screenHeight * 0.02),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  _SortDropdown(label: '가나다순', screenWidth: screenWidth, screenHeight: screenHeight),
-                ],
-              ),
-              SizedBox(height: screenHeight * 0.025),
+                             SizedBox(height: screenHeight * 0.02),
+               
+                               // 예술사조 필터
+                _buildStyleFilter(screenWidth, screenHeight),
+                SizedBox(height: screenHeight * 0.025),
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -140,6 +279,8 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
+        print('🔍 북마크 상세 조회 응답: $data');
+        print('🎭 북마크 style 값: ${data['style']}');
 
         await Navigator.push(
           context,
@@ -151,6 +292,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
               description: data['description'],
               imagePath: '', // 사용되지 않음
               imageUrl: data['imageUrl'],
+              style: data['style'], // 예술사조 추가
               scrollController: ScrollController(),
               fromBookmark: true,
             ),
@@ -255,70 +397,6 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   }
 }
 
-class _TabButton extends StatelessWidget {
-  final String text;
-  final bool selected;
-  final double screenWidth;
-  final double screenHeight;
-  const _TabButton({required this.text, required this.selected, required this.screenWidth, required this.screenHeight});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: screenWidth * 0.21,
-      height: screenHeight * 0.038,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? const Color(0xFF837670) : const Color(0xFFFEF6F2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: screenWidth * 0.042,
-          color:
-              selected ? const Color(0xFFFEFDFC) : const Color(0xFF706B66),
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
 
-class _SortDropdown extends StatelessWidget {
-  final String label;
-  final double screenWidth;
-  final double screenHeight;
-  const _SortDropdown({required this.label, required this.screenWidth, required this.screenHeight});
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: screenWidth * 0.22,
-      height: screenHeight * 0.035,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFFDFC),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF837670)),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: const Color(0xFF837670),
-                fontWeight: FontWeight.w500,
-                fontSize: screenWidth * 0.036,
-              ),
-            ),
-            Icon(Icons.arrow_drop_down,
-                color: const Color(0xFF837670), size: screenWidth * 0.036),
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -66,7 +66,12 @@ class _DescribePageState extends State<DescribePage> {
       //if (!mounted) return;
 
       if (statusCode == 200) {
+        print('🔍 API 응답 전체 데이터: $responseBody');
         final data = json.decode(responseBody);
+        print('📊 파싱된 JSON 데이터: $data');
+        print('🎨 gemini_result: ${data['gemini_result']}');
+        print('🎭 style 값: ${data['gemini_result']?['style']}');
+        
         _safeSetState(() {
           _artData = {
             "title": data['gemini_result']['title'] ?? '정보 없음',
@@ -74,8 +79,10 @@ class _DescribePageState extends State<DescribePage> {
             "year": data['gemini_result']['year'] ?? '',
             "description": data['gemini_result']['description'] ?? '',
             "imageUrl": data['original_image_url'] ?? '',
+            "style": data['gemini_result']['style'] ?? '', // 예술사조 추가
           };
         });
+        print('🎯 최종 _artData: $_artData');
         // 인식이 완료되면 뷰포리아에 이미지 등록
         await _registerToVuforia(_artData!["title"] ?? "", _artData!["imageUrl"] ?? "");
       } else {
@@ -218,6 +225,7 @@ class _DescribePageState extends State<DescribePage> {
   void _onSuccessDialogCompleted() {
     if (_isDisposed) return;
     if (_artData != null) {
+      print('🎭 DescriptionScreen 호출 시 style 값: ${_artData!['style']}');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -228,6 +236,7 @@ class _DescribePageState extends State<DescribePage> {
             description: _artData!['description'],
             imagePath: widget.imagePath,
             imageUrl: _artData!['imageUrl'],
+            style: _artData!['style'], // 예술사조 추가
             scrollController: ScrollController(),
             // ⚠️ Describe 화면에서 AR 버튼 탭 시 이 토큰으로 _unityChannel.invokeMethod('SetJwtToken', token) 하세요.
             jwtToken: _jwtToken,

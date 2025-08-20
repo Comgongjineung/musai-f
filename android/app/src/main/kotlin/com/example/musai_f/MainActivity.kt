@@ -5,8 +5,8 @@ import android.os.Bundle
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import com.unity3d.player.UnityPlayerGameActivity
-import com.unity3d.player.UnityPlayer
+// import com.unity3d.player.UnityPlayerGameActivity
+// import com.unity3d.player.UnityPlayer
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.example.musai_f/unity_ar"
@@ -18,10 +18,11 @@ class MainActivity : FlutterActivity() {
             when (call.method) {
                 "launchUnityAR" -> {
                     try {
-                        val intent = Intent(this, UnityPlayerGameActivity::class.java)
-                        intent.putExtra("unity", "-force-glcore")
-                        startActivity(intent)
-                        result.success("Unity AR launched successfully")
+                        // Unity 라이브러리가 제대로 생성되지 않아 임시로 주석 처리
+                        // val intent = Intent(this, UnityPlayerGameActivity::class.java)
+                        // intent.putExtra("unity", "-force-glcore")
+                        // startActivity(intent)
+                        result.error("UNITY_NOT_AVAILABLE", "Unity library not properly generated", "Please rebuild Unity project first")
                     } catch (e: Exception) {
                         result.error("UNITY_LAUNCH_ERROR", "Failed to launch Unity AR", e.message)
                     }
@@ -29,8 +30,8 @@ class MainActivity : FlutterActivity() {
                 "isUnityAvailable" -> {
                     try {
                         // Unity 라이브러리가 로드 가능한지 확인
-                        System.loadLibrary("unity")
-                        result.success(true)
+                        // System.loadLibrary("unity")
+                        result.success(false) // 임시로 false 반환
                     } catch (e: Exception) {
                         result.success(false)
                     }
@@ -38,8 +39,8 @@ class MainActivity : FlutterActivity() {
                 "SetJwtToken" -> {
                     try {
                         val token = call.arguments as? String ?: ""
-                        UnityPlayer.UnitySendMessage("ARCamera", "SetJwtToken", token)
-                        result.success(true)
+                        // UnityPlayer.UnitySendMessage("ARCamera", "SetJwtToken", token)
+                        result.error("UNITY_NOT_AVAILABLE", "Unity library not properly generated", "Please rebuild Unity project first")
                     } catch (e: Exception) {
                         result.error("UNITY_SEND_ERROR", "Failed to send JWT to Unity", e.message)
                     }

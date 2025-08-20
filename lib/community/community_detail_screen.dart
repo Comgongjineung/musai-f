@@ -1834,7 +1834,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: EdgeInsets.only(left: indentLevel * 20.0), // 들여쓰기
+          margin: EdgeInsets.only(left: indentLevel > 0 ? 20.0 : 0.0), // 들여쓰기: 최대 1단계로 고정
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           decoration: BoxDecoration(
             color: const Color(0xFFFEFDFC),
