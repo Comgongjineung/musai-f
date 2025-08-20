@@ -8,7 +8,45 @@ import '../utils/auth_storage.dart';
 import 'mypage_edit.dart';
 import '../ticket/ticket_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart'; 
+import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart'; 
 
+class ProfileAvatarDisplay extends StatefulWidget {
+  final double size; // width/height
+  const ProfileAvatarDisplay({super.key, required this.size});
+
+  @override
+  State<ProfileAvatarDisplay> createState() => _ProfileAvatarDisplayState();
+}
+
+class _ProfileAvatarDisplayState extends State<ProfileAvatarDisplay> {
+  String? _path;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _path = prefs.getString('profile_image_path');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final imageProvider = (_path != null && File(_path!).existsSync())
+        ? FileImage(File(_path!)) as ImageProvider
+        : const AssetImage('assets/images/profile.png');
+    return CircleAvatar(
+      radius: widget.size / 2,
+      backgroundColor: const Color(0xFFFEFDFC),
+      backgroundImage: imageProvider,
+    );
+  }
+}
 
 //회원 정보 수정
 Future<void> updateUserInfo({
@@ -116,6 +154,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
   String dropdownValue = '클래식한 해설'; // 기본값
   bool _exhibitionAlarm = false; // 전시회 추천 알림
   bool _communityAlarm = false;  // 커뮤니티 알림
+  int _avatarVersion = 0; // 아바타 강제 리빌드용 버전 키
 
   @override
   void initState() {
@@ -295,11 +334,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
               ),
             ],
           ),
-          child: const CircleAvatar(
-            radius: 48,
-            backgroundColor: Color(0xFFFEFDFC),
-            backgroundImage: AssetImage('assets/images/profile.png'),
-          ),
+          child: ProfileAvatarDisplay(
+  key: ValueKey(_avatarVersion), // 버전 키로 강제 리빌드
+  size: 96, // 기존 radius 48 * 2
+),
         ),
         SizedBox(height: screenHeight * 0.01),
         Text(nickname, style: TextStyle(fontSize: screenWidth * 0.05, fontWeight: FontWeight.w500)),
@@ -327,6 +365,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                 final updated = await showEditProfileDialog(context);
                 if (updated == true) {
                   _loadNickname();
+                  setState(() { _avatarVersion++; }); // 아바타 강제 리빌드
                 }
               },
               child: Center(

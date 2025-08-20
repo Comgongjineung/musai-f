@@ -284,13 +284,39 @@ function onLocationSuccess(position) {
   });
 
         const content = document.createElement('div');
-        content.innerHTML = `
-          <div style="background:#f5f5dc; padding:20px 20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.2); font-family:'Inter',sans-serif; max-width:500px; max-height:300px; font-size:25px; line-height:2.5; pointer-events:auto;">
-            <div><strong>이름:</strong> ${place.name}</div>
-            ${place.tel ? `<div><strong>전화번호:</strong> ${place.tel}</div>` : ''}
-            ${place.url ? `<div><strong>홈페이지</strong><br><a href="${place.url}" target="_blank" style="color: #0066cc; text-decoration: underline; cursor: pointer;">${place.url}</a></div>` : ''}
-          </div>
-        `;
+content.innerHTML = `
+  <div style="
+    background: #FFFFFF; 
+    padding: 16px 20px; 
+    border-radius: 16px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+    font-family: 'Inter', sans-serif; 
+    max-width: 400px;
+    min-height: 120px;
+    font-size: 16px; 
+    line-height: 1.8; 
+    color: #333;
+  ">
+    <div style="display:flex; justify-content:space-between; margin-bottom:6px; gap:30px;">
+  <span style="color:#837670;">전시관</span>
+  <span>${place.name}</span>
+</div>
+${place.tel ? `
+<div style="display:flex; justify-content:space-between; margin-bottom:6px; gap:30px;">
+  <span style="color:#837670;">전화번호</span>
+  <span>${place.tel}</span>
+</div>` : ''}
+${place.url ? `
+<div style="display:flex; justify-content:space-between; margin-bottom:0; max-width:400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; gap:30px;">
+  <span style="color:#837670;">홈페이지</span>
+  <a href="${/^https?:\/\//i.test(place.url) ? place.url : 'https://' + place.url}" 
+     target="_blank" 
+     style="color:#0066cc; text-decoration: underline; cursor:pointer;">
+    ${place.url}
+  </a>
+</div>` : ''}
+  </div>
+`;
 
         // 링크 클릭 이벤트 리스너 추가
         const linkElement = content.querySelector('a');
