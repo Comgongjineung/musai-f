@@ -102,11 +102,8 @@
     	<string>kakaolink</string>
     	<string>kakaotalk</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>앱에서 프로필 사진을 선택하기 위해 사진 앨범 접근 권한이 필요합니다.</string>
 </dict>
 
-<key>NSPhotoLibraryUsageDescription</key>
-<string>앱에서 프로필 사진을 선택하기 위해 사진 앨범 접근 권한이 필요합니다.</string>
-
 </plist>
-
-

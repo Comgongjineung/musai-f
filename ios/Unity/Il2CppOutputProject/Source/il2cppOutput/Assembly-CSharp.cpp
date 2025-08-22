@@ -277,7 +277,6 @@ IL2CPP_EXTERN_C String_t* _stringLiteral32B46F6DDBB49CBB34CBDCC0CB269C5ADD237629
 IL2CPP_EXTERN_C String_t* _stringLiteral3AA0AE02902A264D28AC95DBCE732A4E43BFED26;
 IL2CPP_EXTERN_C String_t* _stringLiteral41A03CEDCDECA606C3CBCBC11DC42EA3E32378A7;
 IL2CPP_EXTERN_C String_t* _stringLiteral4429FCC4047B4CEF654A248265BC9A7EC6118A47;
-IL2CPP_EXTERN_C String_t* _stringLiteral5EE721D3EF10FECC9529AFC12F7EDDF7D0675440;
 IL2CPP_EXTERN_C String_t* _stringLiteral64058CC688A96A90239811EF06C9D20DB0499C3E;
 IL2CPP_EXTERN_C String_t* _stringLiteral68C19DD87C91F53CC32943ABE4ACE379CE907935;
 IL2CPP_EXTERN_C String_t* _stringLiteral6A316E3D3301A312072ACE05DE9073E557348E5D;
@@ -4171,7 +4170,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void CloudRecoHandler__ctor_mFAA72E13D68CA639
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Dictionary_2__ctor_m768E076F1E804CE4959F4E71D3E6A9ADE2F55052_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Dictionary_2_t46B2DB028096FA2B828359E52F37F3105A83AD83_il2cpp_TypeInfo_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral5EE721D3EF10FECC9529AFC12F7EDDF7D0675440);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralFE7CF932F387E321AFD05B1D7F077A27712B9016);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -4185,8 +4183,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void CloudRecoHandler__ctor_mFAA72E13D68CA639
 		Dictionary_2__ctor_m768E076F1E804CE4959F4E71D3E6A9ADE2F55052(L_0, Dictionary_2__ctor_m768E076F1E804CE4959F4E71D3E6A9ADE2F55052_RuntimeMethod_var);
 		__this->____descById = L_0;
 		Il2CppCodeGenWriteBarrier((void**)(&__this->____descById), (void*)L_0);
-		__this->____jwtToken = _stringLiteral5EE721D3EF10FECC9529AFC12F7EDDF7D0675440;
-		Il2CppCodeGenWriteBarrier((void**)(&__this->____jwtToken), (void*)_stringLiteral5EE721D3EF10FECC9529AFC12F7EDDF7D0675440);
 		MonoBehaviour__ctor_m592DB0105CA0BC97AA1C5F4AD27B12D68A3B7C1E(__this, NULL);
 		return;
 	}
