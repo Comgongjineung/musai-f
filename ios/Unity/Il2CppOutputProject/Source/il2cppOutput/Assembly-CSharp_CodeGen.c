@@ -51,8 +51,10 @@ extern void U3CReenableAfterDelayU3Ed__10_System_Collections_Generic_IEnumerator
 extern void U3CReenableAfterDelayU3Ed__10_System_Collections_IEnumerator_Reset_mDF1003A41A411A1D348EF4D56928385E5579D778 (void);
 extern void U3CReenableAfterDelayU3Ed__10_System_Collections_IEnumerator_get_Current_m4FD81CED7D022F4B5513F5545EA4950D094C0348 (void);
 extern void PointMetaHolder__ctor_mD0969C769C685D1CF72D746B520BAE4F082E9F19 (void);
+extern void TargetObserverHandler_ForceHideImmediate_m64AA7B0B0DEC864C2A7786BD041939A7DDD4104F (void);
 extern void TargetObserverHandler_OnEnable_mB83F6B1A46C0E61D6774AB5BE9CC5EF18D2B2267 (void);
 extern void TargetObserverHandler_OnDisable_m64521CF4D4A1953955DF2C90C18437F6E3B4018C (void);
+extern void TargetObserverHandler_Bind_m989DDE9E3FB858F458B99C62F1D4E1555E1FD6AB (void);
 extern void TargetObserverHandler_OnTargetStatusChanged_mCB21A419C598A798A08076FD3308A32EED70B234 (void);
 extern void TargetObserverHandler__ctor_m44F3ED1F5E6016DF26221F4D977CE64116757F1D (void);
 extern void PointClickHandler_OnPointerClick_m462FFA6456C3FB49B850877286BBD954682B089C (void);
@@ -71,7 +73,7 @@ extern void VuforiaLicense_GetLicenseKey_m796D51E5EF1C53F3D62BA4EA8806AC1FB1A5E3
 extern void VuforiaLicense__ctor_m094B92B3323DFFD79ADB696474D5D158C95E291B (void);
 extern void UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_mBEB95BEB954BB63E9710BBC7AD5E78C4CB0A0033 (void);
 extern void UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_mE70FB23ACC1EA12ABC948AA22C2E78B2D0AA39B1 (void);
-static Il2CppMethodPointer s_methodPointers[59] = 
+static Il2CppMethodPointer s_methodPointers[61] = 
 {
 	CloudRecoHandler_ReenableAfterDelay_mA0919AA7A301DC337BD28E0F1C5404DDE1660ACD,
 	CloudRecoHandler_Awake_m8B6B5F72CDF08EF6E575D716E085917DC7EBDD95,
@@ -112,8 +114,10 @@ static Il2CppMethodPointer s_methodPointers[59] =
 	U3CReenableAfterDelayU3Ed__10_System_Collections_IEnumerator_Reset_mDF1003A41A411A1D348EF4D56928385E5579D778,
 	U3CReenableAfterDelayU3Ed__10_System_Collections_IEnumerator_get_Current_m4FD81CED7D022F4B5513F5545EA4950D094C0348,
 	PointMetaHolder__ctor_mD0969C769C685D1CF72D746B520BAE4F082E9F19,
+	TargetObserverHandler_ForceHideImmediate_m64AA7B0B0DEC864C2A7786BD041939A7DDD4104F,
 	TargetObserverHandler_OnEnable_mB83F6B1A46C0E61D6774AB5BE9CC5EF18D2B2267,
 	TargetObserverHandler_OnDisable_m64521CF4D4A1953955DF2C90C18437F6E3B4018C,
+	TargetObserverHandler_Bind_m989DDE9E3FB858F458B99C62F1D4E1555E1FD6AB,
 	TargetObserverHandler_OnTargetStatusChanged_mCB21A419C598A798A08076FD3308A32EED70B234,
 	TargetObserverHandler__ctor_m44F3ED1F5E6016DF26221F4D977CE64116757F1D,
 	PointClickHandler_OnPointerClick_m462FFA6456C3FB49B850877286BBD954682B089C,
@@ -133,7 +137,7 @@ static Il2CppMethodPointer s_methodPointers[59] =
 	UnitySourceGeneratedAssemblyMonoScriptTypes_v1_Get_mBEB95BEB954BB63E9710BBC7AD5E78C4CB0A0033,
 	UnitySourceGeneratedAssemblyMonoScriptTypes_v1__ctor_mE70FB23ACC1EA12ABC948AA22C2E78B2D0AA39B1,
 };
-static const int32_t s_InvokerIndices[59] = 
+static const int32_t s_InvokerIndices[61] = 
 {
 	2505,
 	7441,
@@ -176,6 +180,8 @@ static const int32_t s_InvokerIndices[59] =
 	7441,
 	7441,
 	7441,
+	7441,
+	5865,
 	3216,
 	7441,
 	5865,
@@ -199,7 +205,7 @@ IL2CPP_EXTERN_C const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule;
 const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule = 
 {
 	"Assembly-CSharp.dll",
-	59,
+	61,
 	s_methodPointers,
 	0,
 	NULL,

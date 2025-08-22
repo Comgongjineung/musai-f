@@ -2338,6 +2338,10 @@
 					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
 					"$(inherited)",
 					"-weak_framework",
 					CoreMotion,
@@ -2415,6 +2419,10 @@
 					"-DUNITY_VERSION_MIN=21",
 				);
 				OTHER_LDFLAGS = (
+					"-lc++",
+					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
 					"-lc++",
@@ -2505,6 +2513,10 @@
 					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
 					"$(inherited)",
 					"-weak_framework",
 					CoreMotion,
@@ -2584,6 +2596,10 @@
 					"-DUNITY_VERSION_MIN=21",
 				);
 				OTHER_LDFLAGS = (
+					"-lc++",
+					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
 					"-lc++",
