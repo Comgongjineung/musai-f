@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../homescreen/home_screen.dart';
 import '../utils/auth_storage.dart';
+import 'preference_page.dart';
 
 class LoginProfileScreen extends StatelessWidget {
   final int userId;
@@ -24,9 +24,9 @@ class LoginProfileScreen extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: screenHeight * 0.035),
+                  SizedBox(height: screenHeight * 0.03),
                   _stepIndicator(),
-                  SizedBox(height: screenHeight * 0.04),
+                  SizedBox(height: screenHeight * 0.038),
                   _titleSection(screenWidth),
                   SizedBox(height: screenHeight * 0.075),
                   Center(child: ProfileAvatar(screenWidth: screenWidth, screenHeight: screenHeight)),
@@ -46,7 +46,7 @@ class LoginProfileScreen extends StatelessWidget {
   Widget _stepIndicator() {
     return const Align(
       alignment: Alignment.centerLeft,
-      child: StepIndicator(),
+      child: StepIndicator(current: 1), // 이 페이지는 1단계
     );
   }
 
@@ -87,7 +87,7 @@ class LoginProfileScreen extends StatelessWidget {
             if (success) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                MaterialPageRoute(builder: (context) => const PreferencePage()),
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -119,57 +119,76 @@ class LoginProfileScreen extends StatelessWidget {
 
 
 class StepIndicator extends StatelessWidget {
-  const StepIndicator({super.key});
+  final int current; // 1-based index of the current page
+  final int total;
+  const StepIndicator({super.key, required this.current, this.total = 4});
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final circleSize = screenWidth * 0.06;   // 원 지름
+    final fontSize   = screenWidth * 0.03;   // 숫자 폰트
+    final dotSize    = screenWidth * 0.01;   // 약 4px 대응
+    final gapLarge   = screenWidth * 0.0122; // 큰 간격
+    final gapSmall   = screenWidth * 0.004;  // 작은 간격
+
+    final children = <Widget>[];
+    for (int i = 1; i <= total; i++) {
+      final isActive = i == current;
+      children.add(_buildCircle(
+        number: i,
+        isActive: isActive,
+        circleSize: circleSize,
+        fontSize: fontSize,
+      ));
+
+      // 마지막 원이 아니면 점점점 구분자 추가
+      if (i < total) {
+        children.add(SizedBox(width: gapLarge));
+        children.add(_dot(dotSize));
+        children.add(SizedBox(width: gapSmall));
+        children.add(_dot(dotSize));
+        children.add(SizedBox(width: gapSmall));
+        children.add(_dot(dotSize));
+        children.add(SizedBox(width: gapLarge));
+      }
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Container(
-          width: screenWidth * 0.06,
-          height: screenWidth * 0.06,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFFC06062),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            '1',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: screenWidth * 0.03,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        SizedBox(width: screenWidth * 0.0125),
-        const Icon(Icons.circle, size: 4, color: Color(0xFFB1B1B1)),
-        SizedBox(width: screenWidth * 0.005),
-        const Icon(Icons.circle, size: 4, color: Color(0xFFB1B1B1)),
-        SizedBox(width: screenWidth * 0.005),
-        const Icon(Icons.circle, size: 4, color: Color(0xFFB1B1B1)),
-        SizedBox(width: screenWidth * 0.0125),
-        Container(
-          width: screenWidth * 0.06,
-          height: screenWidth * 0.06,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFC06062)),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            '2',
-            style: TextStyle(
-              color: const Color(0xFFC06062),
-              fontSize: screenWidth * 0.03,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ],
+      children: children,
     );
+  }
+
+  Widget _buildCircle({
+    required int number,
+    required bool isActive,
+    required double circleSize,
+    required double fontSize,
+  }) {
+    const red = Color(0xFFC06062);
+    return Container(
+      width: circleSize,
+      height: circleSize,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isActive ? red : Colors.white,             // 해당 페이지: 빨간 배경 / 아니면 흰 배경
+        border: isActive ? null : Border.all(color: red), // 아니면 빨간 테두리
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$number',
+        style: TextStyle(
+          color: isActive ? Colors.white : red,           // 해당 페이지: 흰 글씨 / 아니면 빨간 글씨
+          fontSize: fontSize,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+    );
+  }
+
+  Widget _dot(double size) {
+    return Icon(Icons.circle, size: size, color: const Color(0xFFB1B1B1));
   }
 }
 
@@ -297,7 +316,7 @@ class _NicknameInputState extends State<NicknameInput> {
                 child: TextField(
                   controller: NicknameInput.controller,
                   decoration: InputDecoration(
-                    hintText: 'n자 이내로 입력하세요.',
+                    hintText: '닉네임을 입력하세요.',
                     border: InputBorder.none,
                     hintStyle: TextStyle(
                       fontSize: screenWidth * 0.04,
