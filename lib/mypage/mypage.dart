@@ -10,6 +10,8 @@ import '../ticket/ticket_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart'; 
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart'; 
+import 'mypage_comments.dart';
+import 'mypage_posts.dart';
 
 class ProfileAvatarDisplay extends StatefulWidget {
   final double size; // width/height
@@ -511,8 +513,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              //작성한 글로 이동
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => const UserPostsScreen()));
+              Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MyPostsPage()),
+    );
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -525,8 +529,10 @@ class _MyPageScreenState extends State<MyPageScreen> {
           SizedBox(height: screenHeight * 0.015),
           GestureDetector(
             onTap: () {
-              //작성한 댓글로 이동
-              //Navigator.push(context, MaterialPageRoute(builder: (_) => const UserCommentedPostsScreen()));
+              Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MyCommentsPage()),
+    );
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
