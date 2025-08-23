@@ -68,6 +68,45 @@ def getSdkDir() {
     return local.getProperty('sdk.dir')
 }
 
+// Resolve il2cpp executable cross‑platform (project export first, then Unity Hub installs)
+def findIl2cppExecutable(String workingDir) {
+    def isWin = org.gradle.internal.os.OperatingSystem.current().isWindows()
+    def exeName = isWin ? "il2cpp.exe" : "il2cpp"
+    // 1) Prefer il2cpp shipped inside the exported project
+    def localPath = "${workingDir}/src/main/Il2CppOutputProject/IL2CPP/build/deploy/${exeName}"
+    if (file(localPath).exists()) {
+        return localPath
+    }
+    // 2) Fallback: try common Unity Hub install locations
+    def candidates = [] as List<File>
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        def hubRoot = file("/Applications/Unity/Hub/Editor")
+        if (hubRoot.exists()) {
+            candidates.addAll(fileTree(hubRoot).matching {
+                include("**/Unity.app/Contents/il2cpp/build/deploy/${exeName}")
+            }.files)
+        }
+    } else if (isWin) {
+        def hubRoot = file("C:/Program Files/Unity/Hub/Editor")
+        if (hubRoot.exists()) {
+            candidates.addAll(fileTree(hubRoot).matching {
+                include("**/Editor/Data/il2cpp/build/deploy/${exeName}")
+            }.files)
+        }
+    } else { // Linux
+        def hubRoot = file(System.properties['user.home'] + "/Unity/Hub/Editor")
+        if (hubRoot.exists()) {
+            candidates.addAll(fileTree(hubRoot).matching {
+                include("**/Editor/Data/il2cpp/build/deploy/${exeName}")
+            }.files)
+        }
+    }
+    if (!candidates.isEmpty()) {
+        return candidates.first().absolutePath
+    }
+    throw new GradleException("il2cpp executable not found. Looked for ${localPath} and Unity Hub installs.")
+}
+
 def BuildIl2Cpp(String workingDir, String configuration, String architecture, String abi, String[] staticLibraries) {
     def commandLineArgs = []
     commandLineArgs.add("--compile-cpp")
@@ -88,13 +127,15 @@ def BuildIl2Cpp(String workingDir, String configuration, String architecture, St
     staticLibraries.eachWithIndex {fileName, i->
         commandLineArgs.add("--additional-libraries=" + workingDir + "/src/main/jniStaticLibs/" + abi + "/" + fileName)
     }
-    def executableExtension = ""
-    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
-        executableExtension = ".exe"
-        commandLineArgs = commandLineArgs*.replace('\"', '\\\"')
+    // Resolve il2cpp path per‑OS and ensure it is executable on Unix
+    def il2cppPath = findIl2cppExecutable(workingDir)
+    if (!org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+        try {
+            file(il2cppPath).setExecutable(true)
+        } catch (Throwable ignore) { }
     }
     exec {
-        executable workingDir + "/src/main/Il2CppOutputProject/IL2CPP/build/deploy/il2cpp" + executableExtension
+        executable il2cppPath
         args commandLineArgs
         environment "ANDROID_SDK_ROOT", getSdkDir()
     }
