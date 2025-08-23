@@ -98,6 +98,7 @@ flutter:
     - assets/fonts/
     - assets/images/
     - assets/icons/
+    - assets/styles/
     - assets/kakaomap.html
     - assets/images/ticket_bg.svg
     - assets/images/ticket.png

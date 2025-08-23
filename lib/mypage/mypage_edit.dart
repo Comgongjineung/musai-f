@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../login/login_profile.dart';
 import '../utils/auth_storage.dart';
-
-
-
-const String kProfileImageKey = 'profile_image_path';
+import '../utils/profile_image.dart';
 
 class EditProfileAvatar extends StatefulWidget {
   final double screenWidth;
@@ -20,37 +15,23 @@ class EditProfileAvatar extends StatefulWidget {
 
 class _EditProfileAvatarState extends State<EditProfileAvatar> {
   String? _imagePath;
-  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _loadSavedPath();
+    _loadSavedProfileImagePath();
   }
 
-  Future<void> _loadSavedPath() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _loadSavedProfileImagePath() async {
+    final path = await ProfileImageHelper.getSavedProfileImagePath();
     setState(() {
-      _imagePath = prefs.getString(kProfileImageKey);
+      _imagePath = path;
     });
-  }
-
-  Future<void> _pickImage() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
-    if (picked != null) {
-      final path = picked.path;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(kProfileImageKey, path);
-      setState(() {
-        _imagePath = path;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final size = widget.screenWidth * 0.25;
-    final iconSize = widget.screenWidth * 0.04; // smaller pencil
     final imageProvider = (_imagePath != null && File(_imagePath!).existsSync())
         ? FileImage(File(_imagePath!)) as ImageProvider
         : const AssetImage('assets/images/profile.png');
@@ -70,15 +51,30 @@ class _EditProfileAvatarState extends State<EditProfileAvatar> {
             bottom: 0,
             right: 2,
             child: InkWell(
-              onTap: _pickImage,
+              onTap: () async {
+                final path = await ProfileImageHelper.pickAndSaveProfileImage();
+                if (path != null) {
+                  setState(() => _imagePath = path);
+                }
+              },
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                padding: EdgeInsets.all(iconSize * 0.25),
+                width: widget.screenWidth * 0.08,
+                height: widget.screenWidth * 0.08,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF837670),
-                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0x4DB1B1B1), // #665E5E @ 30% opacity
+                      blurRadius: widget.screenWidth * 0.02,
+                      spreadRadius: widget.screenWidth * 0.005,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
                 ),
-                child: Icon(Icons.edit, size: 26, color: const Color(0xFFFEFDFC)),
+                child: Image.asset(
+                  'assets/images/edit.png',
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
@@ -188,9 +184,8 @@ class _EditDialogButtonsState extends State<EditDialogButtons> {
   bool imageUpdated = false;
 
   // 1) 이미지가 선택/저장되었는지 확인
-  final prefs = await SharedPreferences.getInstance();
-  final imgPath = prefs.getString(kProfileImageKey);
-  if (imgPath != null && File(imgPath).existsSync()) {
+  final hasImage = await ProfileImageHelper.hasSavedProfileImage();
+  if (hasImage) {
     imageUpdated = true;
   }
 

@@ -227,93 +227,115 @@ Future<void> _fetchNearest(double lat, double lng) async {
 }
 
   @override
-Widget build(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-  return Scaffold(
-    backgroundColor: const Color(0xFFFFFDFC),
-    appBar: const AppBarWidget(
-      showNotificationIcon: true,
-      showBackButton: false,
-    ),
-    body: SafeArea(
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFFDFC),
+      appBar: const AppBarWidget(
+        showNotificationIcon: true,
+        showBackButton: false,
+      ),
+      body: SafeArea(
+        child: _buildBody(screenWidth, screenHeight),
+      ),
+      bottomNavigationBar: const BottomNavBarWidget(currentIndex: 0),
+      floatingActionButton: _loginFab(context),
+    );
+  }
+
+  /// 메인 바디 구성 (함수형 분리)
+  Widget _buildBody(double screenWidth, double screenHeight) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _searchSection(screenWidth),
+        _nearbyMapSection(screenWidth),
+        _scrollableSections(screenWidth, screenHeight),
+      ],
+    );
+  }
+
+  /// 검색창 섹션
+  Widget _searchSection(double screenWidth) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.06,
+        right: screenWidth * 0.06,
+        top: screenWidth * 0.05,
+        bottom: screenWidth * 0.05,
+      ),
+      child: _searchBar(screenWidth),
+    );
+  }
+
+  /// 근처 전시 지도 섹션 (타이틀 + 지도)
+  Widget _nearbyMapSection(double screenWidth) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
-          // 검색창
-          Padding(
-            padding: EdgeInsets.only(
-              left: screenWidth * 0.06,
-              right: screenWidth * 0.06,
-              top: screenWidth * 0.05,
-              bottom: screenWidth * 0.05, 
-            ),
-            child: _searchBar(screenWidth),
-          ),
-
-          // 섹션 제목 + 지도
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _sectionTitle('Nearby Exhibition', screenWidth),
-                SizedBox(height: screenWidth * 0.02),
-                _buildMapWrapper(screenWidth),
-                SizedBox(height: screenWidth * 0.04),
-              ],
-            ),
-          ),
-
-          // 전체 섹션 스크롤 가능
-Expanded(
-  child: SingleChildScrollView(
-    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06)
-        .copyWith(bottom: 10), // ⬅맨 아래 여백 10
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 주변 전시 3개 카드
-        if (_loadingNearest)
-  Padding(
-    padding: EdgeInsets.only(top: screenWidth * 0.02),
-    child: const Center(child: CircularProgressIndicator()),
-  )
-else if (_nearestError != null)
-  Padding(
-    padding: EdgeInsets.only(top: screenWidth * 0.02),
-    child: Text(_nearestError!, style: const TextStyle(color: Colors.redAccent)),
-  )
-else
-  _NearestListCard(
-      items: _nearest.take(3).toList(),
-      screenWidth: screenWidth,
-      screenHeight: screenHeight,
-      onTap: (e) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => ExhibitionDetailPage(exhibition: e)),
-        );
-      },
-    ),
-
-        SizedBox(height: screenWidth * 0.06),
-
-        // Recommendation 섹션
-        _sectionTitle('Recommendation', screenWidth),
-        SizedBox(height: screenWidth * 0.02),
-        _recommendationList(BoxConstraints(maxWidth: screenWidth), screenWidth),
-      ],
-    ),
-  ),
-),
+          _sectionTitle('Nearby Exhibition', screenWidth),
+          SizedBox(height: screenWidth * 0.02),
+          _buildMapWrapper(screenWidth),
+          SizedBox(height: screenWidth * 0.04),
         ],
       ),
-    ),
-    bottomNavigationBar: const BottomNavBarWidget(currentIndex: 0),
-    floatingActionButton: FloatingActionButton(
+    );
+  }
+
+  /// 스크롤 가능한 섹션 묶음 (주변 전시 리스트 + 추천)
+  Widget _scrollableSections(double screenWidth, double screenHeight) {
+    return Expanded(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06)
+            .copyWith(bottom: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _nearestListArea(screenWidth, screenHeight),
+            SizedBox(height: screenWidth * 0.06),
+            _sectionTitle('Recommendation', screenWidth),
+            SizedBox(height: screenWidth * 0.02),
+            _recommendationList(BoxConstraints(maxWidth: screenWidth), screenWidth),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 주변 전시 3개 리스트 표시 영역
+  Widget _nearestListArea(double screenWidth, double screenHeight) {
+    if (_loadingNearest) {
+      return Padding(
+        padding: EdgeInsets.only(top: screenWidth * 0.02),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    } else if (_nearestError != null) {
+      return Padding(
+        padding: EdgeInsets.only(top: screenWidth * 0.02),
+        child: Text(_nearestError!, style: const TextStyle(color: Colors.redAccent)),
+      );
+    } else {
+      return _NearestListCard(
+        items: _nearest.take(3).toList(),
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        onTap: (e) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => ExhibitionDetailPage(exhibition: e)),
+          );
+        },
+      );
+    }
+  }
+
+  /// 로그인 테스트 플로팅 버튼
+  Widget _loginFab(BuildContext context) {
+    return FloatingActionButton(
       onPressed: () {
         print('✅ 로그인 테스트 버튼 클릭됨');
         Navigator.push(
@@ -321,16 +343,15 @@ else
           MaterialPageRoute(builder: (context) => SignupPage()),
         );
       },
-      child: Icon(Icons.login),
+      child: const Icon(Icons.login),
       backgroundColor: Colors.blue,
       heroTag: 'loginTestBtn',
-    ),
-  );
-}
+    );
+  }
 
 Widget _buildMapWrapper(double screenWidth) {
   return SizedBox(
-    height: screenWidth * 0.6,
+    height: screenWidth * 0.5,
     child: _mapContainer(BoxConstraints(maxWidth: screenWidth), screenWidth),
   );
 }
@@ -344,13 +365,13 @@ Widget _buildMapWrapper(double screenWidth) {
       );
     },
     child: Container(
-              height: screenWidth * 0.12, // 44px → 반응형
+              height: screenWidth * 0.12, 
       decoration: BoxDecoration(
         color: const Color(0xFFFEF6F2),
-        borderRadius: BorderRadius.circular(screenWidth * 0.05), // 20px → 반응형
+        borderRadius: BorderRadius.circular(screenWidth * 0.05),
       ),
       alignment: Alignment.centerLeft,
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), // 16px → 반응형
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04), 
       child: Row(
         children: [
           Expanded(
@@ -358,12 +379,11 @@ Widget _buildMapWrapper(double screenWidth) {
               '전시회를 검색하세요',
               style: TextStyle(
                 color: const Color(0xFFB1B1B1),
-                fontSize: screenWidth * 0.04, // 16px → 반응형
-                fontFamily: 'Pretendard',
+                fontSize: screenWidth * 0.04, 
               ),
             ),
           ),
-          Icon(Icons.search, color: const Color(0xFFB1B1B1), size: screenWidth * 0.055), // 22px → 반응형
+          Icon(Icons.search, color: const Color(0xFFB1B1B1), size: screenWidth * 0.055), 
         ],
       ),
     ),
@@ -374,9 +394,9 @@ Widget _buildMapWrapper(double screenWidth) {
     text,
     style: TextStyle(
       color: const Color(0xFF706B66),
-      fontSize: screenWidth * 0.05, // 20px → 반응형
+      fontSize: screenWidth * 0.05, 
       fontWeight: FontWeight.bold,
-      fontFamily: 'Pretendard',
+
     ),
   );
 
@@ -384,7 +404,7 @@ Widget _buildMapWrapper(double screenWidth) {
   Widget _mapContainer(BoxConstraints constraints, double screenWidth) => SizedBox(
     height: screenWidth * 0.6,
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(screenWidth * 0.05), // 20px → 반응형
+      borderRadius: BorderRadius.circular(screenWidth * 0.05), 
       child: Stack(
         children: [
           InAppWebView(
@@ -655,16 +675,9 @@ class _NearestListCard extends StatelessWidget {
     return Container(
       // 높이 고정 제거 (내용만큼 자동)
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(sw * 0.04), // ~16px
-        border: Border.all(color: const Color(0xFFF0ECE9)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: Color(0xFFFEFDFC),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFEBEBEB)),
       ),
       child: Column(
   children: List.generate(items.length, (idx) {
@@ -693,9 +706,8 @@ class _NearestListCard extends StatelessWidget {
                 '${idx + 1}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'Pretendard',
                   fontWeight: FontWeight.w600,
-                  fontSize: sw * 0.043,
+                  fontSize: sw * 0.04,
                   color: const Color(0xFF706B66),
                 ),
               ),
@@ -711,16 +723,15 @@ class _NearestListCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'Pretendard',
                       fontWeight: FontWeight.w600,
                       fontSize: sw * 0.04,
-                      color: const Color(0xFF2E2A27),
+                      color: const Color(0xFF343231),
                     ),
                   ),
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Icons.place_outlined, size: 16, color: Color(0xFFB1B1B1)),
+                      const Icon(Icons.place_outlined, size: 14, color: Color(0xFFB1B1B1)),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -728,7 +739,6 @@ class _NearestListCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontFamily: 'Pretendard',
                             fontWeight: FontWeight.w500,
                             fontSize: sw * 0.03,
                             color: const Color(0xFFB1B1B1),
