@@ -1,11 +1,11 @@
 #pragma once
 
+#include "../Baselib_CountdownTimer.h"
 #include "../Baselib_Atomic_TypeSafe.h"
 #include "../Baselib_SystemSemaphore.h"
 #include "../Baselib_StaticAssert.h"
-#include "Baselib_SpinLoop.h"
 
-#if PLATFORM_HAS_NATIVE_FUTEX
+#if PLATFORM_FUTEX_NATIVE_SUPPORT
     #error "It's highly recommended to use Baselib_EventSemaphore_FutexBased.inl.h on platforms which has native semaphore support"
 #endif
 
@@ -39,16 +39,16 @@ typedef struct Baselib_EventSemaphore
     Detail_Baselib_EventSemaphore_State state;
     Baselib_SystemSemaphore_Handle setSemaphore;
     Baselib_SystemSemaphore_Handle setInProgressSemaphore;
-    char _cachelineSpacer0[PLATFORM_PROPERTY_CACHE_LINE_SIZE - 2 * sizeof(Baselib_SystemSemaphore_Handle) - sizeof(Detail_Baselib_EventSemaphore_State)];
+    char _cachelineSpacer0[PLATFORM_CACHE_LINE_SIZE - 2 * sizeof(Baselib_SystemSemaphore_Handle) - sizeof(Detail_Baselib_EventSemaphore_State)];
     char _systemSemaphoreDataSemaphore[Baselib_SystemSemaphore_PlatformSize];
-    char _cachelineSpacer1[PLATFORM_PROPERTY_CACHE_LINE_SIZE - Baselib_SystemSemaphore_PlatformSize];
+    char _cachelineSpacer1[PLATFORM_CACHE_LINE_SIZE - Baselib_SystemSemaphore_PlatformSize];
     char _systemSemaphoreDataInProgressSemaphore[Baselib_SystemSemaphore_PlatformSize];
 } Baselib_EventSemaphore;
 
-BASELIB_STATIC_ASSERT((offsetof(Baselib_EventSemaphore, state) + PLATFORM_PROPERTY_CACHE_LINE_SIZE) ==
+BASELIB_STATIC_ASSERT((offsetof(Baselib_EventSemaphore, state) + PLATFORM_CACHE_LINE_SIZE) ==
     offsetof(Baselib_EventSemaphore, _systemSemaphoreDataSemaphore), "state and _systemSemaphoreDataSemaphore must not share cacheline");
 
-BASELIB_STATIC_ASSERT((offsetof(Baselib_EventSemaphore, _systemSemaphoreDataSemaphore) + PLATFORM_PROPERTY_CACHE_LINE_SIZE) ==
+BASELIB_STATIC_ASSERT((offsetof(Baselib_EventSemaphore, _systemSemaphoreDataSemaphore) + PLATFORM_CACHE_LINE_SIZE) ==
     offsetof(Baselib_EventSemaphore, _systemSemaphoreDataInProgressSemaphore), "_systemSemaphoreDataSemaphore and _systemSemaphoreDataInProgressSemaphore must not share cacheline");
 
 // How (Timed)Acquire works for the SemaphoreBased EventSemaphore:
@@ -126,17 +126,10 @@ BASELIB_INLINE_API void Baselib_EventSemaphore_CreateInplace(Baselib_EventSemaph
 }
 
 COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_EventSemaphore_TrySpinAcquire(Baselib_EventSemaphore* semaphore, uint32_t maxSpinCount)
+BASELIB_INLINE_API bool Baselib_EventSemaphore_TryAcquire(Baselib_EventSemaphore* semaphore)
 {
-    int32_t numWaitingForSetAndStateFlags = Baselib_atomic_load_32_acquire(&semaphore->state.parts.numWaitingForSetAndStateFlags);
-    while (true)
-    {
-        if (Detail_Baselib_EventSemaphore_IsSet(numWaitingForSetAndStateFlags))
-            return true;
-
-        if (!Detail_Baselib_SpinLoop(&semaphore->state.parts.numWaitingForSetAndStateFlags, &numWaitingForSetAndStateFlags, &maxSpinCount))
-            return false;
-    }
+    const int32_t numWaitingForSetAndStateFlags = Baselib_atomic_load_32_acquire(&semaphore->state.parts.numWaitingForSetAndStateFlags);
+    return Detail_Baselib_EventSemaphore_IsSet(numWaitingForSetAndStateFlags);
 }
 
 BASELIB_INLINE_API void Baselib_EventSemaphore_Acquire(Baselib_EventSemaphore* semaphore)
@@ -187,7 +180,6 @@ BASELIB_INLINE_API void Baselib_EventSemaphore_Set(Baselib_EventSemaphore* semap
         &numWaitingForSetAndStateFlags,
         numWaitingForSetAndStateFlagsSet));
 
-    Baselib_Cpu_Hint_MonitorRelease();
     if (!Detail_Baselib_EventSemaphore_IsSetInProgress(numWaitingForSetAndStateFlags) && numWaitingForSet)
         Baselib_SystemSemaphore_Release(semaphore->setSemaphore, numWaitingForSet);
 }

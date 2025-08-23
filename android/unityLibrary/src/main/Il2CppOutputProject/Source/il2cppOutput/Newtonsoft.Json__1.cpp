@@ -1,7 +1,13 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
+#include <limits>
 
 
 struct VirtualActionInvoker0
@@ -180,8 +186,10 @@ IL2CPP_EXTERN_C RuntimeClass* AsyncTaskMethodBuilder_t7A5128C134547B5918EB1AA24F
 IL2CPP_EXTERN_C RuntimeClass* AsyncUtils_t2172E6EFE7AF89193B0556B417E8A4430C28A7FC_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Base64Encoder_t70348F0C1F3E24616D01828E151D7E559CE8AC57_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ConvertUtils_t3C1CAEF7394D81B972BD50219081D15B326D4797_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Convert_t7097FF336D592F7C06D88A98349A44646F91EFFC_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* CultureInfo_t9BA817D41AD55AC8BD07480DD8AC22F8FFA378E0_il2cpp_TypeInfo_var;
@@ -200,7 +208,9 @@ IL2CPP_EXTERN_C RuntimeClass* Nullable_1_t6E154519A812D040E3016229CD7638843A2CC1
 IL2CPP_EXTERN_C RuntimeClass* Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Nullable_1_tEADC262F7F8B8BC4CC0A003DBDD3CA7C1B63F9AC_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* State_tFC19CCEAFF8F4E6C73914F3B8850C622CE3490A4_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* String_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Type_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Uri_t1500A52B5F71A04F5D05C0852D0F2A0941842A0E_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C String_t* _stringLiteral042D5257625C9358C840FA1BA4A978DC0470104F;
 IL2CPP_EXTERN_C String_t* _stringLiteral08440D5D4C6716EB5A69FB4349AD1731E41170F7;
@@ -3494,6 +3504,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CDoReadAsBooleanAsyncU3Ed__40_MoveNext
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_SetResult_m0582B44433D671C064F3AE9A809A3EA5FE256781_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_t0F76E779969EE3E617B35882CAB293B65403E2F3_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m3D8C463996184A1FE94D1B59A379F3ACB425C7CF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_mA0D0419EF40E9DF864B87B495FFE05C08475C00B_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_get_IsCompleted_mC2024766896945A56978CF121456A78A6F054190_RuntimeMethod_var);
@@ -4151,7 +4163,7 @@ IL_03e4_1:
 		}
 		{
 			RuntimeObject* L_94 = V_10;
-			__this->___U3CiU3E5__2 = ((*(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)UnBox(L_94, BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var)));
+			__this->___U3CiU3E5__2 = ((*(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)((BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)UnBox(L_94, BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var))));
 			Il2CppCodeGenWriteBarrier((void**)&(((&__this->___U3CiU3E5__2))->____bits), (void*)NULL);
 			BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F L_95 = __this->___U3CiU3E5__2;
 			il2cpp_codegen_runtime_class_init_inline(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var);
@@ -4181,7 +4193,7 @@ IL_042c_1:
 			JsonTextReader_tCEDEE183A71157D31A68AB80F3636C1CBC2BE43E* L_101 = V_1;
 			bool L_102 = V_7;
 			bool L_103 = L_102;
-			RuntimeObject* L_104 = Box(il2cpp_defaults.boolean_class, &L_103);
+			RuntimeObject* L_104 = Box(Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var, &L_103);
 			NullCheck(L_101);
 			JsonReader_SetToken_m53C7B4EA9EC9F6D97E7CAC00F96DE6393EFEADEC(L_101, ((int32_t)10), L_104, (bool)0, NULL);
 			bool L_105 = V_7;
@@ -4296,7 +4308,7 @@ IL_04ed_1:
 			JsonTextReader_tCEDEE183A71157D31A68AB80F3636C1CBC2BE43E* L_132 = V_1;
 			bool L_133 = __this->___U3CisTrueU3E5__3;
 			bool L_134 = L_133;
-			RuntimeObject* L_135 = Box(il2cpp_defaults.boolean_class, &L_134);
+			RuntimeObject* L_135 = Box(Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var, &L_134);
 			NullCheck(L_132);
 			JsonReader_SetToken_m57B521A8D559EBEC2CF1FED3001068F4F897FEFF(L_132, ((int32_t)10), L_135, NULL);
 			bool L_136 = __this->___U3CisTrueU3E5__3;
@@ -4499,7 +4511,7 @@ IL_0660_1:
 			NullCheck(L_180);
 			L_180->____charPos = ((int32_t)il2cpp_codegen_add(L_182, 1));
 			Il2CppChar L_183 = V_6;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_184;
 			L_184 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_183, NULL);
 			if (L_184)
@@ -4681,6 +4693,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CDoReadAsBytesAsyncU3Ed__42_MoveNext_m
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_SetResult_mA33666F8F9751DDF31F6C4C22C991E9F4BDA52B0_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_tF4B144BF5EE52E8AC70FFD31FC2684642AC52B81_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m3D8C463996184A1FE94D1B59A379F3ACB425C7CF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_mAA584E3F7D719917CBCE21EE79C69ADD984F7F0E_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_m6BAD322C74730A75BE5EC7654FD70E68ECE1080D_RuntimeMethod_var);
@@ -5619,7 +5632,7 @@ IL_064c_1:
 			NullCheck(L_182);
 			L_182->____charPos = ((int32_t)il2cpp_codegen_add(L_184, 1));
 			Il2CppChar L_185 = V_6;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_186;
 			L_186 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_185, NULL);
 			if (L_186)
@@ -5880,7 +5893,7 @@ IL_0073_1:
 			RuntimeObject* L_15;
 			L_15 = ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383((&V_3), ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
 			UnBoxNullable(L_15, Nullable_1_tEADC262F7F8B8BC4CC0A003DBDD3CA7C1B63F9AC_il2cpp_TypeInfo_var, L_16);
-			V_2 = ((*(Nullable_1_tEADC262F7F8B8BC4CC0A003DBDD3CA7C1B63F9AC*)L_16));
+			V_2 = ((*(Nullable_1_tEADC262F7F8B8BC4CC0A003DBDD3CA7C1B63F9AC*)((Nullable_1_tEADC262F7F8B8BC4CC0A003DBDD3CA7C1B63F9AC*)(Nullable_1_tEADC262F7F8B8BC4CC0A003DBDD3CA7C1B63F9AC*)L_16)));
 			goto IL_009b;
 		}
 	}
@@ -6050,7 +6063,7 @@ IL_0073_1:
 			RuntimeObject* L_15;
 			L_15 = ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383((&V_3), ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
 			UnBoxNullable(L_15, Nullable_1_t5127ABE6809BA32727C69CB2E076B28D676EB15B_il2cpp_TypeInfo_var, L_16);
-			V_2 = ((*(Nullable_1_t5127ABE6809BA32727C69CB2E076B28D676EB15B*)L_16));
+			V_2 = ((*(Nullable_1_t5127ABE6809BA32727C69CB2E076B28D676EB15B*)((Nullable_1_t5127ABE6809BA32727C69CB2E076B28D676EB15B*)(Nullable_1_t5127ABE6809BA32727C69CB2E076B28D676EB15B*)L_16)));
 			goto IL_009b;
 		}
 	}
@@ -6220,7 +6233,7 @@ IL_0073_1:
 			RuntimeObject* L_15;
 			L_15 = ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383((&V_3), ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
 			UnBoxNullable(L_15, Nullable_1_t072551AA1AA8366A46F232F8180C34AA0CFFACBB_il2cpp_TypeInfo_var, L_16);
-			V_2 = ((*(Nullable_1_t072551AA1AA8366A46F232F8180C34AA0CFFACBB*)L_16));
+			V_2 = ((*(Nullable_1_t072551AA1AA8366A46F232F8180C34AA0CFFACBB*)((Nullable_1_t072551AA1AA8366A46F232F8180C34AA0CFFACBB*)(Nullable_1_t072551AA1AA8366A46F232F8180C34AA0CFFACBB*)L_16)));
 			goto IL_009b;
 		}
 	}
@@ -6390,7 +6403,7 @@ IL_0073_1:
 			RuntimeObject* L_15;
 			L_15 = ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383((&V_3), ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
 			UnBoxNullable(L_15, Nullable_1_t6E154519A812D040E3016229CD7638843A2CC165_il2cpp_TypeInfo_var, L_16);
-			V_2 = ((*(Nullable_1_t6E154519A812D040E3016229CD7638843A2CC165*)L_16));
+			V_2 = ((*(Nullable_1_t6E154519A812D040E3016229CD7638843A2CC165*)((Nullable_1_t6E154519A812D040E3016229CD7638843A2CC165*)(Nullable_1_t6E154519A812D040E3016229CD7638843A2CC165*)L_16)));
 			goto IL_009b;
 		}
 	}
@@ -6560,7 +6573,7 @@ IL_0073_1:
 			RuntimeObject* L_15;
 			L_15 = ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383((&V_3), ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
 			UnBoxNullable(L_15, Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28_il2cpp_TypeInfo_var, L_16);
-			V_2 = ((*(Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28*)L_16));
+			V_2 = ((*(Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28*)((Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28*)(Nullable_1_tCF32C56A2641879C053C86F273C0C6EC1B40BC28*)L_16)));
 			goto IL_009b;
 		}
 	}
@@ -6651,6 +6664,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CDoReadAsStringAsyncU3Ed__55_MoveNext_
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m10364C3B0A904803E890B2D75674665F986BDAB2_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_get_IsCompleted_mD6243A7544181F96816A5F81459F4B66908ADB5E_RuntimeMethod_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Task_1_ConfigureAwait_m9D6420C859925B7C250DED7586DD770C91632070_RuntimeMethod_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -6726,7 +6740,7 @@ IL_0073_1:
 		{
 			RuntimeObject* L_15;
 			L_15 = ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383((&V_3), ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
-			V_2 = ((String_t*)CastclassSealed((RuntimeObject*)L_15, il2cpp_defaults.string_class));
+			V_2 = ((String_t*)CastclassSealed((RuntimeObject*)L_15, String_t_il2cpp_TypeInfo_var));
 			goto IL_009b;
 		}
 	}
@@ -7042,6 +7056,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CEatWhitespaceAsyncU3Ed__17_MoveNext_m
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_t6D4C5E6B82017ED33DAFA1EFC33B0EFBE3137618_TisU3CEatWhitespaceAsyncU3Ed__17_tB5ACE0F164BD4E46E90D99CB3ED5885CE1301B1F_m9E9E57DEB97FEF28668AC07C8469C95588153DAD_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_t8FC486401D1951F2426478F2050EE290197B6E80_TisU3CEatWhitespaceAsyncU3Ed__17_tB5ACE0F164BD4E46E90D99CB3ED5885CE1301B1F_m2F61CE96EC54E3560F284CD447908055E4C90118_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_t7A5128C134547B5918EB1AA24FE47ED4C1DF3F06_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m7A77B1981FEC19CC7E1570EDC3F16AC5C14B4439_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_mF1FF6CBD66A3F581D413793BA8C2AF58B707D9CC_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_get_IsCompleted_mD70263ED42C8E379EE20DBC2F218C3E629B4B4D3_RuntimeMethod_var);
@@ -7270,7 +7285,7 @@ IL_0157_1:
 		}
 		{
 			Il2CppChar L_47 = V_2;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_48;
 			L_48 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_47, NULL);
 			if (!L_48)
@@ -8496,7 +8511,7 @@ IL_00e0_1:
 			int32_t L_39 = L_38;
 			uint16_t L_40 = (uint16_t)(L_36)->GetAt(static_cast<il2cpp_array_size_t>(L_39));
 			Il2CppChar L_41 = ((Il2CppChar)L_40);
-			RuntimeObject* L_42 = Box(il2cpp_defaults.char_class, &L_41);
+			RuntimeObject* L_42 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_41);
 			String_t* L_43;
 			L_43 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteralC24C7EB2258A7909378797A0C4011EC281984C75)), L_34, L_42, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_44;
@@ -8970,6 +8985,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CParseConstructorAsyncU3Ed__25_MoveNex
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_t8FC486401D1951F2426478F2050EE290197B6E80_TisU3CParseConstructorAsyncU3Ed__25_tF73A320F9D98CCA7E54246C9C787CEF21B954092_mD626D03677BB846275EEAFD8FE79FBCD0FEC9F25_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_tADFEF9AE6CB4E22E17B1DFA386EE3D86DB8955E4_TisU3CParseConstructorAsyncU3Ed__25_tF73A320F9D98CCA7E54246C9C787CEF21B954092_m8CFC98A277CA7C4206210F1593381E6AC556D293_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_t7A5128C134547B5918EB1AA24FE47ED4C1DF3F06_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m3D8C463996184A1FE94D1B59A379F3ACB425C7CF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m7A77B1981FEC19CC7E1570EDC3F16AC5C14B4439_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_mA0D0419EF40E9DF864B87B495FFE05C08475C00B_RuntimeMethod_var);
@@ -9246,7 +9262,7 @@ IL_01bd_1:
 IL_01dc_1:
 		{
 			Il2CppChar L_61 = V_6;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_62;
 			L_62 = Char_IsLetterOrDigit_m14049A362108679FD23E424FD9C5C42057359B72(L_61, NULL);
 			if (!L_62)
@@ -9348,7 +9364,7 @@ IL_027b_1:
 IL_0295_1:
 		{
 			Il2CppChar L_85 = V_6;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_86;
 			L_86 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_85, NULL);
 			if (!L_86)
@@ -9394,7 +9410,7 @@ IL_02ce_1:
 			L_96 = CultureInfo_get_InvariantCulture_mD1E96DC845E34B10F78CB744B0CB5D7D63CEB1E6(NULL);
 			Il2CppChar L_97 = V_6;
 			Il2CppChar L_98 = L_97;
-			RuntimeObject* L_99 = Box(il2cpp_defaults.char_class, &L_98);
+			RuntimeObject* L_99 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_98);
 			String_t* L_100;
 			L_100 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral57B341789365819E03B537390DEEB644B5EB0CEA)), L_96, L_99, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_101;
@@ -9499,7 +9515,7 @@ IL_038d_1:
 			int32_t L_136 = L_135;
 			uint16_t L_137 = (uint16_t)(L_133)->GetAt(static_cast<il2cpp_array_size_t>(L_136));
 			Il2CppChar L_138 = ((Il2CppChar)L_137);
-			RuntimeObject* L_139 = Box(il2cpp_defaults.char_class, &L_138);
+			RuntimeObject* L_139 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_138);
 			String_t* L_140;
 			L_140 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral57B341789365819E03B537390DEEB644B5EB0CEA)), L_131, L_139, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_141;
@@ -10340,6 +10356,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CParseObjectAsyncU3Ed__15_MoveNext_mEA
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_tADFEF9AE6CB4E22E17B1DFA386EE3D86DB8955E4_TisU3CParseObjectAsyncU3Ed__15_tD8DA78FCF30569472EC2738627FD798EEA97BB11_mD94AECFEDDAEB7AC392E1DAA99CCA9435256A82B_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_SetResult_mF21C48FC9CEC24F4E9C5975C54F87BE9CA179046_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_t651E7BA5C7209C40335555F361280911CF711AAA_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m3D8C463996184A1FE94D1B59A379F3ACB425C7CF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m7A77B1981FEC19CC7E1570EDC3F16AC5C14B4439_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_mA0D0419EF40E9DF864B87B495FFE05C08475C00B_RuntimeMethod_var);
@@ -10702,7 +10719,7 @@ IL_0227_1:
 IL_023a_1:
 		{
 			Il2CppChar L_67 = V_3;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_68;
 			L_68 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_67, NULL);
 			if (!L_68)
@@ -10858,6 +10875,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CParsePostValueAsyncU3Ed__4_MoveNext_m
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_t8FC486401D1951F2426478F2050EE290197B6E80_TisU3CParsePostValueAsyncU3Ed__4_t2565628AABDE0EFE32362E8AB8F38097959B639B_m2FDB304FAD78ED97AC8B69372A90FC22A26E407F_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_SetResult_mF21C48FC9CEC24F4E9C5975C54F87BE9CA179046_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_t651E7BA5C7209C40335555F361280911CF711AAA_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m7A77B1981FEC19CC7E1570EDC3F16AC5C14B4439_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_mF1FF6CBD66A3F581D413793BA8C2AF58B707D9CC_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_get_IsCompleted_mD70263ED42C8E379EE20DBC2F218C3E629B4B4D3_RuntimeMethod_var);
@@ -11309,7 +11327,7 @@ IL_02ca_1:
 IL_02d5_1:
 		{
 			Il2CppChar L_87 = V_3;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_88;
 			L_88 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_87, NULL);
 			if (!L_88)
@@ -11364,7 +11382,7 @@ IL_030a_1:
 			L_98 = CultureInfo_get_InvariantCulture_mD1E96DC845E34B10F78CB744B0CB5D7D63CEB1E6(NULL);
 			Il2CppChar L_99 = V_3;
 			Il2CppChar L_100 = L_99;
-			RuntimeObject* L_101 = Box(il2cpp_defaults.char_class, &L_100);
+			RuntimeObject* L_101 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_100);
 			String_t* L_102;
 			L_102 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral9FE6C6537467A9CE1B0920766AE42A334B64AA94)), L_98, L_101, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_103;
@@ -11668,7 +11686,7 @@ IL_0155_1:
 			int32_t L_51 = L_50;
 			uint16_t L_52 = (uint16_t)(L_48)->GetAt(static_cast<il2cpp_array_size_t>(L_51));
 			Il2CppChar L_53 = ((Il2CppChar)L_52);
-			RuntimeObject* L_54 = Box(il2cpp_defaults.char_class, &L_53);
+			RuntimeObject* L_54 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_53);
 			String_t* L_55;
 			L_55 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral546DC8042D987ADE62998CEBF32C2F71A92A8154)), L_46, L_54, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_56;
@@ -11825,7 +11843,7 @@ IL_024c_1:
 			int32_t L_102 = L_101;
 			uint16_t L_103 = (uint16_t)(L_99)->GetAt(static_cast<il2cpp_array_size_t>(L_102));
 			Il2CppChar L_104 = ((Il2CppChar)L_103);
-			RuntimeObject* L_105 = Box(il2cpp_defaults.char_class, &L_104);
+			RuntimeObject* L_105 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_104);
 			String_t* L_106;
 			L_106 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral3CB83D01AFDFD325DD1290B1890CD781893086B0)), L_97, L_105, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_107;
@@ -12540,6 +12558,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CParseValueAsyncU3Ed__8_MoveNext_m8B41
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_tADFEF9AE6CB4E22E17B1DFA386EE3D86DB8955E4_TisU3CParseValueAsyncU3Ed__8_tB97C3E304A31B7E7F9C6224B197A9F5D7FF565D0_m05AA8632BE946EEF07B55CA7C1CD509A064F67DF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_SetResult_mF21C48FC9CEC24F4E9C5975C54F87BE9CA179046_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_t651E7BA5C7209C40335555F361280911CF711AAA_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m10364C3B0A904803E890B2D75674665F986BDAB2_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m3D8C463996184A1FE94D1B59A379F3ACB425C7CF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m7A77B1981FEC19CC7E1570EDC3F16AC5C14B4439_RuntimeMethod_var);
@@ -13868,7 +13887,7 @@ IL_0938_1:
 IL_094b_1:
 		{
 			Il2CppChar L_270 = V_3;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_271;
 			L_271 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_270, NULL);
 			if (!L_271)
@@ -13889,7 +13908,7 @@ IL_094b_1:
 IL_0966_1:
 		{
 			Il2CppChar L_275 = V_3;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_276;
 			L_276 = Char_IsNumber_m9C6A6326BEF8A833F2FC7BA93F5E211D9423C5F3(L_275, NULL);
 			if (L_276)
@@ -14901,7 +14920,7 @@ IL_0195_1:
 			int32_t L_55 = L_54;
 			uint16_t L_56 = (uint16_t)(L_52)->GetAt(static_cast<il2cpp_array_size_t>(L_55));
 			Il2CppChar L_57 = ((Il2CppChar)L_56);
-			RuntimeObject* L_58 = Box(il2cpp_defaults.char_class, &L_57);
+			RuntimeObject* L_58 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_57);
 			String_t* L_59;
 			L_59 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteralD4375B5558631B37241ECEF7EADCC7F8558F7FD0)), L_50, L_58, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_60;
@@ -15244,7 +15263,7 @@ IL_019a_1:
 			int32_t L_55 = L_54;
 			uint16_t L_56 = (uint16_t)(L_52)->GetAt(static_cast<il2cpp_array_size_t>(L_55));
 			Il2CppChar L_57 = ((Il2CppChar)L_56);
-			RuntimeObject* L_58 = Box(il2cpp_defaults.char_class, &L_57);
+			RuntimeObject* L_58 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_57);
 			String_t* L_59;
 			L_59 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteralD4375B5558631B37241ECEF7EADCC7F8558F7FD0)), L_50, L_58, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_60;
@@ -16127,6 +16146,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CReadNumberValueAsyncU3Ed__38_MoveNext
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_tADFEF9AE6CB4E22E17B1DFA386EE3D86DB8955E4_TisU3CReadNumberValueAsyncU3Ed__38_t1E673208CDB5C144FFC3F97CDF0C05BC03B38BDE_m380EC9260D64B284F0B1F0802138C6A58D57B314_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_SetResult_m0D83195F995F9825D7A6DCDC3835D6917C43B5A6_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_tE810F083929D7952F192036D298085BD4B048AD0_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m10364C3B0A904803E890B2D75674665F986BDAB2_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m3D8C463996184A1FE94D1B59A379F3ACB425C7CF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
@@ -17269,7 +17289,7 @@ IL_07bf_1:
 			NullCheck(L_211);
 			L_211->____charPos = ((int32_t)il2cpp_codegen_add(L_213, 1));
 			Il2CppChar L_214 = V_6;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_215;
 			L_215 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_214, NULL);
 			if (L_215)
@@ -17688,7 +17708,7 @@ IL_0136_1:
 			L_46 = CultureInfo_get_InvariantCulture_mD1E96DC845E34B10F78CB744B0CB5D7D63CEB1E6(NULL);
 			Il2CppChar L_47 = __this->___quote;
 			Il2CppChar L_48 = L_47;
-			RuntimeObject* L_49 = Box(il2cpp_defaults.char_class, &L_48);
+			RuntimeObject* L_49 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_48);
 			String_t* L_50;
 			L_50 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral451FE154B618BE0288F8F244B9F13BB01C4D2FDF)), L_46, L_49, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_51;
@@ -17761,7 +17781,7 @@ IL_01e4_1:
 			L_68 = CultureInfo_get_InvariantCulture_mD1E96DC845E34B10F78CB744B0CB5D7D63CEB1E6(NULL);
 			Il2CppChar L_69 = __this->___quote;
 			Il2CppChar L_70 = L_69;
-			RuntimeObject* L_71 = Box(il2cpp_defaults.char_class, &L_70);
+			RuntimeObject* L_71 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)), &L_70);
 			String_t* L_72;
 			L_72 = StringUtils_FormatWith_m97587965D365EA1584A7D31B57D618E7768073E5(((String_t*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&_stringLiteral451FE154B618BE0288F8F244B9F13BB01C4D2FDF)), L_68, L_71, NULL);
 			JsonReaderException_t44F3F6F2980FC806231B19A65F37D1E034B218DA* L_73;
@@ -18241,7 +18261,7 @@ IL_056f_1:
 			il2cpp_codegen_runtime_class_init_inline(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&CultureInfo_t9BA817D41AD55AC8BD07480DD8AC22F8FFA378E0_il2cpp_TypeInfo_var)));
 			CultureInfo_t9BA817D41AD55AC8BD07480DD8AC22F8FFA378E0* L_174;
 			L_174 = CultureInfo_get_InvariantCulture_mD1E96DC845E34B10F78CB744B0CB5D7D63CEB1E6(NULL);
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var)));
 			String_t* L_175;
 			L_175 = Char_ToString_m2A308731F9577C06AF3C0901234E2EAC8327410C((&V_2), NULL);
 			String_t* L_176;
@@ -18453,6 +18473,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void U3CReadStringValueAsyncU3Ed__37_MoveNext
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_AwaitUnsafeOnCompleted_TisConfiguredTaskAwaiter_tADFEF9AE6CB4E22E17B1DFA386EE3D86DB8955E4_TisU3CReadStringValueAsyncU3Ed__37_tC22F6DC2FBC218785263CEEFF8AC80A27BD5DFBE_mEBAED0553F317311EE3274E6BE63F4550D9DC776_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_SetResult_m0D83195F995F9825D7A6DCDC3835D6917C43B5A6_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&AsyncTaskMethodBuilder_1_tE810F083929D7952F192036D298085BD4B048AD0_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m10364C3B0A904803E890B2D75674665F986BDAB2_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaitable_1_GetAwaiter_m3D8C463996184A1FE94D1B59A379F3ACB425C7CF_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ConfiguredTaskAwaiter_GetResult_m00ABE5C46A983C38086438B7A7CB2C62296B3383_RuntimeMethod_var);
@@ -19739,7 +19760,7 @@ IL_085f_1:
 			NullCheck(L_244);
 			L_244->____charPos = ((int32_t)il2cpp_codegen_add(L_246, 1));
 			Il2CppChar L_247 = V_6;
-			il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.char_class);
+			il2cpp_codegen_runtime_class_init_inline(Char_t521A6F19B456D956AF452D926C32709DC03D6B17_il2cpp_TypeInfo_var);
 			bool L_248;
 			L_248 = Char_IsWhiteSpace_m02AEC6EA19513CAFC6882CFCA54C45794D2B5924(L_247, NULL);
 			if (L_248)
@@ -19969,7 +19990,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA857
 		TextWriter_tA9E5461506CF806E17B6BBBF2119359DEDA3F0F3* L_3 = __this->____writer;
 		NullCheck(L_3);
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_4;
-		L_4 = VirtualFuncInvoker0< Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* >::Invoke(24, L_3);
+		L_4 = VirtualFuncInvoker0< Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* >::Invoke(21, L_3);
 		G_B2_0 = L_4;
 	}
 
@@ -21519,7 +21540,7 @@ IL_0011:
 		uint8_t L_4 = ___0_value;
 		CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED L_5 = ___1_cancellationToken;
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_6;
-		L_6 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)((uint32_t)L_4)), L_5, NULL);
+		L_6 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)L_4), L_5, NULL);
 		return L_6;
 	}
 }
@@ -21571,7 +21592,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA857
 		L_1 = Nullable_1_GetValueOrDefault_mE1BD2EC3D88CCEF213FC050F3022BD301B857F61_inline((&___0_value), Nullable_1_GetValueOrDefault_mE1BD2EC3D88CCEF213FC050F3022BD301B857F61_RuntimeMethod_var);
 		CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED L_2 = ___1_cancellationToken;
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_3;
-		L_3 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)((uint32_t)L_1)), L_2, NULL);
+		L_3 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)L_1), L_2, NULL);
 		return L_3;
 	}
 
@@ -22686,7 +22707,7 @@ IL_0013:
 	}
 	{
 		RuntimeObject* L_5 = ___0_value;
-		V_0 = ((*(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)UnBox(L_5, BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var)));
+		V_0 = ((*(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)((BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)UnBox(L_5, BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var))));
 		BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F L_6 = V_0;
 		CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED L_7 = ___1_cancellationToken;
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_8;
@@ -23169,7 +23190,7 @@ IL_0011:
 		uint32_t L_4 = ___0_value;
 		CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED L_5 = ___1_cancellationToken;
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_6;
-		L_6 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)((uint32_t)L_4)), L_5, NULL);
+		L_6 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)L_4), L_5, NULL);
 		return L_6;
 	}
 }
@@ -23221,7 +23242,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA857
 		L_1 = Nullable_1_GetValueOrDefault_m1534AD85F2094EE7E4C958FBEE356468ED7A1B51_inline((&___0_value), Nullable_1_GetValueOrDefault_m1534AD85F2094EE7E4C958FBEE356468ED7A1B51_RuntimeMethod_var);
 		CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED L_2 = ___1_cancellationToken;
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_3;
-		L_3 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)((uint32_t)L_1)), L_2, NULL);
+		L_3 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)L_1), L_2, NULL);
 		return L_3;
 	}
 
@@ -23478,7 +23499,7 @@ IL_0011:
 		uint16_t L_4 = ___0_value;
 		CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED L_5 = ___1_cancellationToken;
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_6;
-		L_6 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)((uint32_t)L_4)), L_5, NULL);
+		L_6 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)L_4), L_5, NULL);
 		return L_6;
 	}
 }
@@ -23530,7 +23551,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA857
 		L_1 = Nullable_1_GetValueOrDefault_m02B4DD41DAF6A26617F539C1884EB316FD082037_inline((&___0_value), Nullable_1_GetValueOrDefault_m02B4DD41DAF6A26617F539C1884EB316FD082037_RuntimeMethod_var);
 		CancellationToken_t51142D9C6D7C02D314DA34A6A7988C528992FFED L_2 = ___1_cancellationToken;
 		Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572* L_3;
-		L_3 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)((uint32_t)L_1)), L_2, NULL);
+		L_3 = JsonTextWriter_WriteIntegerValueAsync_m61BB9345184C85E9220135CBD8A94164A9F82DB0(__this, ((int64_t)(uint64_t)L_1), L_2, NULL);
 		return L_3;
 	}
 
@@ -24053,6 +24074,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void JsonTextWriter__ctor_mE77A9BD1789BB07C3B
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&JsonTextWriter_t8A730143EFDFE2A07F31B3C4DB82061A883A60F4_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&JsonWriter_t1750495CE81BD2D7BF7335A8468E2F960CA3ABC3_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	{
@@ -24083,7 +24105,7 @@ IL_0014:
 		Type_t* L_3;
 		L_3 = Object_GetType_mE10A8FC1E57F3DF29972CCBC026C2DC3942263B3(__this, NULL);
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_4 = { reinterpret_cast<intptr_t> (JsonTextWriter_t8A730143EFDFE2A07F31B3C4DB82061A883A60F4_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_5;
 		L_5 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_4, NULL);
 		bool L_6;
@@ -24588,7 +24610,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void JsonTextWriter_WriteValue_m07E724EAEA49E
 	}
 	{
 		RuntimeObject* L_1 = ___0_value;
-		V_0 = ((*(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)UnBox(L_1, BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var)));
+		V_0 = ((*(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)((BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)(BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F*)UnBox(L_1, BigInteger_tF7779A0AA6D6B9BE0E0C1C293E7708765DEF7D0F_il2cpp_TypeInfo_var))));
 		JsonWriter_InternalWriteValue_m7E8EC6F2C19FDF8EEE42F5B33931C55AC01088F6(__this, 7, NULL);
 		il2cpp_codegen_runtime_class_init_inline(CultureInfo_t9BA817D41AD55AC8BD07480DD8AC22F8FFA378E0_il2cpp_TypeInfo_var);
 		CultureInfo_t9BA817D41AD55AC8BD07480DD8AC22F8FFA378E0* L_2;
@@ -24718,7 +24740,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void JsonTextWriter_WriteValue_m32656623E229E
 	{
 		JsonWriter_InternalWriteValue_m7E8EC6F2C19FDF8EEE42F5B33931C55AC01088F6(__this, 7, NULL);
 		uint32_t L_0 = ___0_value;
-		JsonTextWriter_WriteIntegerValue_m68840DA4197A6A3682D23CCB9FEA0CA8007DB11C(__this, ((int64_t)(uint64_t)((uint32_t)L_0)), NULL);
+		JsonTextWriter_WriteIntegerValue_m68840DA4197A6A3682D23CCB9FEA0CA8007DB11C(__this, ((int64_t)(uint64_t)L_0), NULL);
 		return;
 	}
 }
@@ -25683,7 +25705,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t JsonTextWriter_WriteNumberToBuffer_mF
 		JsonTextWriter_EnsureWriteBuffer_mF1019CFAE05467B551055C56E322432839A4387B(__this, NULL);
 		uint32_t L_0 = ___0_value;
 		int32_t L_1;
-		L_1 = MathUtils_IntLength_m23241F09F5280B9249FBD8D666E56C81E464919C(((int64_t)(uint64_t)((uint32_t)L_0)), NULL);
+		L_1 = MathUtils_IntLength_m23241F09F5280B9249FBD8D666E56C81E464919C(((int64_t)(uint64_t)L_0), NULL);
 		V_0 = L_1;
 		bool L_2 = ___1_negative;
 		if (!L_2)

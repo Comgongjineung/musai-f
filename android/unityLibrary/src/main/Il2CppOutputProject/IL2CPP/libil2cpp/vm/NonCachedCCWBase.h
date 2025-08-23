@@ -18,7 +18,7 @@ namespace vm
     {
     private:
         baselib::atomic<uint32_t> m_RefCount;
-        Il2CppGCHandle m_GCHandle;
+        uint32_t m_GCHandle;
 
     public:
         inline NonCachedCCWBase(Il2CppObject* obj) :

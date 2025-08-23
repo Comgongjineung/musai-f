@@ -1,7 +1,13 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
+#include <limits>
 
 
 struct VirtualActionInvoker0
@@ -187,6 +193,7 @@ struct Action_3_t2DDA476626C83E61B40D2231D251968B93E6DFF3;
 struct AsyncLocal_1_t1D3339EA4C8650D2DEDDF9553E5C932B3DC2CCFD;
 struct BlockingCollection_1_t81934C5472D881165093C9221B01BD4C59224566;
 struct BlockingCollection_1_t4DCC1026BF9096DC145A24B46735A05429DCCC88;
+struct ConditionalWeakTable_2_t815A43BFBA64EC1F9F92AD042622E80EED65712E;
 struct Dictionary_2_tA74B2D3A0B981C070FC5DB672AC4F7BF2640B326;
 struct Dictionary_2_t9712A49F3B5C0E0DBA2A36D2DB72EEADFDAA623C;
 struct Dictionary_2_t5668553A5EAB79BC669C120CB54258EACA63878E;
@@ -768,12 +775,14 @@ IL2CPP_EXTERN_C RuntimeClass* SimulatorEditorPrefsProperty_tE1C5AA2DAB2EA4AC3F1D
 IL2CPP_EXTERN_C RuntimeClass* SimulatorInputActionAssetProperty_tDD009EA4DE7E4010A650AB04801045191089CA8B_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* SingleThreadTaskScheduler_t5B89753B7A24B9960ED0F4DC983F274197FEDA22_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* String_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* TaskScheduler_t3F0550EBEF7C41F74EC8C08FF4BED0D8CE66006E_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* TaskU5BU5D_t368E447BD9A179BA9A26BAAABF1BAE9CA79F60B3_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Texture2D_tE6505BC111DD8A424A9DBE8E05D7D09E11FFFCF4_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ThreadStart_t7662D98F1793EDE90192D7304D1C3C44119328A2_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Thread_t0A773B9DE873D2DCAA7D229EAB36757B500E207F_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Type_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CBuildContentMeshU3Ed__34_t9DD4220021D5E53BF2CE1B3C4613FB66CDACC9EA_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CBuildContentMeshU3Ed__5_t307574458D22DB226CDA63CF5E9752DDDD0AF850_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CBuildContentMeshU3Ed__6_tD107ECA9D727BFA252F696350A6067960AB4A88A_il2cpp_TypeInfo_var;
@@ -2093,7 +2102,6 @@ struct PosePublisherComponent_tCF3C59C056C40DE9073E4CE51ADC515EF506800E  : publi
 };
 struct PropertyAttribute_t5E0CB5A6CDA6E24CBD4FF26DE3B0C29D8BB54BF0  : public Attribute_tFDA8EFEFB0711976D22474794576DAF28F7440AA
 {
-	bool ___U3CapplyToCollectionU3Ek__BackingField;
 };
 struct PropertyChangedEventArgs_tFA01343D8F2BD799951B40A3EBF4A6B38EE63321  : public EventArgs_t37273F03EAC87217701DD431B190FBD84AD7C377
 {
@@ -3563,7 +3571,6 @@ struct BoxCollider_tFA5D239388334D6DE0B8FFDAD6825C5B03786E23  : public Collider_
 };
 struct Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184  : public Behaviour_t01970CFBBA658497AE30F311C447DB0440BAB7FA
 {
-	uint32_t ___m_NonSerializedVersion;
 };
 struct Canvas_t2DB4CEFDFF732884866C83F11ABF75F5AE8FFB26  : public Behaviour_t01970CFBBA658497AE30F311C447DB0440BAB7FA
 {
@@ -3978,6 +3985,7 @@ struct Task_t751C4CC3ECD055BABA8A0B6A5DFBB4283DCA8572_ThreadStaticFields
 };
 struct TaskScheduler_t3F0550EBEF7C41F74EC8C08FF4BED0D8CE66006E_StaticFields
 {
+	ConditionalWeakTable_2_t815A43BFBA64EC1F9F92AD042622E80EED65712E* ___s_activeTaskSchedulers;
 	TaskScheduler_t3F0550EBEF7C41F74EC8C08FF4BED0D8CE66006E* ___s_defaultTaskScheduler;
 	int32_t ___s_taskSchedulerIdCounter;
 	EventHandler_1_tE698654C3F437D97ABCCA3FD0AD8F86E776DC77A* ____unobservedTaskException;
@@ -4150,11 +4158,6 @@ struct SingleThreadTaskScheduler_t5B89753B7A24B9960ED0F4DC983F274197FEDA22_Threa
 struct AsyncTaskMethodBuilder_t7A5128C134547B5918EB1AA24FE47ED4C1DF3F06_StaticFields
 {
 	Task_1_tE41CFF640EB7C045550D9D0D92BE67533B084C17* ___s_cachedCompleted;
-};
-struct Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3_StaticFields
-{
-	int32_t ___k_ColorId;
-	int32_t ___k_MainTexId;
 };
 struct Type_t_StaticFields
 {
@@ -5378,7 +5381,7 @@ inline PointCloudMaterial_t6CFDCC92144311093C1AC1BB53F9D35E74E9AB62* Enumerable_
 {
 	return ((  PointCloudMaterial_t6CFDCC92144311093C1AC1BB53F9D35E74E9AB62* (*) (RuntimeObject*, Func_2_tBE8471835CDB2C1532ECD7B6D8FA0DC98374DAEA*, const RuntimeMethod*))Enumerable_FirstOrDefault_TisRuntimeObject_mFACC750E4D7AF7B43F5B866C84F613B3ECC41994_gshared)(___0_source, ___1_predicate, method);
 }
-IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool IntPtr_op_Inequality_m90EFC9C4CAD9A33E309F2DDF98EE4E1DD253637B_inline (intptr_t ___0_value1, intptr_t ___1_value2, const RuntimeMethod* method) ;
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool IntPtr_op_Inequality_m90EFC9C4CAD9A33E309F2DDF98EE4E1DD253637B (intptr_t ___0_value1, intptr_t ___1_value2, const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool CesiumTiles_Destroy3DTiles_m4936C02030EB79581889D703FA47A452854655B8 (intptr_t ___0_tiles, const RuntimeMethod* method) ;
 inline void List_1__ctor_mCFE6549CB6002DAFB1BF7DB7F771EE4F8F9DAEC7 (List_1_tC8FEE4B5DCCD8E523E37482339A2C1CF5AA3803C* __this, const RuntimeMethod* method)
 {
@@ -10724,7 +10727,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PointCloudBehaviour_DestroyZipPtr_m218EA
 		intptr_t L_0;
 		L_0 = VoxelTree_get_zipHandle_mD7F6A11DDA3614ADEA56D19CF5F68659C3CCACC4_inline(__this, NULL);
 		bool L_1;
-		L_1 = IntPtr_op_Inequality_m90EFC9C4CAD9A33E309F2DDF98EE4E1DD253637B_inline(L_0, 0, NULL);
+		L_1 = IntPtr_op_Inequality_m90EFC9C4CAD9A33E309F2DDF98EE4E1DD253637B(L_0, 0, NULL);
 		if (!L_1)
 		{
 			goto IL_001e;
@@ -10845,7 +10848,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PointCloudVoxel_OnContentLoaded_mD17962D
 		RuntimeObject* L_0 = ___0_loadedData;
 		Voxel_OnContentLoaded_m0C4778F2C64FD18319EFEB709F00AB0AAB3B7625(__this, L_0, NULL);
 		RuntimeObject* L_1 = ___0_loadedData;
-		V_0 = ((*(ColoredPointCloudData_t2141D90537781CC3920F7BCA2327EABFBCC574EF*)UnBox(L_1, ColoredPointCloudData_t2141D90537781CC3920F7BCA2327EABFBCC574EF_il2cpp_TypeInfo_var)));
+		V_0 = ((*(ColoredPointCloudData_t2141D90537781CC3920F7BCA2327EABFBCC574EF*)((ColoredPointCloudData_t2141D90537781CC3920F7BCA2327EABFBCC574EF*)(ColoredPointCloudData_t2141D90537781CC3920F7BCA2327EABFBCC574EF*)UnBox(L_1, ColoredPointCloudData_t2141D90537781CC3920F7BCA2327EABFBCC574EF_il2cpp_TypeInfo_var))));
 		ColoredPointCloudData_t2141D90537781CC3920F7BCA2327EABFBCC574EF L_2 = V_0;
 		Vector3U5BU5D_tFF1859CCE176131B909E2044F76443064254679C* L_3 = L_2.___PointPosition;
 		NullCheck(L_3);
@@ -13973,6 +13976,12 @@ IL_0052:
 }
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* PosixPath_TrimLeadingSlashes_mE808C71D0CFA0E7F0B4EE869A1E48414EE02C617 (String_t* ___0_subPath, const RuntimeMethod* method) 
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
 	int32_t V_0 = 0;
 	{
 		V_0 = 0;
@@ -14024,12 +14033,18 @@ IL_0023:
 		}
 	}
 	{
-		String_t* L_13 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_13 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		return L_13;
 	}
 }
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* PosixPath_TrimTrailingSlashes_mB16AE18C8B35478C90196BD80C6AC73E9BC4BB61 (String_t* ___0_subPath, const RuntimeMethod* method) 
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
 	int32_t V_0 = 0;
 	{
 		String_t* L_0 = ___0_subPath;
@@ -14076,7 +14091,7 @@ IL_0025:
 		}
 	}
 	{
-		String_t* L_10 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_10 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		return L_10;
 	}
 }
@@ -23373,8 +23388,14 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RequiredShaders__ctor_m789817ABDA8C64E99
 #endif
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void PackageInfo__ctor_m11BF58D57D517A487AE4E35E0F572B8E7A1D77CC (PackageInfo_t9311D5186E71745B442DFB6BB8929BAE204C7F16* __this, const RuntimeMethod* method) 
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
 	{
-		String_t* L_0 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
+	{
+		String_t* L_0 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		__this->___ARFoundationVersion = L_0;
 		Il2CppCodeGenWriteBarrier((void**)(&__this->___ARFoundationVersion), (void*)L_0);
 		Object__ctor_mE837C6B9FA8C6D5D109F4B2EC885D79919AC0EA2(__this, NULL);
@@ -27066,6 +27087,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool HitTestResult_Equals_mA12A27D053C2DF9D93
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&HitTestResult_t623F1DB9A0AAD8416652DFFE1842F908250D44D9_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	{
@@ -27099,7 +27121,7 @@ IL_000b:
 		L_3 = Object_GetType_mE10A8FC1E57F3DF29972CCBC026C2DC3942263B3(L_2, NULL);
 		Type_t* L_4;
 		L_4 = Object_GetType_mE10A8FC1E57F3DF29972CCBC026C2DC3942263B3(__this, NULL);
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		bool L_5;
 		L_5 = Type_op_Inequality_m83209C7BB3C05DFBEA3B6199B0BEFE8037301172(L_3, L_4, NULL);
 		if (!L_5)
@@ -30077,14 +30099,6 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void FileIOTask_set_FileName_mCB7
 		__this->___U3CFileNameU3Ek__BackingField = L_0;
 		Il2CppCodeGenWriteBarrier((void**)(&__this->___U3CFileNameU3Ek__BackingField), (void*)L_0);
 		return;
-	}
-}
-IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR bool IntPtr_op_Inequality_m90EFC9C4CAD9A33E309F2DDF98EE4E1DD253637B_inline (intptr_t ___0_value1, intptr_t ___1_value2, const RuntimeMethod* method) 
-{
-	{
-		intptr_t L_0 = ___0_value1;
-		intptr_t L_1 = ___1_value2;
-		return (bool)((((int32_t)((((intptr_t)L_0) == ((intptr_t)L_1))? 1 : 0)) == ((int32_t)0))? 1 : 0);
 	}
 }
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Color_tD001788D726C3A7F1379BEED0260B9591F440C1F Color32_op_Implicit_m47CBB138122B400E0B1F4BFD7C30A6C2C00FCA3E_inline (Color32_t73C5004937BF5BB8AD55323D51AAA40A898EF48B ___0_c, const RuntimeMethod* method) 

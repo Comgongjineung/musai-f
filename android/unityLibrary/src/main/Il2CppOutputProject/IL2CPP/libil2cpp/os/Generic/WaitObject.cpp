@@ -1,6 +1,6 @@
 #include "il2cpp-config.h"
 
-#if (IL2CPP_THREADS_PTHREAD || IL2CPP_THREADS_WIN32)
+#if (IL2CPP_THREADS_PTHREAD || IL2CPP_THREADS_WIN32) && !RUNTIME_TINY
 
 #include "WaitObject.h"
 #include "os/Time.h"

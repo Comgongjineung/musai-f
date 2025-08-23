@@ -1,6 +1,6 @@
 #pragma once
 
-#if IL2CPP_TARGET_POSIX || IL2CPP_SUPPORT_SOCKETS_POSIX_API
+#if (IL2CPP_TARGET_POSIX || IL2CPP_SUPPORT_SOCKETS_POSIX_API) && !RUNTIME_TINY
 
 #include <pthread.h>
 #include <time.h>
@@ -46,9 +46,6 @@ namespace posix
         { pthread_mutex_unlock(mutex); }
     };
 
-#if PLATFORM_POLL_FLAGS_OVERRIDE
-    #include "PlatformPosixHelpers.h"
-#else
 
     inline short PollFlagsToPollEvents(PollFlags flags)
     {
@@ -59,8 +56,6 @@ namespace posix
     {
         return (PollFlags)events;
     }
-
-#endif // PLATFORM_POLL_FLAGS_OVERRIDE
 
     int Poll(pollfd* handles, int numHandles, int timeout);
 }

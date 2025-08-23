@@ -227,16 +227,12 @@ namespace vm
         static void GetNameInternal(std::string &oss, const Il2CppType *type, Il2CppTypeNameFormat format, bool is_nested);
         static bool IsReference(const Il2CppType* type);
         static bool IsStruct(const Il2CppType* type);
+        static bool GenericInstIsValuetype(const Il2CppType* type);
         static bool HasVariableRuntimeSizeWhenFullyShared(const Il2CppType* type);
 
         static bool IsArray(const Il2CppType *type);
         static bool IsEnum(const Il2CppType *type);
-
-        inline static bool IsValueType(const Il2CppType* type)
-        {
-            return type->valuetype;
-        }
-
+        static bool IsValueType(const Il2CppType *type);
         static bool IsPointerType(const Il2CppType *type);
 
         static bool IsSystemDBNull(const Il2CppType *type);

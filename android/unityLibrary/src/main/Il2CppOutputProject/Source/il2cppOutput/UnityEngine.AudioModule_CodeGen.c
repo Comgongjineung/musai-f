@@ -1,4 +1,9 @@
 ﻿#include "pch-c.h"
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
 #include "codegen/il2cpp-codegen-metadata.h"
@@ -39,15 +44,6 @@ extern void WebCamTexture_set_requestedWidth_mF45C8D70FE7C22D84D86AC7CD81270067B
 extern void WebCamTexture_set_requestedHeight_m2216C94A7C59856727881B36974DD8E09BAB103C (void);
 extern void WebCamTexture_get_didUpdateThisFrame_m3672350773BAA9131D648B886DFD4E3351F045BE (void);
 extern void WebCamTexture_Internal_CreateWebCamTexture_mE8B5E78C03DAD51A213D6D39D5A154919409BDD9 (void);
-extern void WebCamTexture_Play_Injected_m3352EB6991BA2F019AE3764AFB7DE8B919D3AB58 (void);
-extern void WebCamTexture_Stop_Injected_m25CCBCD6118A9AAFDD44BF997978E1BE6E3F3A73 (void);
-extern void WebCamTexture_get_isPlaying_Injected_m3B7379991B103A20E478CAD56CC78DD6BD065AF7 (void);
-extern void WebCamTexture_set_deviceName_Injected_m207F05F7508F8AC88AA8687418A0F8A444C8FDE8 (void);
-extern void WebCamTexture_set_requestedFPS_Injected_m4671BF4DC9BECFC8F23AC95769295D65E9698408 (void);
-extern void WebCamTexture_set_requestedWidth_Injected_mA89E59C59C90D34FD7745339C5AAC58F1FA86E4A (void);
-extern void WebCamTexture_set_requestedHeight_Injected_mCB46FBCE36A3D68BD1CE079ECA460404ADFA8408 (void);
-extern void WebCamTexture_get_didUpdateThisFrame_Injected_m54E7818BA2C349DBF76A89CC8450E613FB470858 (void);
-extern void WebCamTexture_Internal_CreateWebCamTexture_Injected_m7393102C5FC1B8C3BE8AF719DCB1EC88B261A636 (void);
 extern void AudioSampleProvider_InvokeSampleFramesAvailable_mEB16F7230AB65A3576BF053AC5719F8E134FBCD4 (void);
 extern void AudioSampleProvider_InvokeSampleFramesOverflow_m66593173A527981F5EB2A5EF77B0C9119DAB5E15 (void);
 extern void SampleFramesHandler__ctor_m7DDE0BAD439CD80791140C7D42D661B598A7663A (void);
@@ -56,7 +52,7 @@ extern void AudioClipPlayable_GetHandle_mEA1D664328FF9B08E4F7D5EBCD4B51A754D97C4
 extern void AudioClipPlayable_Equals_m9C1C75ACBB74FE06AD02BE4643F6EB39413EFF83 (void);
 extern void AudioMixerPlayable_GetHandle_m6C182D9794E901D123223BB57738A302BEAB41FD (void);
 extern void AudioMixerPlayable_Equals_mDFB945EB48199A338BAD00D40FB8EEC34CF64D57 (void);
-static Il2CppMethodPointer s_methodPointers[49] = 
+static Il2CppMethodPointer s_methodPointers[40] = 
 {
 	AudioSettings_InvokeOnAudioConfigurationChanged_m8273D3AEB24F4C3E374238B6F699BE6696808E85,
 	AudioSettings_InvokeOnAudioSystemShuttingDown_m1B9895D60B3267EBDEC69B9169730DBAD8325E90,
@@ -90,15 +86,6 @@ static Il2CppMethodPointer s_methodPointers[49] =
 	WebCamTexture_set_requestedHeight_m2216C94A7C59856727881B36974DD8E09BAB103C,
 	WebCamTexture_get_didUpdateThisFrame_m3672350773BAA9131D648B886DFD4E3351F045BE,
 	WebCamTexture_Internal_CreateWebCamTexture_mE8B5E78C03DAD51A213D6D39D5A154919409BDD9,
-	WebCamTexture_Play_Injected_m3352EB6991BA2F019AE3764AFB7DE8B919D3AB58,
-	WebCamTexture_Stop_Injected_m25CCBCD6118A9AAFDD44BF997978E1BE6E3F3A73,
-	WebCamTexture_get_isPlaying_Injected_m3B7379991B103A20E478CAD56CC78DD6BD065AF7,
-	WebCamTexture_set_deviceName_Injected_m207F05F7508F8AC88AA8687418A0F8A444C8FDE8,
-	WebCamTexture_set_requestedFPS_Injected_m4671BF4DC9BECFC8F23AC95769295D65E9698408,
-	WebCamTexture_set_requestedWidth_Injected_mA89E59C59C90D34FD7745339C5AAC58F1FA86E4A,
-	WebCamTexture_set_requestedHeight_Injected_mCB46FBCE36A3D68BD1CE079ECA460404ADFA8408,
-	WebCamTexture_get_didUpdateThisFrame_Injected_m54E7818BA2C349DBF76A89CC8450E613FB470858,
-	WebCamTexture_Internal_CreateWebCamTexture_Injected_m7393102C5FC1B8C3BE8AF719DCB1EC88B261A636,
 	AudioSampleProvider_InvokeSampleFramesAvailable_mEB16F7230AB65A3576BF053AC5719F8E134FBCD4,
 	AudioSampleProvider_InvokeSampleFramesOverflow_m66593173A527981F5EB2A5EF77B0C9119DAB5E15,
 	SampleFramesHandler__ctor_m7DDE0BAD439CD80791140C7D42D661B598A7663A,
@@ -116,68 +103,59 @@ extern void AudioMixerPlayable_Equals_mDFB945EB48199A338BAD00D40FB8EEC34CF64D57_
 static Il2CppTokenAdjustorThunkPair s_adjustorThunks[5] = 
 {
 	{ 0x06000015, WebCamDevice_get_name_m2BF75E8EA486668299906EAC9B35214890D4601E_AdjustorThunk },
-	{ 0x0600002E, AudioClipPlayable_GetHandle_mEA1D664328FF9B08E4F7D5EBCD4B51A754D97C44_AdjustorThunk },
-	{ 0x0600002F, AudioClipPlayable_Equals_m9C1C75ACBB74FE06AD02BE4643F6EB39413EFF83_AdjustorThunk },
-	{ 0x06000030, AudioMixerPlayable_GetHandle_m6C182D9794E901D123223BB57738A302BEAB41FD_AdjustorThunk },
-	{ 0x06000031, AudioMixerPlayable_Equals_mDFB945EB48199A338BAD00D40FB8EEC34CF64D57_AdjustorThunk },
+	{ 0x06000025, AudioClipPlayable_GetHandle_mEA1D664328FF9B08E4F7D5EBCD4B51A754D97C44_AdjustorThunk },
+	{ 0x06000026, AudioClipPlayable_Equals_m9C1C75ACBB74FE06AD02BE4643F6EB39413EFF83_AdjustorThunk },
+	{ 0x06000027, AudioMixerPlayable_GetHandle_m6C182D9794E901D123223BB57738A302BEAB41FD_AdjustorThunk },
+	{ 0x06000028, AudioMixerPlayable_Equals_mDFB945EB48199A338BAD00D40FB8EEC34CF64D57_AdjustorThunk },
 };
-static const int32_t s_InvokerIndices[49] = 
+static const int32_t s_InvokerIndices[40] = 
 {
-	23030,
-	24288,
-	24288,
-	24157,
-	24157,
-	5505,
-	10566,
-	24157,
-	23030,
-	24157,
-	23030,
-	24157,
-	24288,
-	24288,
-	10738,
-	10686,
-	5505,
-	10738,
-	5505,
-	10686,
-	13964,
-	24208,
-	14160,
-	14160,
-	14160,
-	13789,
-	10738,
-	10825,
-	10686,
-	10686,
-	13789,
-	16094,
-	23041,
-	23041,
-	22227,
-	20259,
-	20265,
-	20262,
-	20262,
-	22227,
-	15953,
-	10686,
-	10686,
-	5505,
-	5557,
-	13986,
-	7432,
-	13986,
-	7433,
+	10967,
+	11235,
+	11235,
+	11160,
+	11160,
+	3281,
+	5882,
+	11160,
+	10967,
+	11160,
+	10967,
+	11160,
+	11235,
+	11235,
+	5992,
+	5959,
+	3281,
+	5992,
+	3281,
+	5959,
+	7492,
+	11191,
+	7625,
+	7625,
+	7625,
+	7382,
+	5992,
+	6034,
+	5959,
+	5959,
+	7382,
+	8374,
+	5959,
+	5959,
+	3281,
+	3296,
+	7500,
+	4151,
+	7500,
+	4152,
 };
 IL2CPP_EXTERN_C const Il2CppCodeGenModule g_UnityEngine_AudioModule_CodeGenModule;
 const Il2CppCodeGenModule g_UnityEngine_AudioModule_CodeGenModule = 
 {
 	"UnityEngine.AudioModule.dll",
-	49,
+	40,
 	s_methodPointers,
 	5,
 	s_adjustorThunks,

@@ -11,16 +11,10 @@ namespace baselib
         //
         // Allocations are guaranteed to be aligned to at least the value of `default_alignment`.
         // All methods with no page state parameter input will default to `default_page_state` where applicable.
-        // All methods with no extended page state parameter input will default to `default_ext_page_state` where applicable.
-        //
-        // Notes on the `ext_page_state` parameter:
-        //  If not set to default_ext_page_state (zero) the `ext_page_state` parameter extends the internally translated page state (from the `state` parameter)
-        //  with a native page state that will be applied using an bitwise OR operation unless the platforms native page states are mutually exclusive
-        //  in which case the `state` parameter is ignored and replaced by the `ext_page_state` value. Note that the `ext_page_state` value has no validation!
         //
         // Notes on allocation size:
         //  All sizes are by allocator standards in bytes. The page allocator internally rounds up sizes to the nearest page size value. Consider this when
-        //  allocating. Use `optimal_size` to retrieve number of bytes allocated given a specific size (1 to retrieve the page size value).
+        //  allocating. Use `optimal_size` to retreive number of bytes allocated given a specific size (1 to retreive the page size value).
         //  Large alignments may lead to a significantly higher use of virtual address space than the amount of memory requested.
         //  This may result in an aligned page allocation to fail where a less/non-aligned allocation would succeed.
         //  Note that this is especially common in 32bit applications but a platform may impose additional restrictions on the size of its virtual address space.
@@ -48,7 +42,7 @@ namespace baselib
         } Memory_PageState;
 
         // Allocator
-        template<uint32_t default_alignment = 4096, Memory_PageState default_page_state = Memory_PageState_ReadWrite, uint32_t default_ext_page_state = 0>
+        template<uint32_t default_alignment = 4096, Memory_PageState default_page_state = Memory_PageState_ReadWrite>
         class page_allocator
         {
             static_assert((default_alignment != 0), "'default_alignment' must not be zero");
@@ -77,10 +71,10 @@ namespace baselib
             // Allocates number of pages required to hold `size` number of bytes, with initial page state set to `state`
             //
             // \returns Address to memory block of allocated memory or `nullptr` if allocation failed.
-            void* allocate(size_t size, Memory_PageState state = default_page_state, uint32_t ext_page_state = default_ext_page_state) const
+            void* allocate(size_t size, Memory_PageState state = default_page_state) const
             {
                 error_state result = Baselib_ErrorState_Create();
-                return allocate(size, state, &result, ext_page_state);
+                return allocate(size, state, &result);
             }
 
             // Allocates number of pages required to hold `size` number of bytes, with initial page state set to `state`
@@ -93,9 +87,9 @@ namespace baselib
             // - Baselib_ErrorCode_OutOfMemory:             If there is not enough continuous address space available, or physical memory space when acquiring committed memory.
             //
             // \returns Address to memory block of allocated memory or `nullptr` if allocation failed.
-            void* allocate(size_t size, Memory_PageState state, error_state *error_state_ptr, uint32_t ext_page_state = default_ext_page_state) const
+            void* allocate(size_t size, Memory_PageState state, error_state *error_state_ptr) const
             {
-                return m_Impl.allocate(size, state, error_state_ptr, ext_page_state);
+                return m_Impl.allocate(size, state, error_state_ptr);
             }
 
             // Reallocate is not supported by the page allocator. The operation is a no-op.
@@ -154,10 +148,10 @@ namespace baselib
             // Passing `nullptr` or a zero page count result in a no-op.
             //
             // \returns True if the operation was successful.
-            bool set_page_state(void* ptr, size_t size, Memory_PageState state, uint32_t ext_page_state = default_ext_page_state) const
+            bool set_page_state(void* ptr, size_t size, Memory_PageState state) const
             {
                 error_state result = Baselib_ErrorState_Create();
-                return set_page_state(ptr, size, state, &result, ext_page_state);
+                return set_page_state(ptr, size, state, &result);
             }
 
             // Modifies the page state property of an already allocated virtual address in `ptr` of `size` to `state`.
@@ -174,9 +168,9 @@ namespace baselib
             // - Baselib_ErrorCode_UnsupportedPageState:    The underlying system doesn't support the requested page state.
             //
             // \returns True if the operation was successful.
-            bool set_page_state(void* ptr, size_t size, Memory_PageState state, error_state *error_state_ptr, uint32_t ext_page_state = default_ext_page_state) const
+            bool set_page_state(void* ptr, size_t size, Memory_PageState state, error_state *error_state_ptr) const
             {
-                return m_Impl.set_page_state(ptr, size, state, error_state_ptr, ext_page_state);
+                return m_Impl.set_page_state(ptr, size, state, error_state_ptr);
             }
         };
     }

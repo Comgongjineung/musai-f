@@ -1,7 +1,13 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
+#include <limits>
 
 
 
@@ -89,6 +95,7 @@ IL2CPP_EXTERN_C RuntimeClass* Mouse_t9A9CC4636FA9CDBAD7FB7A02DB0D6395EDCC338F_il
 IL2CPP_EXTERN_C RuntimeClass* Pen_tBDA63CF60697FAF5D75A8A19E939BAC1BE434AFF_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Pointer_t800EF2832B62E889AC9C182E3B18098AF220E32A_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Type_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* UInt16U5BU5D_tEB7C42D811D999D2AA815BADC3FCCDD9C67B3F83_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* UInt32U5BU5D_t02FBD658AD156A17574ECE6106CF1FBFCC9807FA_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Vector2_t1FD6F485C871E832B347AB2DC8CBA08B739D8DF7_il2cpp_TypeInfo_var;
@@ -5675,7 +5682,7 @@ IL_0055:
 	{
 		int32_t L_8 = ___0_button;
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_9 = { reinterpret_cast<intptr_t> (((RuntimeType*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&PenButton_t0BA4B52240ABD38446866B65EE531F669377E554_0_0_0_var))) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Type_t_il2cpp_TypeInfo_var)));
 		Type_t* L_10;
 		L_10 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_9, NULL);
 		InvalidEnumArgumentException_t5B42625AD815A72639D894ED1592FF4BE438D989* L_11 = (InvalidEnumArgumentException_t5B42625AD815A72639D894ED1592FF4BE438D989*)il2cpp_codegen_object_new(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&InvalidEnumArgumentException_t5B42625AD815A72639D894ED1592FF4BE438D989_il2cpp_TypeInfo_var)));
@@ -5718,7 +5725,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Pen_FinishSetup_m3FE4715EDB01BFBB4049951
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputControl_GetChildControl_TisAxisControl_tD6613A2445A3C2BFA22C77E16CA3201AF72354A7_mE395247B4A734866EFF7A908510EEF5B2CFE3841_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputControl_GetChildControl_TisButtonControl_t85949109B98AAF5B7ADC0285F0EC98A61EC88ECF_m37B3269440E54D5C867480E334993426D47F9044_RuntimeMethod_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputControl_GetChildControl_TisIntegerControl_tA24544EFF42204852F638FF5147F754962C997AB_m87D5D6574BD57F88D41DDE18D17933360E255297_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputControl_GetChildControl_TisVector2Control_t8D1B4021A1D82671AF916D3C0A476AA94E46A432_m3957D0D8F6F298173F867E33A3E5ED0F9A591F85_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral385A3F00319A5A164D8F37EB690D86A55732F2BA);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral4B576693C6B9746100D95299FEA96205A88C9908);
@@ -5727,7 +5733,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Pen_FinishSetup_m3FE4715EDB01BFBB4049951
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral5E90C36CB8BAA2CE12D913AA21AD9B44ADB55B55);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral7554E51BD776C63E10B1C7EFE49675C81B0A4D2A);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral77BBFE9A0D1EAA1F76FF1F082200CCE201CAA5C2);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralB624235BF2D7964F2345ECC1D415BE83D6A8AD6B);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralCAC1B7441E991F1446DBAD8D87340C3D80D150F6);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteralFC7AA3A534CA44A0863721F4BB7D5973EF1BF0FC);
 		s_Il2CppMethodInitialized = true;
@@ -5760,9 +5765,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Pen_FinishSetup_m3FE4715EDB01BFBB4049951
 		AxisControl_tD6613A2445A3C2BFA22C77E16CA3201AF72354A7* L_8;
 		L_8 = InputControl_GetChildControl_TisAxisControl_tD6613A2445A3C2BFA22C77E16CA3201AF72354A7_mE395247B4A734866EFF7A908510EEF5B2CFE3841(__this, _stringLiteral385A3F00319A5A164D8F37EB690D86A55732F2BA, InputControl_GetChildControl_TisAxisControl_tD6613A2445A3C2BFA22C77E16CA3201AF72354A7_mE395247B4A734866EFF7A908510EEF5B2CFE3841_RuntimeMethod_var);
 		Pen_set_twist_m37597EDEA7F2FB85967E3B675794050B797E08C1_inline(__this, L_8, NULL);
-		IntegerControl_tA24544EFF42204852F638FF5147F754962C997AB* L_9;
-		L_9 = InputControl_GetChildControl_TisIntegerControl_tA24544EFF42204852F638FF5147F754962C997AB_m87D5D6574BD57F88D41DDE18D17933360E255297(__this, _stringLiteralB624235BF2D7964F2345ECC1D415BE83D6A8AD6B, InputControl_GetChildControl_TisIntegerControl_tA24544EFF42204852F638FF5147F754962C997AB_m87D5D6574BD57F88D41DDE18D17933360E255297_RuntimeMethod_var);
-		Pointer_set_displayIndex_m4BCF2ACA4956540F0933FA29C9BF00FB4A145C38_inline(__this, L_9, NULL);
 		Pointer_FinishSetup_m8A6BFEFCDD2AA085471757A211B9262DE0B8FDCD(__this, NULL);
 		return;
 	}

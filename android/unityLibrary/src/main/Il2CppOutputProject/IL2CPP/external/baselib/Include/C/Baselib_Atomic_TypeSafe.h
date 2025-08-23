@@ -3,15 +3,6 @@
 #include "Baselib_Atomic.h"
 
 // TypeSafe version of baselib atomics "C" API
-// TypeSafe C++ version is in Atomic.h (C++)
-// A non-typesafe void* based version including 128bit atomics can be found at Baselib_Atomic.h (C)
-
-// ATTENTION: The caller must ensure that the address of obj is aligned to the size of its respective target. (e.g. 64bit values need to be aligned to 8 bytes)
-//            Failure to comply is undefined behavior (in practice depending on compiler & architecture either crash, non-atomicity or slow performance)
-//            In Cpp code, ALIGN_ATOMIC can be used to ensure this, but generally it is recommended to use the baselib::atomic struct instead!
-
-// ATTENTION: SEQ_CST memory order is NOT equivalent to having a full memory barrier. More details are in Baselib_Atomic_Gcc.h
-//            Please add a `Baselib_atomic_thread_fence_seq_cst();` call for a full memory barrier.
 
 // 8-bit declarations
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -133,8 +124,6 @@ static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_16_seq_cst_relax
 static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_16_seq_cst_acquire(int16_t* obj, int16_t* expected, int16_t value);
 static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_16_seq_cst_seq_cst(int16_t* obj, int16_t* expected, int16_t value);
 
-static FORCE_INLINE bool Baselib_atomic_ref_dec_16(int16_t* obj)        { return Baselib_atomic_ref_dec_16_v(obj); }
-
 // 32-bit declarations
 // ------------------------------------------------------------------------------------------------------------------------------
 static FORCE_INLINE int32_t Baselib_atomic_load_32_relaxed(const int32_t* obj);
@@ -195,8 +184,6 @@ static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_32_seq_cst_relax
 static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_32_seq_cst_acquire(int32_t* obj, int32_t* expected, int32_t value);
 static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_32_seq_cst_seq_cst(int32_t* obj, int32_t* expected, int32_t value);
 
-static FORCE_INLINE bool Baselib_atomic_ref_dec_32(int32_t* obj)        { return Baselib_atomic_ref_dec_32_v(obj); }
-
 // 64-bit declarations
 // ------------------------------------------------------------------------------------------------------------------------------
 static FORCE_INLINE int64_t Baselib_atomic_load_64_relaxed(const int64_t* obj);
@@ -256,8 +243,6 @@ static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_64_acq_rel_acqui
 static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_64_seq_cst_relaxed(int64_t* obj, int64_t* expected, int64_t value);
 static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_64_seq_cst_acquire(int64_t* obj, int64_t* expected, int64_t value);
 static FORCE_INLINE bool Baselib_atomic_compare_exchange_strong_64_seq_cst_seq_cst(int64_t* obj, int64_t* expected, int64_t value);
-
-static FORCE_INLINE bool Baselib_atomic_ref_dec_64(int64_t* obj)        { return Baselib_atomic_ref_dec_64_v(obj); }
 
 // ptr declarations
 // ------------------------------------------------------------------------------------------------------------------------------

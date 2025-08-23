@@ -17,11 +17,15 @@
 #include <string>
 #include <cstdlib>
 
+#if RUNTIME_TINY
+#include "vm/DebugMetadata.h"
+#endif
+
 namespace il2cpp
 {
 namespace utils
 {
-#if IL2CPP_ENABLE_NATIVE_STACKTRACES
+#if (IL2CPP_ENABLE_NATIVE_STACKTRACES && (!RUNTIME_TINY || IL2CPP_TINY_DEBUG_METADATA))
 
     static Il2CppMethodPointer MaskSpareBits(const Il2CppMethodPointer method)
     {
@@ -76,6 +80,7 @@ namespace utils
     static SymbolInfo* s_SymbolInfos;
     static void* s_ImageBase;
 
+#if !RUNTIME_TINY
     static void* LoadSymbolInfoFileFrom(const std::string& path)
     {
         int error;
@@ -93,8 +98,13 @@ namespace utils
         return mappedFile;
     }
 
+#endif //!RUNTIME_TINY
+
     static void* LoadSymbolInfoFile()
     {
+#if RUNTIME_TINY
+        return NULL;
+#else
 #if IL2CPP_TARGET_ANDROID
     #if defined(__i386__)
         std::string symbolMapFileName = "SymbolMap-x86";
@@ -124,6 +134,7 @@ namespace utils
             return result;
 
         return LoadSymbolInfoFileFrom(il2cpp::utils::PathUtils::Combine(utils::Runtime::GetDataDir(), symbolMapFileName));
+#endif
     }
 
     static void InitializeSymbolInfos()
@@ -217,7 +228,11 @@ namespace utils
             NativeMethodMap::iterator iter = s_NativeMethods.find_first(MaskSpareBits(nativeMethod));
             if (iter != s_NativeMethods.end())
             {
+#if RUNTIME_TINY
+                return tiny::vm::DebugMetadata::GetMethodNameFromMethodDefinitionIndex(iter->methodIndex);
+#else
                 return il2cpp::vm::MetadataCache::GetMethodInfoFromMethodHandle(iter->methodHandle);
+#endif
             }
         }
         else
@@ -243,7 +258,11 @@ namespace utils
             if (methodAfterNativeMethod != s_NativeMethods.begin())
                 methodAfterNativeMethod--;
 
+#if RUNTIME_TINY
+            return tiny::vm::DebugMetadata::GetMethodNameFromMethodDefinitionIndex(methodAfterNativeMethod->methodIndex);
+#else
             return il2cpp::vm::MetadataCache::GetMethodInfoFromMethodHandle(methodAfterNativeMethod->methodHandle);
+#endif
         }
 
         return NULL;

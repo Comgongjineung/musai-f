@@ -83,11 +83,7 @@
 #define COMPILER_DEBUG_TRAP()               __asm__ volatile(".inst 0xd4200000")
 #endif
 
-#if __cplusplus >= 201703L
-    #define COMPILER_WARN_UNUSED_RESULT         [[nodiscard]]
-#else
-    #define COMPILER_WARN_UNUSED_RESULT         __attribute__((warn_unused_result))
-#endif
+#define COMPILER_WARN_UNUSED_RESULT         __attribute__((warn_unused_result))
 
 #define HAS_CLANG_FEATURE(x) 0
 

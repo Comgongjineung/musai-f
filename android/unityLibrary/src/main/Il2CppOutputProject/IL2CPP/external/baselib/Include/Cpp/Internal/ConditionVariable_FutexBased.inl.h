@@ -4,7 +4,7 @@
 #include "../../C/Baselib_SystemFutex.h"
 #include "../../C/Baselib_Thread.h"
 
-#if !PLATFORM_HAS_NATIVE_FUTEX
+#if !PLATFORM_FUTEX_NATIVE_SUPPORT
     #error "Only use this implementation on top of a proper futex, in all other situations us ConditionVariable_SemaphoreBased.inl.h"
 #endif
 

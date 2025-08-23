@@ -10,6 +10,12 @@ struct Assembly_t;
 
 #include "il2cpp-class-internals.h"
 
+#if RUNTIME_TINY
+
+struct RuntimeMethod;
+
+#else
+
 struct TypeInfo;
 struct MethodInfo;
 struct FieldInfo;
@@ -25,3 +31,4 @@ typedef Il2CppArray RuntimeArray;
 typedef Il2CppAssembly RuntimeAssembly;
 typedef Il2CppString RuntimeString;
 typedef Il2CppDelegate RuntimeDelegate;
+#endif

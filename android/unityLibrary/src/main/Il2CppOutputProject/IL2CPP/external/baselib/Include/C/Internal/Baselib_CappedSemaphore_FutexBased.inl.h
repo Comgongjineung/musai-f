@@ -1,12 +1,11 @@
 #pragma once
 
-#include "../Baselib_Atomic_TypeSafe.h"
 #include "../Baselib_CountdownTimer.h"
+#include "../Baselib_Atomic_TypeSafe.h"
 #include "../Baselib_SystemFutex.h"
 #include "../Baselib_Thread.h"
-#include "Baselib_SpinLoop.h"
 
-#if !PLATFORM_HAS_NATIVE_FUTEX
+#if !PLATFORM_FUTEX_NATIVE_SUPPORT
     #error "Only use this implementation on top of a proper futex, in all other situations us Baselib_CappedSemaphore_SemaphoreBased.inl.h"
 #endif
 
@@ -17,15 +16,15 @@
 typedef struct Baselib_CappedSemaphore
 {
     int32_t wakeups;
-    char _cachelineSpacer0[PLATFORM_PROPERTY_CACHE_LINE_SIZE - sizeof(int32_t)];
+    char _cachelineSpacer0[PLATFORM_CACHE_LINE_SIZE - sizeof(int32_t)];
     int32_t count;
     int32_t cap;
-    char _cachelineSpacer1[PLATFORM_PROPERTY_CACHE_LINE_SIZE - sizeof(int32_t) * 2]; // Having cap on the same cacheline is fine since it is a constant.
+    char _cachelineSpacer1[PLATFORM_CACHE_LINE_SIZE - sizeof(int32_t) * 2]; // Having cap on the same cacheline is fine since it is a constant.
 } Baselib_CappedSemaphore;
 
-BASELIB_STATIC_ASSERT(sizeof(Baselib_CappedSemaphore) == PLATFORM_PROPERTY_CACHE_LINE_SIZE * 2, "Baselib_CappedSemaphore (Futex) size should match 2*cacheline size (128bytes)");
+BASELIB_STATIC_ASSERT(sizeof(Baselib_CappedSemaphore) == PLATFORM_CACHE_LINE_SIZE * 2, "Baselib_CappedSemaphore (Futex) size should match 2*cacheline size (128bytes)");
 BASELIB_STATIC_ASSERT(offsetof(Baselib_CappedSemaphore, wakeups) ==
-    (offsetof(Baselib_CappedSemaphore, count) - PLATFORM_PROPERTY_CACHE_LINE_SIZE), "Baselib_CappedSemaphore (futex) wakeups and count shouldnt share cacheline");
+    (offsetof(Baselib_CappedSemaphore, count) - PLATFORM_CACHE_LINE_SIZE), "Baselib_CappedSemaphore (futex) wakeups and count shouldnt share cacheline");
 
 
 BASELIB_INLINE_API void Baselib_CappedSemaphore_CreateInplace(Baselib_CappedSemaphore* semaphoreData, const uint16_t cap)
@@ -47,26 +46,21 @@ BASELIB_INLINE_API bool Detail_Baselib_CappedSemaphore_ConsumeWakeup(Baselib_Cap
     int32_t previousCount = Baselib_atomic_load_32_relaxed(&semaphore->wakeups);
     while (previousCount > 0)
     {
-        if (Baselib_atomic_compare_exchange_weak_32_acquire_relaxed(&semaphore->wakeups, &previousCount, previousCount - 1))
+        if (Baselib_atomic_compare_exchange_weak_32_relaxed_relaxed(&semaphore->wakeups, &previousCount, previousCount - 1))
             return true;
     }
     return false;
 }
 
-COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_CappedSemaphore_TrySpinAcquire(Baselib_CappedSemaphore* semaphore, uint32_t maxSpinCount)
+BASELIB_INLINE_API bool Baselib_CappedSemaphore_TryAcquire(Baselib_CappedSemaphore* semaphore)
 {
     int32_t previousCount = Baselib_atomic_load_32_relaxed(&semaphore->count);
-    while (true)
+    while (previousCount > 0)
     {
-        while (OPTIMIZER_LIKELY(previousCount > 0))
-        {
-            if (OPTIMIZER_LIKELY(Baselib_atomic_compare_exchange_weak_32_acquire_relaxed(&semaphore->count, &previousCount, previousCount - 1)))
-                return true;
-        }
-        if (!Detail_Baselib_SpinLoop(&semaphore->count, &previousCount, &maxSpinCount))
-            return false;
+        if (Baselib_atomic_compare_exchange_weak_32_acquire_relaxed(&semaphore->count, &previousCount, previousCount - 1))
+            return true;
     }
+    return false;
 }
 
 BASELIB_INLINE_API void Baselib_CappedSemaphore_Acquire(Baselib_CappedSemaphore* semaphore)
@@ -81,7 +75,6 @@ BASELIB_INLINE_API void Baselib_CappedSemaphore_Acquire(Baselib_CappedSemaphore*
     }
 }
 
-COMPILER_WARN_UNUSED_RESULT
 BASELIB_INLINE_API bool Baselib_CappedSemaphore_TryTimedAcquire(Baselib_CappedSemaphore* semaphore, const uint32_t timeoutInMilliseconds)
 {
     const int32_t previousCount = Baselib_atomic_fetch_add_32_acquire(&semaphore->count, -1);
@@ -116,7 +109,7 @@ BASELIB_INLINE_API bool Baselib_CappedSemaphore_TryTimedAcquire(Baselib_CappedSe
                 return false;
         }
         // Likely a race, yield to give the release operation room to complete.
-        // This includes a full memory barrier which ensures that there is no reordering between changing/reading count and wakeup consumption.
+        // This includes a fully memory barrier which ensures that there is no reordering between changing/reading count and wakeup consumption.
         Baselib_Thread_YieldExecution();
     }
     while (!Detail_Baselib_CappedSemaphore_ConsumeWakeup(semaphore));
@@ -125,29 +118,24 @@ BASELIB_INLINE_API bool Baselib_CappedSemaphore_TryTimedAcquire(Baselib_CappedSe
 
 BASELIB_INLINE_API uint16_t Baselib_CappedSemaphore_Release(Baselib_CappedSemaphore* semaphore,  const uint16_t _count)
 {
-    int32_t count;
+    int32_t count = _count;
     int32_t previousCount = Baselib_atomic_load_32_relaxed(&semaphore->count);
     do
     {
         if (previousCount == semaphore->cap)
             return 0;
 
-        count = previousCount + _count > semaphore->cap
-            ? semaphore->cap - previousCount
-            : _count;
+        if (previousCount + count > semaphore->cap)
+            count = semaphore->cap - previousCount;
     }
     while (!Baselib_atomic_compare_exchange_weak_32_release_relaxed(&semaphore->count, &previousCount, previousCount + count));
 
-    if (previousCount < 1)
+    if (OPTIMIZER_UNLIKELY(previousCount < 0))
     {
-        Baselib_Cpu_Hint_MonitorRelease();
-        if (OPTIMIZER_UNLIKELY(previousCount < 0))
-        {
-            const int32_t waitingThreads = -previousCount;
-            const int32_t threadsToWakeup = count < waitingThreads ? count : waitingThreads;
-            Baselib_atomic_fetch_add_32_relaxed(&semaphore->wakeups, threadsToWakeup);
-            Baselib_SystemFutex_Notify(&semaphore->wakeups, threadsToWakeup, Baselib_WakeupFallbackStrategy_OneByOne);
-        }
+        const int32_t waitingThreads = -previousCount;
+        const int32_t threadsToWakeup = count < waitingThreads ? count : waitingThreads;
+        Baselib_atomic_fetch_add_32_relaxed(&semaphore->wakeups, threadsToWakeup);
+        Baselib_SystemFutex_Notify(&semaphore->wakeups, threadsToWakeup, Baselib_WakeupFallbackStrategy_OneByOne);
     }
     return count;
 }

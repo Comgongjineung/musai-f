@@ -1,5 +1,5 @@
 #pragma once
-#if IL2CPP_THREADS_PTHREAD
+#if IL2CPP_THREADS_PTHREAD && !RUNTIME_TINY
 
 #include <stdint.h>
 #include <pthread.h>

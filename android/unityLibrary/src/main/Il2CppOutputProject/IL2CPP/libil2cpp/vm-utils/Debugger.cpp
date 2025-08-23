@@ -90,53 +90,31 @@ namespace il2cpp
 {
 namespace utils
 {
+    static os::Thread* s_DebuggerThread;
+    static bool s_IsDebuggerAttached = false;
+    static bool s_IsDebuggerInitialized = false;
+    static std::string s_AgentOptions;
+
+    static os::Mutex s_Il2CppMonoLoaderLock(false);
+    static uint64_t s_Il2CppMonoLoaderLockThreadId = 0;
+
+    static Il2CppMonoInterpCallbacks s_InterpCallbacks;
+
     typedef dynamic_array<Il2CppSequencePoint*> SequencePointList;
     typedef Il2CppHashMap<const MethodInfo*, SequencePointList*, il2cpp::utils::PointerHash<MethodInfo> > MethodToSequencePointsMap;
+    static MethodToSequencePointsMap s_methodToSequencePoints;
+
     typedef dynamic_array<Il2CppCatchPoint*> CatchPointList;
     typedef Il2CppHashMap<const MethodInfo*, CatchPointList*, il2cpp::utils::PointerHash<MethodInfo> > MethodToCatchPointsMap;
+    static MethodToCatchPointsMap s_methodToCatchPoints;
+
     typedef Il2CppHashMap<const MethodInfo*, const MethodInfo*, il2cpp::utils::PointerHash<MethodInfo> > MethodToMethodMap;
+    static MethodToMethodMap s_uninflatedMethodToInflated;
+    SequencePointList s_sequencePoints;
+
     typedef dynamic_array<const char*> FileNameList;
     typedef Il2CppHashMap<const Il2CppClass*, FileNameList, il2cpp::utils::PointerHash<Il2CppClass> > TypeSourceFileMap;
-
-    struct DebuggerContext
-    {
-        DebuggerContext() : m_IsDebuggerAttached(false), m_IsDebuggerInitialized(false), m_Il2CppMonoLoaderLock(false), m_Il2CppMonoLoaderLockThreadId(0)
-        {
-        }
-
-        os::Thread* m_DebuggerThread;
-        bool m_IsDebuggerAttached;
-        bool m_IsDebuggerInitialized;
-
-        os::Mutex m_Il2CppMonoLoaderLock;
-        uint64_t m_Il2CppMonoLoaderLockThreadId;
-
-        Il2CppMonoInterpCallbacks m_InterpCallbacks;
-
-        MethodToSequencePointsMap m_methodToSequencePoints;
-
-        MethodToCatchPointsMap m_methodToCatchPoints;
-
-        MethodToMethodMap m_uninflatedMethodToInflated;
-        SequencePointList m_sequencePoints;
-
-        TypeSourceFileMap *m_typeSourceFiles;
-    };
-
-    static std::string s_AgentOptions; // Intentionally left out from the DebuggerContext because it is accessed before we have a chance to call void Debugger::AllocateStaticData()
-    static DebuggerContext* s_DebuggerContext = nullptr;
-
-    void Debugger::AllocateStaticData()
-    {
-        if (s_DebuggerContext == nullptr)
-            s_DebuggerContext = new DebuggerContext();
-    }
-
-    void Debugger::FreeStaticData()
-    {
-        delete s_DebuggerContext;
-        s_DebuggerContext = nullptr;
-    }
+    static TypeSourceFileMap *s_typeSourceFiles;
 
     static MethodToSequencePointsMap::const_iterator GetMethodSequencePointIterator(const MethodInfo *method);
 
@@ -157,9 +135,9 @@ namespace utils
 
     static void InitializeInterpCallbacks()
     {
-        s_DebuggerContext->m_InterpCallbacks.frame_get_arg = FrameGetArg;
-        s_DebuggerContext->m_InterpCallbacks.frame_get_local = FrameGetLocal;
-        s_DebuggerContext->m_InterpCallbacks.frame_get_this = FrameGetThis;
+        s_InterpCallbacks.frame_get_arg = FrameGetArg;
+        s_InterpCallbacks.frame_get_local = FrameGetLocal;
+        s_InterpCallbacks.frame_get_this = FrameGetThis;
     }
 
     void Debugger::RegisterMetadata(const Il2CppDebuggerMetadataRegistration *data)
@@ -191,7 +169,7 @@ namespace utils
         mono_debugger_agent_parse_options(options);
         mono_debugger_agent_init();
 
-        s_DebuggerContext->m_typeSourceFiles = new TypeSourceFileMap();
+        s_typeSourceFiles = new TypeSourceFileMap();
 
         MonoDebuggerRuntimeCallbacks cbs;
         cbs.il2cpp_debugger_save_thread_context = Debugger::SaveThreadContext;
@@ -202,7 +180,7 @@ namespace utils
 
         register_allocator(il2cpp_malloc, il2cpp_mfree);
 
-        s_DebuggerContext->m_IsDebuggerInitialized = true;
+        s_IsDebuggerInitialized = true;
 #else
         IL2CPP_ASSERT(0 && "The managed debugger is only supported for the libil2cpp runtime backend.");
 #endif
@@ -249,7 +227,7 @@ namespace utils
                 klass = il2cpp::vm::MetadataCache::GetTypeInfoFromTypeSourcePair(image, &pair);
                 if (klass != lastKlass && lastKlass != NULL)
                 {
-                    s_DebuggerContext->m_typeSourceFiles->add(lastKlass, files);
+                    s_typeSourceFiles->add(lastKlass, files);
                     files.clear();
                 }
                 lastKlass = klass;
@@ -258,12 +236,12 @@ namespace utils
         }
 
         if (files.size() > 0)
-            s_DebuggerContext->m_typeSourceFiles->add(klass, files);
+            s_typeSourceFiles->add(klass, files);
     }
 
     void Debugger::Start()
     {
-        if (s_DebuggerContext->m_IsDebuggerInitialized)
+        if (s_IsDebuggerInitialized)
         {
             vm::MetadataCache::InitializeAllMethodMetadata();
             InitializeTypeSourceFileMap();
@@ -286,8 +264,6 @@ namespace utils
 
     void Debugger::Init()
     {
-        AllocateStaticData();
-
         bool debuggerIsInitialized = false;
         if (!s_AgentOptions.empty())
         {
@@ -321,8 +297,8 @@ namespace utils
     {
 #if defined(RUNTIME_IL2CPP)
         // This thread is allocated here once and never deallocated.
-        s_DebuggerContext->m_DebuggerThread = new os::Thread();
-        s_DebuggerContext->m_DebuggerThread->Run(mono_debugger_run_debugger_thread_func, NULL);
+        s_DebuggerThread = new os::Thread();
+        s_DebuggerThread->Run(mono_debugger_run_debugger_thread_func, NULL);
 #else
         IL2CPP_ASSERT(0 && "The managed debugger is only supported for the libil2cpp runtime backend.");
 #endif
@@ -330,7 +306,7 @@ namespace utils
 
     Il2CppThreadUnwindState* Debugger::GetThreadStatePointer()
     {
-        if (!s_DebuggerContext->m_IsDebuggerInitialized)
+        if (!s_IsDebuggerInitialized)
             return NULL;
 
         Il2CppThreadUnwindState* unwindState;
@@ -341,7 +317,7 @@ namespace utils
 
     void Debugger::SaveThreadContext(Il2CppThreadUnwindState* context, int frameCountAdjust)
     {
-        if (!s_DebuggerContext->m_IsDebuggerInitialized)
+        if (!s_IsDebuggerInitialized)
             return;
 
         IL2CPP_ASSERT(!IsDebuggerThread(os::Thread::GetCurrentThread()));
@@ -349,7 +325,7 @@ namespace utils
 
     void Debugger::FreeThreadContext(Il2CppThreadUnwindState* context)
     {
-        if (!s_DebuggerContext->m_IsDebuggerInitialized)
+        if (!s_IsDebuggerInitialized)
             return;
 
         IL2CPP_ASSERT(!IsDebuggerThread(os::Thread::GetCurrentThread()));
@@ -397,17 +373,17 @@ namespace utils
 
     bool Debugger::GetIsDebuggerAttached()
     {
-        return s_DebuggerContext->m_IsDebuggerAttached;
+        return s_IsDebuggerAttached;
     }
 
     void Debugger::SetIsDebuggerAttached(bool attached)
     {
-        s_DebuggerContext->m_IsDebuggerAttached = attached;
+        s_IsDebuggerAttached = attached;
     }
 
     bool Debugger::IsDebuggerThread(os::Thread* thread)
     {
-        return thread == s_DebuggerContext->m_DebuggerThread;
+        return thread == s_DebuggerThread;
     }
 
     static void InitializeUnwindState(Il2CppThreadUnwindState* unwindState, uint32_t frameCapacity)
@@ -448,7 +424,7 @@ namespace utils
 
     void Debugger::FreeThreadLocalData()
     {
-        if (s_DebuggerContext->m_IsDebuggerInitialized)
+        if (s_IsDebuggerInitialized)
         {
             Il2CppThreadUnwindState* unwindState;
             s_ExecutionContexts.GetValue(reinterpret_cast<void**>(&unwindState));
@@ -484,7 +460,7 @@ namespace utils
         if (!*iter)
         {
             MethodToSequencePointsMap::const_iterator entry = GetMethodSequencePointIterator(method);
-            if (entry == s_DebuggerContext->m_methodToSequencePoints.end())
+            if (entry == s_methodToSequencePoints.end())
                 return NULL;
 
             pIter = new SeqPointIter();
@@ -513,10 +489,10 @@ namespace utils
     {
         size_t index = (size_t)(intptr_t)*iter;
 
-        if (index >= s_DebuggerContext->m_sequencePoints.size())
+        if (index >= s_sequencePoints.size())
             return NULL;
 
-        Il2CppSequencePoint* retVal = s_DebuggerContext->m_sequencePoints[index];
+        Il2CppSequencePoint* retVal = s_sequencePoints[index];
         *iter = (void*)(intptr_t)(index + 1);
         return retVal;
     }
@@ -526,30 +502,30 @@ namespace utils
         if (method->is_inflated)
             method = method->genericMethod->methodDefinition;
 
-        MethodToSequencePointsMap::const_iterator entry = s_DebuggerContext->m_methodToSequencePoints.find(method);
-        if (entry == s_DebuggerContext->m_methodToSequencePoints.end())
+        MethodToSequencePointsMap::const_iterator entry = s_methodToSequencePoints.find(method);
+        if (entry == s_methodToSequencePoints.end())
         {
             //the sequence point map doesn't have uninflated methods, need to map the incoming method to
             //an inflated method.  il2cpp_mono_methods_match has a case for this.
-            MethodToMethodMap::const_iterator inflated = s_DebuggerContext->m_uninflatedMethodToInflated.find(method);
-            if (inflated != s_DebuggerContext->m_uninflatedMethodToInflated.end())
+            MethodToMethodMap::const_iterator inflated = s_uninflatedMethodToInflated.find(method);
+            if (inflated != s_uninflatedMethodToInflated.end())
             {
                 method = inflated->second;
             }
             else
             {
-                for (MethodToSequencePointsMap::iterator mapIter = s_DebuggerContext->m_methodToSequencePoints.begin(); mapIter != s_DebuggerContext->m_methodToSequencePoints.end(); ++mapIter)
+                for (MethodToSequencePointsMap::iterator mapIter = s_methodToSequencePoints.begin(); mapIter != s_methodToSequencePoints.end(); ++mapIter)
                 {
                     if (il2cpp_mono_methods_match(method, mapIter->first))
                     {
-                        s_DebuggerContext->m_uninflatedMethodToInflated.add(method, mapIter->first);
+                        s_uninflatedMethodToInflated.add(method, mapIter->first);
                         method = mapIter->first;
                         break;
                     }
                 }
             }
 
-            return s_DebuggerContext->m_methodToSequencePoints.find(method);
+            return s_methodToSequencePoints.find(method);
         }
 
         return entry;
@@ -560,7 +536,7 @@ namespace utils
         const MethodInfo *method = GetCatchPointMethod(image, cp);
 
         MethodToSequencePointsMap::const_iterator entry = GetMethodSequencePointIterator(method);
-        if (entry == s_DebuggerContext->m_methodToSequencePoints.end())
+        if (entry == s_methodToSequencePoints.end())
             return NULL;
 
         SequencePointList::iterator iter = entry->second->begin();
@@ -589,8 +565,8 @@ namespace utils
 
         if (!*iter)
         {
-            MethodToCatchPointsMap::const_iterator entry = s_DebuggerContext->m_methodToCatchPoints.find(method);
-            if (entry == s_DebuggerContext->m_methodToCatchPoints.end())
+            MethodToCatchPointsMap::const_iterator entry = s_methodToCatchPoints.find(method);
+            if (entry == s_methodToCatchPoints.end())
                 return NULL;
 
             pIter = new CatchPointIter();
@@ -617,7 +593,7 @@ namespace utils
 
     void Debugger::HandleException(Il2CppException *exc)
     {
-        if (s_DebuggerContext->m_IsDebuggerInitialized)
+        if (s_IsDebuggerInitialized)
             unity_debugger_agent_handle_exception(exc);
     }
 
@@ -651,11 +627,11 @@ namespace utils
                     IL2CPP_ASSERT(!method->is_inflated && "Only open generic methods should have sequence points");
 
                     SequencePointList* list;
-                    MethodToSequencePointsMap::iterator existingList = s_DebuggerContext->m_methodToSequencePoints.find(method);
-                    if (existingList == s_DebuggerContext->m_methodToSequencePoints.end())
+                    MethodToSequencePointsMap::iterator existingList = s_methodToSequencePoints.find(method);
+                    if (existingList == s_methodToSequencePoints.end())
                     {
                         list = new SequencePointList();
-                        s_DebuggerContext->m_methodToSequencePoints.add(method, list);
+                        s_methodToSequencePoints.add(method, list);
                     }
                     else
                     {
@@ -667,13 +643,13 @@ namespace utils
             }
         }
 
-        s_DebuggerContext->m_sequencePoints.reserve(count);
+        s_sequencePoints.reserve(count);
 
-        for (MethodToSequencePointsMap::iterator methods = s_DebuggerContext->m_methodToSequencePoints.begin(); methods != s_DebuggerContext->m_methodToSequencePoints.end(); ++methods)
+        for (MethodToSequencePointsMap::iterator methods = s_methodToSequencePoints.begin(); methods != s_methodToSequencePoints.end(); ++methods)
         {
             SequencePointList *seqPoints = methods->second;
             std::sort(seqPoints->begin(), seqPoints->end(), SequencePointOffsetLess);
-            s_DebuggerContext->m_sequencePoints.insert(s_DebuggerContext->m_sequencePoints.end(), seqPoints->begin(), seqPoints->end());
+            s_sequencePoints.insert(s_sequencePoints.end(), seqPoints->begin(), seqPoints->end());
         }
     }
 
@@ -694,11 +670,11 @@ namespace utils
                 if (method != NULL)
                 {
                     CatchPointList* list;
-                    MethodToCatchPointsMap::iterator existingList = s_DebuggerContext->m_methodToCatchPoints.find(method);
-                    if (existingList == s_DebuggerContext->m_methodToCatchPoints.end())
+                    MethodToCatchPointsMap::iterator existingList = s_methodToCatchPoints.find(method);
+                    if (existingList == s_methodToCatchPoints.end())
                     {
                         list = new CatchPointList();
-                        s_DebuggerContext->m_methodToCatchPoints.add(method, list);
+                        s_methodToCatchPoints.add(method, list);
                     }
                     else
                     {
@@ -709,7 +685,7 @@ namespace utils
             }
         }
 
-        for (MethodToCatchPointsMap::iterator methods = s_DebuggerContext->m_methodToCatchPoints.begin(); methods != s_DebuggerContext->m_methodToCatchPoints.end(); ++methods)
+        for (MethodToCatchPointsMap::iterator methods = s_methodToCatchPoints.begin(); methods != s_methodToCatchPoints.end(); ++methods)
         {
             CatchPointList *catchPoints = methods->second;
             std::sort(catchPoints->begin(), catchPoints->end(), CatchPointOffsetLess);
@@ -718,8 +694,8 @@ namespace utils
 
     const char** Debugger::GetTypeSourceFiles(const Il2CppClass *klass, int& count)
     {
-        TypeSourceFileMap::iterator it = s_DebuggerContext->m_typeSourceFiles->find(klass);
-        if (it == s_DebuggerContext->m_typeSourceFiles->end())
+        TypeSourceFileMap::iterator it = s_typeSourceFiles->find(klass);
+        if (it == s_typeSourceFiles->end())
         {
             count = 0;
             return NULL;
@@ -731,7 +707,7 @@ namespace utils
 
     void Debugger::UserBreak()
     {
-        if (s_DebuggerContext->m_IsDebuggerAttached)
+        if (s_IsDebuggerAttached)
             debugger_agent_user_break();
     }
 
@@ -742,7 +718,7 @@ namespace utils
 
     void Debugger::Log(int level, Il2CppString *category, Il2CppString *message)
     {
-        if (s_DebuggerContext->m_IsDebuggerAttached)
+        if (s_IsDebuggerAttached)
             debugger_agent_debug_log(level, category, message);
     }
 
@@ -839,24 +815,24 @@ namespace utils
 
     void Debugger::AcquireLoaderLock()
     {
-        s_DebuggerContext->m_Il2CppMonoLoaderLock.Lock();
-        s_DebuggerContext->m_Il2CppMonoLoaderLockThreadId = os::Thread::CurrentThreadId();
+        s_Il2CppMonoLoaderLock.Lock();
+        s_Il2CppMonoLoaderLockThreadId = os::Thread::CurrentThreadId();
     }
 
     void Debugger::ReleaseLoaderLock()
     {
-        s_DebuggerContext->m_Il2CppMonoLoaderLockThreadId = 0;
-        s_DebuggerContext->m_Il2CppMonoLoaderLock.Unlock();
+        s_Il2CppMonoLoaderLockThreadId = 0;
+        s_Il2CppMonoLoaderLock.Unlock();
     }
 
     bool Debugger::LoaderLockIsOwnedByThisThread()
     {
-        return s_DebuggerContext->m_Il2CppMonoLoaderLockThreadId == os::Thread::CurrentThreadId();
+        return s_Il2CppMonoLoaderLockThreadId == os::Thread::CurrentThreadId();
     }
 
     Il2CppMonoInterpCallbacks* Debugger::GetInterpCallbacks()
     {
-        return &s_DebuggerContext->m_InterpCallbacks;
+        return &s_InterpCallbacks;
     }
 
     void Debugger::RuntimeShutdownEnd()

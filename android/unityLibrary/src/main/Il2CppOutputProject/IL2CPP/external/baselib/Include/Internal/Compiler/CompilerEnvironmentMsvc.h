@@ -6,12 +6,6 @@
 
 #define COMPILER_MSVC 1
 
-#ifdef __clang__
-    #define COMPILER_MSVC_EMULATED_BY_CLANG             1
-#else
-    #define COMPILER_MSVC_EMULATED_BY_CLANG             0
-#endif
-
 #ifdef _CPPUNWIND
     #define COMPILER_SUPPORTS_EXCEPTIONS                _CPPUNWIND
 #else
@@ -66,12 +60,8 @@
 
 #define COMPILER_DEBUG_TRAP()               __debugbreak()
 
-#if _MSVC_LANG >= 201703L
-    #define COMPILER_WARN_UNUSED_RESULT         [[nodiscard]]
-#else
 // Note that this is best effort, as "/analyze" compiler flag required to make warning appear
-    #define COMPILER_WARN_UNUSED_RESULT         _Check_return_
-#endif
+#define COMPILER_WARN_UNUSED_RESULT         _Check_return_
 
 #if !defined(alloca)
     #define alloca _alloca

@@ -1429,7 +1429,7 @@
 				7F4E059C2717216D00A2CBE4 /* Sources */,
 				7F4E059D2717216D00A2CBE4 /* Frameworks */,
 				7F4E059E2717216D00A2CBE4 /* CopyFiles */,
-				2E3635A62E57A878006918BE /* ShellScript */,
+				2E3635A62E57A878006918BE /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -1548,7 +1548,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2E3635A62E57A878006918BE /* ShellScript */ = {
+		2E3635A62E57A878006918BE /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1557,6 +1557,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -2342,6 +2343,8 @@
 					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
 					"$(inherited)",
 					"-weak_framework",
 					CoreMotion,
@@ -2419,6 +2422,8 @@
 					"-DUNITY_VERSION_MIN=21",
 				);
 				OTHER_LDFLAGS = (
+					"-lc++",
+					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
 					"-lc++",
@@ -2517,6 +2522,8 @@
 					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
+					"-lc++",
+					"-ld_classic",
 					"$(inherited)",
 					"-weak_framework",
 					CoreMotion,
@@ -2596,6 +2603,8 @@
 					"-DUNITY_VERSION_MIN=21",
 				);
 				OTHER_LDFLAGS = (
+					"-lc++",
+					"-ld_classic",
 					"-lc++",
 					"-ld_classic",
 					"-lc++",

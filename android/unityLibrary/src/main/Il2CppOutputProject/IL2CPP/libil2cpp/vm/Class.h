@@ -48,8 +48,6 @@ namespace vm
     class LIBIL2CPP_CODEGEN_API Class
     {
     public:
-        static void AllocateStaticData();
-        static void FreeStaticData();
         static Il2CppClass* FromIl2CppType(const Il2CppType* type, bool throwOnError = true);
         static Il2CppClass* FromIl2CppTypeEnum(Il2CppTypeEnum type);
         static Il2CppClass* FromName(const Il2CppImage* image, const char* namespaze, const char *name);
@@ -184,7 +182,6 @@ namespace vm
         static void SetupTypeHierarchy(Il2CppClass *klass);
         static void SetupInterfaces(Il2CppClass *klass);
 
-        // Must be called with the GC lock held!
         static const il2cpp::utils::dynamic_array<Il2CppClass*>& GetStaticFieldData();
 
         static size_t GetBitmapSize(const Il2CppClass* klass);

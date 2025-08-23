@@ -6,7 +6,9 @@
 // Platforms here are very loosely defined on the set of available system apis.
 // They have closest relation with the platform toolchains defined in Bee.
 
-#if defined(__NX__)
+#if defined(_XBOX_ONE)
+    #define BASELIB_PLATFORM_XBOXONE 1
+#elif defined(__NX__)
     #define BASELIB_PLATFORM_SWITCH 1
 #elif defined __ORBIS__
     #define BASELIB_PLATFORM_PS4 1
@@ -21,10 +23,10 @@
     #if !defined(TARGET_OS_XR)
         #define TARGET_OS_XR 0
     #endif
-    #if !defined(TARGET_OS_VISION)
-        #define TARGET_OS_VISION 0
-    #endif
-    #if TARGET_OS_XR || TARGET_OS_VISION
+// TODO: Remove when Bratwurst is removed.
+    #if defined(TARGET_OS_BRATWURST) && TARGET_OS_BRATWURST
+        #define BASELIB_PLATFORM_BRATWURST 1
+    #elif TARGET_OS_XR
         #define BASELIB_PLATFORM_VISIONOS 1
     #elif TARGET_OS_IOS
         #define BASELIB_PLATFORM_IOS 1
@@ -36,7 +38,9 @@
 #elif defined(__NetBSD__)
     #define BASELIB_PLATFORM_NETBSD 1
 #elif defined(linux) || defined(__linux__)
-    #if defined(ANDROID) || defined(__ANDROID__)
+    #if defined(GGP)
+        #define BASELIB_PLATFORM_STADIA 1
+    #elif defined(ANDROID) || defined(__ANDROID__)
         #define BASELIB_PLATFORM_ANDROID 1
     #elif defined(EMBEDDED_LINUX)
         #define BASELIB_PLATFORM_EMBEDDED_LINUX 1

@@ -34,6 +34,7 @@ namespace gc
         static void AddMemoryPressure(int64_t value);
         static int32_t GetMaxGeneration();
         static int32_t GetGeneration(void* addr);
+#if !RUNTIME_TINY
         static void InitializeFinalizer();
         static bool IsFinalizerThread(Il2CppThread* thread);
         static bool IsFinalizerInternalThread(Il2CppInternalThread* thread);
@@ -45,6 +46,7 @@ namespace gc
         static void SuppressFinalizer(Il2CppObject* obj);
         static void WaitForPendingFinalizers();
         static Il2CppIUnknown* GetOrCreateCCW(Il2CppObject* obj, const Il2CppGuid& iid);
+#endif
 
         // functions implemented in a GC specific manner
         static void Initialize();
@@ -69,12 +71,13 @@ namespace gc
         static int64_t GetAllocatedHeapSize();
 
         static void* MakeDescriptorForObject(size_t *bitmap, int numbits);
-        static void* MakeEmptyDescriptor();
         static void* MakeDescriptorForString();
         static void* MakeDescriptorForArray();
 
+#if RUNTIME_TINY
         static void* Allocate(size_t size);
         static void* AllocateObject(size_t size, void* type);
+#endif
 
         static void* AllocateFixed(size_t size, void *descr);
         static void FreeFixed(void* addr);
@@ -82,8 +85,10 @@ namespace gc
         static void RegisterThread();
         static bool UnregisterThread();
 
+#if !RUNTIME_TINY
         static bool HasPendingFinalizers();
         static int32_t InvokeFinalizers();
+#endif
 
         static void AddWeakLink(void **link_addr, Il2CppObject *obj, bool track);
         static void RemoveWeakLink(void **link_addr);

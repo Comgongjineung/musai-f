@@ -116,7 +116,7 @@ namespace baselib
                 }
 
             protected:
-                char _cachelineSpacer0[sizeof(Allocator) < PLATFORM_PROPERTY_CACHE_LINE_SIZE ? PLATFORM_PROPERTY_CACHE_LINE_SIZE - sizeof(Allocator) : sizeof(uint64_t)];
+                char _cachelineSpacer0[sizeof(Allocator) < PLATFORM_CACHE_LINE_SIZE ? PLATFORM_CACHE_LINE_SIZE - sizeof(Allocator) : sizeof(uint64_t)];
                 const uint64_t  m_BlockSizeMax;
                 const uint64_t  m_BlockCount;
                 const uint64_t  m_BlockSizeMaxLog2;
@@ -210,7 +210,7 @@ namespace baselib
                 }
 
             protected:
-                char _cachelineSpacer0[sizeof(Allocator) < PLATFORM_PROPERTY_CACHE_LINE_SIZE ? PLATFORM_PROPERTY_CACHE_LINE_SIZE - sizeof(Allocator) : sizeof(uint64_t)];
+                char _cachelineSpacer0[sizeof(Allocator) < PLATFORM_CACHE_LINE_SIZE ? PLATFORM_CACHE_LINE_SIZE - sizeof(Allocator) : sizeof(uint64_t)];
                 Block          m_Block[64];
                 const uint64_t  m_BlockSizeMax;
                 const uint64_t  m_BlockCount;
@@ -303,27 +303,25 @@ namespace baselib
                                 if (retry)
                                 {
                                     // Swap the current encoded block position, updating with new block index and size factors, reseting position.
-                                    // The release barrier is required for the following operations to guaranteed to happen after AllocateBlock (writes).
-                                    const uint64_t oldPos = baselib::atomic_exchange_explicit(m_EncodedBlockPosition, EncodeBlockIndex(newBlockIndex) | EncodeBlockSizeFactorLog2(newBlockSizeFactorLog2), baselib::memory_order_release);
-
+                                    const uint64_t oldPos = baselib::atomic_exchange_explicit(m_EncodedBlockPosition, EncodeBlockIndex(newBlockIndex) | EncodeBlockSizeFactorLog2(newBlockSizeFactorLog2), baselib::memory_order_relaxed);
                                     // Offset (increment) the old block allocation size register with the returned position.
                                     // This is a "zero-sum game", where when the size reaches zero, all allocations in that block have been deallocated.
                                     // That is safe to do here, since the returned position included this allocation. The deallocation/inactivation of the
                                     // block will happen when the last deallocation is invoked (which can be the subsequent DeallocImpl call below)-
                                     OffsetBlockAllocationSize(blockIndex, DecodeBlockPosition(oldPos));
 
-                                    // New block is set to used. This does not need to be in order with the operations following the release barrier above, since
-                                    // no new block can be used before the end of this lock scope. The early bail check before the lock scope can potentially
-                                    // result in a false positive, but that will in the rare event it happening resolve with the following changed block test.
-                                    // (blockIndex != DecodeBlockIndex)
-                                    SetBlockUsed(newBlockIndex);
+                                    // Fake depencency (newBlockIndex will never equal oldPos encoded block index).
+                                    // This to ensure `SetBlockUsed` is called after m_EncodedBlockPosition is refreshed, to be able to orderly
+                                    // compare current block index change of m_EncodedBlockPosition one early bail (exhausted).
+                                    if (OPTIMIZER_LIKELY(newBlockIndex != DecodeBlockIndex(oldPos)))
+                                        SetBlockUsed(newBlockIndex);
                                 }
                             });
                         }
                         else
                         {
                             // If allocator was exhausted, check if current block has changed and if so retry.
-                            // Reload m_EncodedBlockPosition since we update that before m_FreeBlockMask (SetBlockUsed invocation) when swapping blocks above.
+                            // Reload m_EncodedBlockPosition since we update that before m_FreeBlockMask (SetBlockUsed invokatin) when swapping blocks above.
                             uint64_t encPos = baselib::atomic_load_explicit(m_EncodedBlockPosition, baselib::memory_order_relaxed);
                             uint64_t pos = DecodeBlockPosition(encPos);
                             // if block index has changed, we retry allocate (new block available)
@@ -629,14 +627,14 @@ namespace baselib
                 const uint64_t  m_BlockSizeLog2;
 
                 // 1x frequent read/write access for allocate (+2x infrequent, for new block).
-                char _cachelineSpacer0[PLATFORM_PROPERTY_CACHE_LINE_SIZE - (sizeof(uint64_t) * 2)];
+                char _cachelineSpacer0[PLATFORM_CACHE_LINE_SIZE - (sizeof(uint64_t) * 2)];
                 uint64_t m_EncodedBlockPosition;   // nr bits reserved MSB to LSB [block index:7][block size factor:0-3][position (offset):54-57]
-                char _cachelineSpacer1[PLATFORM_PROPERTY_CACHE_LINE_SIZE - sizeof(uint64_t)];
+                char _cachelineSpacer1[PLATFORM_CACHE_LINE_SIZE - sizeof(uint64_t)];
 
                 // 1x frequent access for deallocate (infrequent for allocate). Last element reserved for initial allocator setup
                 uint64_t        m_BlockAllocationSizeArray[MaxBlocks + 1];
 
-                // Other, infrequence access - separate from above high frequency access
+                // Other, infrequence acccess - separate from above high frequency access
                 uint8_t         m_BlockSizeFactorLog2Array[MaxBlocks];  // read/modified when swapping and evicting or blocks
                 uint64_t        m_Capacity;                             // read only by `capacity, `reserve` and swapping blocks
                 uint64_t        m_FreeBlockMask;                        // read/modified when swapping blocks

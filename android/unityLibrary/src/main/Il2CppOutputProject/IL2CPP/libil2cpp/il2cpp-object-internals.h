@@ -2,6 +2,8 @@
 
 #include "il2cpp-config.h"
 
+#if !RUNTIME_TINY
+
 #include <stdint.h>
 #include <stddef.h>
 #include "il2cpp-class-internals.h"
@@ -35,10 +37,14 @@ namespace os
 
 namespace baselib
 {
+#if !IL2CPP_TINY || IL2CPP_TINY_FROM_IL2CPP_BUILDER
     inline namespace il2cpp_baselib
 {
+#endif
     class ReentrantLock;
+#if !IL2CPP_TINY || IL2CPP_TINY_FROM_IL2CPP_BUILDER
 }
+#endif
 }
 #endif //__cplusplus
 
@@ -498,6 +504,7 @@ typedef struct Il2CppException
 {
     Il2CppObject object;
 #endif //__cplusplus
+#if !IL2CPP_TINY
     Il2CppString* className;
     Il2CppString* message;
     Il2CppObject* _data;
@@ -514,6 +521,17 @@ typedef struct Il2CppException
     Il2CppArray* captured_traces;
     Il2CppArray* native_trace_ips;
     int32_t caught_in_unmanaged;
+#else
+    Il2CppString* message;
+    union
+    {
+        // Stack trace is the field at this position,
+        // but we'll define inner_ex and hresult to reduce the number of defines we need in vm::Exception.cpp
+        Il2CppString* stack_trace;
+        Il2CppException* inner_ex;
+        il2cpp_hresult_t hresult;
+    };
+#endif
 } Il2CppException;
 
 // System.SystemException
@@ -541,6 +559,7 @@ typedef struct Il2CppTypedRef
 typedef struct Il2CppDelegate
 {
     Il2CppObject object;
+#if !IL2CPP_TINY
     /* The compiled code of the target method */
     Il2CppMethodPointer method_ptr;
     /* The invoke code */
@@ -575,12 +594,23 @@ typedef struct Il2CppDelegate
     Il2CppObject *data;
 
     bool method_is_virtual;
+#else
+    void* method_ptr;
+    Il2CppObject* m_target;
+    void* invoke_impl;
+    void* multicast_invoke_impl;
+    void* m_ReversePInvokeWrapperPtr;
+    bool m_IsDelegateOpen;
+#endif // !IL2CPP_TINY
 } Il2CppDelegate;
 
 typedef struct Il2CppMulticastDelegate
 {
     Il2CppDelegate delegate;
     Il2CppArray *delegates;
+#if IL2CPP_TINY
+    int delegateCount;
+#endif
 } Il2CppMulticastDelegate;
 
 // System.MarshalByRefObject
@@ -1121,3 +1151,5 @@ typedef struct Il2CppByReference
 {
     intptr_t value;
 } Il2CppByReference;
+
+#endif // !RUNTIME_TINY

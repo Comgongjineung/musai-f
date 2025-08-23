@@ -280,6 +280,12 @@ namespace vm
         return (Il2CppThread*)value;
     }
 
+    Il2CppThread** Thread::GetAllAttachedThreads(size_t &size)
+    {
+        size = s_AttachedThreads->size();
+        return &(*s_AttachedThreads)[0];
+    }
+
     static void STDCALL TerminateThread(void* context)
     {
         // We throw a dummy exception to make sure things clean up properly
@@ -537,7 +543,7 @@ namespace vm
 
             for (int i = 0; i < kMaxThreadStaticDataPointers; i++)
             {
-                if (!staticData->slots[slot]->data[i])
+                if (staticData->slots[slot]->data[i])
                     break;
                 gc::GarbageCollector::FreeFixed(staticData->slots[slot]->data[i]);
             }

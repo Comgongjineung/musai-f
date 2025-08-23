@@ -1,7 +1,13 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
+#include <limits>
 
 
 struct VirtualActionInvoker0
@@ -205,11 +211,13 @@ struct U3CGetAttributesU3Ed__116_t349AC65AB20D47B0EFABF0BA61E89C063BEE2E84;
 IL2CPP_EXTERN_C RuntimeClass* ArgumentException_tAD90411542A20A9C72D5CDA3A84181D8B947A263_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ArgumentNullException_t327031E412FAB2351B0022DD5DAD47E67E597129_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* BaseUriAnnotation_t3E8EF7050D4B9D097C974B45CF5AB93DDC04A350_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ContentReader_t56371E0C4A048375E6F67D1055871BE63348066E_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* CultureInfo_t9BA817D41AD55AC8BD07480DD8AC22F8FFA378E0_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Double_tE150EF3D1D43DEE85D533810AB4C742307EEDE5F_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* EventArgs_t37273F03EAC87217701DD431B190FBD84AD7C377_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ExtractKeyDelegate_t2CB1F734FE7BBA8353A1EB62ED27544C812D4424_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ExtractKeyDelegate_tF846F349E00D201712A8EEA75D152D36A0BA7FEB_il2cpp_TypeInfo_var;
@@ -225,10 +233,13 @@ IL2CPP_EXTERN_C RuntimeClass* NotSupportedException_t1429765983D409BD2986508963C
 IL2CPP_EXTERN_C RuntimeClass* ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* PlatformNotSupportedException_tD2BD7EB9278518AA5FE8AE75AD5D0D4298A4631A_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* SaveOptions_t9AB03C2B1CF04E8EFD8DE36C647D84C22095F332_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Single_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringBuilderCache_t79A8C09B300F15741A46DA2E76213B7A763A40CB_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringBuilder_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringWriter_tF48052BE4F980E5C85403221E835768E4156267D_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* String_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Type_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CGetAttributesU3Ed__116_t349AC65AB20D47B0EFABF0BA61E89C063BEE2E84_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CNodesU3Ed__18_t7A83FD09099FD062B2BCC201FEC49C58CF13C4C1_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* WeakReference_tD4B0518CE911FFD9FAAB3FCD492644A354312D8E_il2cpp_TypeInfo_var;
@@ -252,9 +263,6 @@ IL2CPP_EXTERN_C RuntimeClass* XText_t006159E7F735736D41BBC0738FFB066A14B31AE2_il
 IL2CPP_EXTERN_C RuntimeClass* XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* XmlNodeType_tCA25567E42A464038FDA6BA318EC0A9627B4CB95_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* XmlWriterSettings_t4C33BC8989A2AF592E88EAE69930915E6D960674_il2cpp_TypeInfo_var;
-IL2CPP_EXTERN_C RuntimeField* ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var;
-IL2CPP_EXTERN_C RuntimeField* NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var;
-IL2CPP_EXTERN_C RuntimeField* NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var;
 IL2CPP_EXTERN_C String_t* _stringLiteral0585B1F8C119DD15D843D55F7CCBF9D9162B9AC8;
 IL2CPP_EXTERN_C String_t* _stringLiteral0C3C6829C3CCF8020C6AC45B87963ADC095CD44A;
 IL2CPP_EXTERN_C String_t* _stringLiteral11680B2FB0D0FC01D9AFDF475517284900ACFB79;
@@ -371,9 +379,6 @@ IL2CPP_EXTERN_C const RuntimeMethod* XText_WriteTo_m8DA512ED0623E5D736844AEF4F95
 IL2CPP_EXTERN_C const RuntimeMethod* XText__ctor_m30153536CE7D619BF5609B3D3453109B3ECDD28D_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* XText__ctor_m57E9875B16480CE76D1F612F68AC85B2EAFBADF8_RuntimeMethod_var;
 IL2CPP_EXTERN_C const RuntimeMethod* XText_set_Value_m285A62B03AEFA17C99B9637F5E9BD62A5E707C38_RuntimeMethod_var;
-IL2CPP_EXTERN_C const RuntimeType* ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var;
-IL2CPP_EXTERN_C const RuntimeType* NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var;
-IL2CPP_EXTERN_C const RuntimeType* NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var;
 IL2CPP_EXTERN_C const RuntimeType* SaveOptions_t9AB03C2B1CF04E8EFD8DE36C647D84C22095F332_0_0_0_var;
 struct CultureData_tEEFDCF4ECA1BBF6C0C8C94EB3541657245598F9D_marshaled_com;
 struct CultureData_tEEFDCF4ECA1BBF6C0C8C94EB3541657245598F9D_marshaled_pinvoke;
@@ -2034,6 +2039,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XAttribute_GetPrefixOfNamespace_mDE
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral349C6DC0F34B9BA242E4C728EDD28CAB809D4917);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral420B74A52534550B0DD14DCF7D8988C2BD4936CE);
@@ -2058,7 +2064,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XAttribute_GetPrefixOfNamespace_mDE
 		}
 	}
 	{
-		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		return L_4;
 	}
 
@@ -2539,6 +2545,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer__ctor_mA9E3D02F0E4DB6052A159E
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -2562,7 +2569,7 @@ IL_0014:
 		XContainer_tF94A2D69B11B71834E4E5531DD59E627CBFE2BBF* L_2 = ___0_other;
 		NullCheck(L_2);
 		RuntimeObject* L_3 = L_2->___content;
-		if (!((String_t*)IsInstSealed((RuntimeObject*)L_3, il2cpp_defaults.string_class)))
+		if (!((String_t*)IsInstSealed((RuntimeObject*)L_3, String_t_il2cpp_TypeInfo_var)))
 		{
 			goto IL_002e;
 		}
@@ -2620,6 +2627,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR XNode_t185C922661054AAD14F49676DD6F3CB10D652A
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XText_t006159E7F735736D41BBC0738FFB066A14B31AE2_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
@@ -2656,7 +2664,7 @@ IL_000a:
 IL_001b:
 	{
 		RuntimeObject* L_4 = __this->___content;
-		V_1 = ((String_t*)IsInstSealed((RuntimeObject*)L_4, il2cpp_defaults.string_class));
+		V_1 = ((String_t*)IsInstSealed((RuntimeObject*)L_4, String_t_il2cpp_TypeInfo_var));
 		String_t* L_5 = V_1;
 		if (!L_5)
 		{
@@ -2714,6 +2722,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_Add_m26111A020919619F03525ED3
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEnumerable_t6331596D5DD37C462B1B8D49CF6B319B00AB7131_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEnumerator_t7B609C2FFA6EB5167D9C62A0C32A21DE2F666DAA_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XAttribute_tA7C325029CA82AA067080AEA6BDDC52E08987FDF_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
@@ -2777,7 +2786,7 @@ IL_0014:
 IL_0026:
 	{
 		RuntimeObject* L_6 = ___0_content;
-		V_1 = ((String_t*)IsInstSealed((RuntimeObject*)L_6, il2cpp_defaults.string_class));
+		V_1 = ((String_t*)IsInstSealed((RuntimeObject*)L_6, String_t_il2cpp_TypeInfo_var));
 		String_t* L_7 = V_1;
 		if (!L_7)
 		{
@@ -2988,6 +2997,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_RemoveNodes_m4AEA5FE86A02C530
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XObjectChangeEventArgs_tD06978690A72B3D2B986EBA7E166B736F909B55F_il2cpp_TypeInfo_var);
@@ -3012,7 +3022,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_RemoveNodes_m4AEA5FE86A02C530
 IL_0012:
 	{
 		RuntimeObject* L_1 = __this->___content;
-		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_1, il2cpp_defaults.string_class));
+		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_1, String_t_il2cpp_TypeInfo_var));
 		String_t* L_2 = V_0;
 		if (!L_2)
 		{
@@ -3197,6 +3207,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_AddContentSkipNotify_mB41DFA1
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEnumerable_t6331596D5DD37C462B1B8D49CF6B319B00AB7131_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEnumerator_t7B609C2FFA6EB5167D9C62A0C32A21DE2F666DAA_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XAttribute_tA7C325029CA82AA067080AEA6BDDC52E08987FDF_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
@@ -3245,7 +3256,7 @@ IL_0004:
 IL_0016:
 	{
 		RuntimeObject* L_4 = ___0_content;
-		V_1 = ((String_t*)IsInstSealed((RuntimeObject*)L_4, il2cpp_defaults.string_class));
+		V_1 = ((String_t*)IsInstSealed((RuntimeObject*)L_4, String_t_il2cpp_TypeInfo_var));
 		String_t* L_5 = V_1;
 		if (!L_5)
 		{
@@ -3718,6 +3729,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_AddStringSkipNotify_mC5B6271B
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XCData_tCE86E0709C47284A8D0A6CBE09CDFD6B8609BF3B_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XText_t006159E7F735736D41BBC0738FFB066A14B31AE2_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
@@ -3753,7 +3765,7 @@ IL_0017:
 	}
 	{
 		RuntimeObject* L_5 = __this->___content;
-		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_5, il2cpp_defaults.string_class));
+		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_5, String_t_il2cpp_TypeInfo_var));
 		String_t* L_6 = V_0;
 		if (!L_6)
 		{
@@ -3873,6 +3885,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_AppendNodeSkipNotify_m57D0634
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -3890,7 +3903,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_AppendNodeSkipNotify_m57D0634
 	}
 	{
 		RuntimeObject* L_2 = __this->___content;
-		if (!((String_t*)IsInstSealed((RuntimeObject*)L_2, il2cpp_defaults.string_class)))
+		if (!((String_t*)IsInstSealed((RuntimeObject*)L_2, String_t_il2cpp_TypeInfo_var)))
 		{
 			goto IL_0025;
 		}
@@ -3937,6 +3950,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_AppendText_m04B752A0A4AE57DC5
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -3944,7 +3958,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_AppendText_m04B752A0A4AE57DC5
 	XNode_t185C922661054AAD14F49676DD6F3CB10D652A30* V_1 = NULL;
 	{
 		RuntimeObject* L_0 = __this->___content;
-		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_0, il2cpp_defaults.string_class));
+		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_0, String_t_il2cpp_TypeInfo_var));
 		String_t* L_1 = V_0;
 		if (!L_1)
 		{
@@ -3999,6 +4013,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_ConvertTextToNode_m02D880D745
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XText_t006159E7F735736D41BBC0738FFB066A14B31AE2_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -4006,7 +4021,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_ConvertTextToNode_m02D880D745
 	XText_t006159E7F735736D41BBC0738FFB066A14B31AE2* V_1 = NULL;
 	{
 		RuntimeObject* L_0 = __this->___content;
-		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_0, il2cpp_defaults.string_class));
+		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_0, String_t_il2cpp_TypeInfo_var));
 		String_t* L_1 = V_0;
 		bool L_2;
 		L_2 = String_IsNullOrEmpty_mEA9E3FB005AC28FE02E69FCF95A7B8456192B478(L_1, NULL);
@@ -4044,9 +4059,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XContainer_GetStringValue_m4C4D5485
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Double_tE150EF3D1D43DEE85D533810AB4C742307EEDE5F_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Single_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XObject_t1E867FBE626AA0DC878BDDFC1ABCF19F1A4B5C29_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
@@ -4055,7 +4074,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XContainer_GetStringValue_m4C4D5485
 	String_t* V_0 = NULL;
 	{
 		RuntimeObject* L_0 = ___0_value;
-		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_0, il2cpp_defaults.string_class));
+		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_0, String_t_il2cpp_TypeInfo_var));
 		String_t* L_1 = V_0;
 		if (!L_1)
 		{
@@ -4070,7 +4089,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XContainer_GetStringValue_m4C4D5485
 IL_000c:
 	{
 		RuntimeObject* L_3 = ___0_value;
-		if (!((RuntimeObject*)IsInstSealed((RuntimeObject*)L_3, il2cpp_defaults.double_class)))
+		if (!((RuntimeObject*)IsInstSealed((RuntimeObject*)L_3, Double_tE150EF3D1D43DEE85D533810AB4C742307EEDE5F_il2cpp_TypeInfo_var)))
 		{
 			goto IL_0025;
 		}
@@ -4079,7 +4098,7 @@ IL_000c:
 		RuntimeObject* L_4 = ___0_value;
 		il2cpp_codegen_runtime_class_init_inline(XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
 		String_t* L_5;
-		L_5 = XmlConvert_ToString_m04C12A2A45109D8E79C729DE12EF0A29301C2A2B(((*(double*)UnBox(L_4, il2cpp_defaults.double_class))), NULL);
+		L_5 = XmlConvert_ToString_m04C12A2A45109D8E79C729DE12EF0A29301C2A2B(((*(double*)((double*)(double*)UnBox(L_4, Double_tE150EF3D1D43DEE85D533810AB4C742307EEDE5F_il2cpp_TypeInfo_var)))), NULL);
 		V_0 = L_5;
 		goto IL_00c7;
 	}
@@ -4087,7 +4106,7 @@ IL_000c:
 IL_0025:
 	{
 		RuntimeObject* L_6 = ___0_value;
-		if (!((RuntimeObject*)IsInstSealed((RuntimeObject*)L_6, il2cpp_defaults.single_class)))
+		if (!((RuntimeObject*)IsInstSealed((RuntimeObject*)L_6, Single_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_il2cpp_TypeInfo_var)))
 		{
 			goto IL_003e;
 		}
@@ -4096,7 +4115,7 @@ IL_0025:
 		RuntimeObject* L_7 = ___0_value;
 		il2cpp_codegen_runtime_class_init_inline(XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
 		String_t* L_8;
-		L_8 = XmlConvert_ToString_m0A47C3C098CDB47726C29D7A70B7349D6DA57555(((*(float*)UnBox(L_7, il2cpp_defaults.single_class))), NULL);
+		L_8 = XmlConvert_ToString_m0A47C3C098CDB47726C29D7A70B7349D6DA57555(((*(float*)((float*)(float*)UnBox(L_7, Single_t4530F2FF86FCB0DC29F35385CA1BD21BE294761C_il2cpp_TypeInfo_var)))), NULL);
 		V_0 = L_8;
 		goto IL_00c7;
 	}
@@ -4113,7 +4132,7 @@ IL_003e:
 		RuntimeObject* L_10 = ___0_value;
 		il2cpp_codegen_runtime_class_init_inline(XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
 		String_t* L_11;
-		L_11 = XmlConvert_ToString_m4EE078C46CC4FF023E0286740CFE95E945C5185E(((*(Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F*)UnBox(L_10, Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F_il2cpp_TypeInfo_var))), NULL);
+		L_11 = XmlConvert_ToString_m4EE078C46CC4FF023E0286740CFE95E945C5185E(((*(Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F*)((Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F*)(Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F*)UnBox(L_10, Decimal_tDA6C877282B2D789CF97C0949661CC11D643969F_il2cpp_TypeInfo_var)))), NULL);
 		V_0 = L_11;
 		goto IL_00c7;
 	}
@@ -4121,7 +4140,7 @@ IL_003e:
 IL_0054:
 	{
 		RuntimeObject* L_12 = ___0_value;
-		if (!((RuntimeObject*)IsInstSealed((RuntimeObject*)L_12, il2cpp_defaults.boolean_class)))
+		if (!((RuntimeObject*)IsInstSealed((RuntimeObject*)L_12, Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var)))
 		{
 			goto IL_006a;
 		}
@@ -4130,7 +4149,7 @@ IL_0054:
 		RuntimeObject* L_13 = ___0_value;
 		il2cpp_codegen_runtime_class_init_inline(XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
 		String_t* L_14;
-		L_14 = XmlConvert_ToString_mD598BDDD270BE18CCBABE0569FF42529F06ADADF(((*(bool*)UnBox(L_13, il2cpp_defaults.boolean_class))), NULL);
+		L_14 = XmlConvert_ToString_mD598BDDD270BE18CCBABE0569FF42529F06ADADF(((*(bool*)((bool*)(bool*)UnBox(L_13, Boolean_t09A6377A54BE2F9E6985A8149F19234FD7DDFE22_il2cpp_TypeInfo_var)))), NULL);
 		V_0 = L_14;
 		goto IL_00c7;
 	}
@@ -4147,7 +4166,7 @@ IL_006a:
 		RuntimeObject* L_16 = ___0_value;
 		il2cpp_codegen_runtime_class_init_inline(XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
 		String_t* L_17;
-		L_17 = XmlConvert_ToString_mCD438E48326A2EECD1839100F45A2626B3B65598(((*(DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D*)UnBox(L_16, DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D_il2cpp_TypeInfo_var))), 3, NULL);
+		L_17 = XmlConvert_ToString_mCD438E48326A2EECD1839100F45A2626B3B65598(((*(DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D*)((DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D*)(DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D*)UnBox(L_16, DateTime_t66193957C73913903DDAD89FEDC46139BCA5802D_il2cpp_TypeInfo_var)))), 3, NULL);
 		V_0 = L_17;
 		goto IL_00c7;
 	}
@@ -4164,7 +4183,7 @@ IL_0081:
 		RuntimeObject* L_19 = ___0_value;
 		il2cpp_codegen_runtime_class_init_inline(XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
 		String_t* L_20;
-		L_20 = XmlConvert_ToString_m94540B3F4E815CA0CEDD0B655248460FD19E419A(((*(DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4*)UnBox(L_19, DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4_il2cpp_TypeInfo_var))), NULL);
+		L_20 = XmlConvert_ToString_m94540B3F4E815CA0CEDD0B655248460FD19E419A(((*(DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4*)((DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4*)(DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4*)UnBox(L_19, DateTimeOffset_t4EE701FE2F386D6F932FAC9B11E4B74A5B30F0A4_il2cpp_TypeInfo_var)))), NULL);
 		V_0 = L_20;
 		goto IL_00c7;
 	}
@@ -4181,7 +4200,7 @@ IL_0097:
 		RuntimeObject* L_22 = ___0_value;
 		il2cpp_codegen_runtime_class_init_inline(XmlConvert_t5D100AFD62FF717BD4F8A6CABA9EDF7A5DF719EA_il2cpp_TypeInfo_var);
 		String_t* L_23;
-		L_23 = XmlConvert_ToString_mEF060F018017514326BC5A2127ABEAC96BE8A14B(((*(TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A*)UnBox(L_22, TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A_il2cpp_TypeInfo_var))), NULL);
+		L_23 = XmlConvert_ToString_mEF060F018017514326BC5A2127ABEAC96BE8A14B(((*(TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A*)((TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A*)(TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A*)UnBox(L_22, TimeSpan_t8195C5B013A2C532FEBDF0B64B6911982E750F5A_il2cpp_TypeInfo_var)))), NULL);
 		V_0 = L_23;
 		goto IL_00c7;
 	}
@@ -4561,6 +4580,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_WriteContentTo_mE5DB0F2476BE5
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XDocument_tFD643046CAF39623C3D8AA1693390D5EE08E82F1_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
@@ -4576,7 +4596,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XContainer_WriteContentTo_mE5DB0F2476BE5
 	}
 	{
 		RuntimeObject* L_1 = __this->___content;
-		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_1, il2cpp_defaults.string_class));
+		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_1, String_t_il2cpp_TypeInfo_var));
 		String_t* L_2 = V_0;
 		if (!L_2)
 		{
@@ -4737,6 +4757,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool ContentReader_ReadContentFrom_mDACD19076
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XAttribute_tA7C325029CA82AA067080AEA6BDDC52E08987FDF_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XCData_tCE86E0709C47284A8D0A6CBE09CDFD6B8609BF3B_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XComment_t2FD9205AC70AF739D97E5CE8B1CC29459191F43D_il2cpp_TypeInfo_var);
@@ -4901,7 +4922,7 @@ IL_0081:
 
 IL_00a0:
 	{
-		String_t* L_20 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_20 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		G_B6_0 = L_20;
 		G_B6_1 = G_B5_0;
 		G_B6_2 = G_B5_1;
@@ -4976,7 +4997,7 @@ IL_00f7:
 	}
 	{
 		XContainer_tF94A2D69B11B71834E4E5531DD59E627CBFE2BBF* L_39 = __this->____currentContainer;
-		String_t* L_40 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_40 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		NullCheck(L_39);
 		L_39->___content = L_40;
 		Il2CppCodeGenWriteBarrier((void**)(&L_39->___content), (void*)L_40);
@@ -5140,6 +5161,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool ContentReader_ReadContentFrom_m08791D2D3
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IXmlLineInfo_tDD8332CE7D244FDA50A6C5744D7EAEC4A6CCBF05_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XAttribute_tA7C325029CA82AA067080AEA6BDDC52E08987FDF_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XCData_tCE86E0709C47284A8D0A6CBE09CDFD6B8609BF3B_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XComment_t2FD9205AC70AF739D97E5CE8B1CC29459191F43D_il2cpp_TypeInfo_var);
@@ -5365,7 +5387,7 @@ IL_00dc:
 
 IL_00fb:
 	{
-		String_t* L_35 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_35 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		G_B12_0 = L_35;
 		G_B12_1 = G_B11_0;
 	}
@@ -5484,7 +5506,7 @@ IL_019e:
 	}
 	{
 		XContainer_tF94A2D69B11B71834E4E5531DD59E627CBFE2BBF* L_66 = __this->____currentContainer;
-		String_t* L_67 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_67 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		NullCheck(L_66);
 		L_66->___content = L_67;
 		Il2CppCodeGenWriteBarrier((void**)(&L_66->___content), (void*)L_67);
@@ -7029,6 +7051,12 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t XElement_get_NodeType_mC7D6F185CEE118
 }
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XElement_get_Value_mC49BD0D0A616BD26B1B8E2D33D2E22D2F5A667BA (XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909* __this, const RuntimeMethod* method) 
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
 	String_t* V_0 = NULL;
 	StringBuilder_t* V_1 = NULL;
 	{
@@ -7039,14 +7067,14 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XElement_get_Value_mC49BD0D0A616BD2
 		}
 	}
 	{
-		String_t* L_1 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_1 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		return L_1;
 	}
 
 IL_000e:
 	{
 		RuntimeObject* L_2 = ((XContainer_tF94A2D69B11B71834E4E5531DD59E627CBFE2BBF*)__this)->___content;
-		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_2, il2cpp_defaults.string_class));
+		V_0 = ((String_t*)IsInstSealed((RuntimeObject*)L_2, String_t_il2cpp_TypeInfo_var));
 		String_t* L_3 = V_0;
 		if (!L_3)
 		{
@@ -7875,6 +7903,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void XElement_ReadElementFromImpl_m8B6FD4923D
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IXmlLineInfo_tDD8332CE7D244FDA50A6C5744D7EAEC4A6CCBF05_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XAttribute_tA7C325029CA82AA067080AEA6BDDC52E08987FDF_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -8017,7 +8046,7 @@ IL_007e:
 
 IL_0093:
 	{
-		String_t* L_31 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_31 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		G_B13_0 = L_31;
 	}
 
@@ -8390,26 +8419,12 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* U3CGetAttributesU3Ed__116_Syst
 #endif
 IL2CPP_EXTERN_C void NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshal_pinvoke(const NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E& unmarshaled, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshaled_pinvoke& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
+	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_ns' of type 'NamespaceCache': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____nsException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshal_pinvoke_back(const NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshaled_pinvoke& marshaled, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
+	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_ns' of type 'NamespaceCache': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____nsException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshal_pinvoke_cleanup(NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshaled_pinvoke& marshaled)
@@ -8417,26 +8432,12 @@ IL2CPP_EXTERN_C void NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_ma
 }
 IL2CPP_EXTERN_C void NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshal_com(const NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E& unmarshaled, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshaled_com& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
+	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_ns' of type 'NamespaceCache': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____nsException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshal_com_back(const NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshaled_com& marshaled, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_____ns_FieldInfo_var, NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_0_0_0_var);
+	Exception_t* ____nsException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_ns' of type 'NamespaceCache': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____nsException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshal_com_cleanup(NamespaceCache_tA4C61EA86BE904343F818AF0B22EC00A2A272B5E_marshaled_com& marshaled)
@@ -8492,26 +8493,12 @@ IL2CPP_EXTERN_C  XNamespace_t86B6F8515F5E20D387B83EBDE0890C4559A4012C* Namespace
 
 IL2CPP_EXTERN_C void ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshal_pinvoke(const ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E& unmarshaled, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshaled_pinvoke& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
+	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_writer' of type 'ElementWriter': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____writerException, NULL);
 }
 IL2CPP_EXTERN_C void ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshal_pinvoke_back(const ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshaled_pinvoke& marshaled, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
+	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_writer' of type 'ElementWriter': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____writerException, NULL);
 }
 IL2CPP_EXTERN_C void ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshal_pinvoke_cleanup(ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshaled_pinvoke& marshaled)
@@ -8521,26 +8508,12 @@ IL2CPP_EXTERN_C void ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_mar
 
 IL2CPP_EXTERN_C void ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshal_com(const ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E& unmarshaled, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshaled_com& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
+	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_writer' of type 'ElementWriter': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____writerException, NULL);
 }
 IL2CPP_EXTERN_C void ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshal_com_back(const ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshaled_com& marshaled, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_____writer_FieldInfo_var, ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_0_0_0_var);
+	Exception_t* ____writerException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_writer' of type 'ElementWriter': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____writerException, NULL);
 }
 IL2CPP_EXTERN_C void ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshal_com_cleanup(ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E_marshaled_com& marshaled)
@@ -8569,6 +8542,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ElementWriter_WriteElement_mC858417C1446
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNode_t185C922661054AAD14F49676DD6F3CB10D652A30_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
@@ -8616,7 +8590,7 @@ IL_002d:
 		XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909* L_8 = ___0_e;
 		NullCheck(L_8);
 		RuntimeObject* L_9 = ((XContainer_tF94A2D69B11B71834E4E5531DD59E627CBFE2BBF*)L_8)->___content;
-		V_2 = ((String_t*)IsInstSealed((RuntimeObject*)L_9, il2cpp_defaults.string_class));
+		V_2 = ((String_t*)IsInstSealed((RuntimeObject*)L_9, String_t_il2cpp_TypeInfo_var));
 		String_t* L_10 = V_2;
 		if (!L_10)
 		{
@@ -8717,6 +8691,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* ElementWriter_GetPrefixOfNamespace_
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral349C6DC0F34B9BA242E4C728EDD28CAB809D4917);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral420B74A52534550B0DD14DCF7D8988C2BD4936CE);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral9CDCEEB7A12F71E8DF3D6AC05D04621DD4FBABF3);
@@ -8741,7 +8716,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* ElementWriter_GetPrefixOfNamespace_
 		}
 	}
 	{
-		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		return L_4;
 	}
 
@@ -8807,6 +8782,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ElementWriter_PushAncestors_mE594931ADD6
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -8889,7 +8865,7 @@ IL_001a:
 
 IL_004e:
 	{
-		String_t* L_18 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_18 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		G_B6_0 = L_18;
 		G_B6_1 = G_B5_0;
 	}
@@ -8934,6 +8910,12 @@ IL2CPP_EXTERN_C  void ElementWriter_PushAncestors_mE594931ADD6A3BFAFE02B768322DD
 }
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ElementWriter_PushElement_mDC0DBDBC8C9029B35D453BA33FAB358F33D6F19C (ElementWriter_t8A2F575C32A5E65A6A4AA13994BCB24D1CB4CC3E* __this, XElement_t545ABA4BFF2045168A2E472A68FE2FCAA5E1F909* ___0_e, const RuntimeMethod* method) 
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
 	XAttribute_tA7C325029CA82AA067080AEA6BDDC52E08987FDF* V_0 = NULL;
 	NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46* G_B4_0 = NULL;
 	NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46* G_B3_0 = NULL;
@@ -9002,7 +8984,7 @@ IL_0015:
 
 IL_0049:
 	{
-		String_t* L_16 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_16 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		G_B5_0 = L_16;
 		G_B5_1 = G_B4_0;
 	}
@@ -9264,26 +9246,12 @@ IL2CPP_EXTERN_C  void ElementWriter_WriteStartElement_m2B5053DBE09413D2F2284EE44
 #endif
 IL2CPP_EXTERN_C void NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshal_pinvoke(const NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46& unmarshaled, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshaled_pinvoke& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
+	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_declaration' of type 'NamespaceResolver': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____declarationException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshal_pinvoke_back(const NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshaled_pinvoke& marshaled, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
+	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_declaration' of type 'NamespaceResolver': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____declarationException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshal_pinvoke_cleanup(NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshaled_pinvoke& marshaled)
@@ -9291,26 +9259,12 @@ IL2CPP_EXTERN_C void NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46
 }
 IL2CPP_EXTERN_C void NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshal_com(const NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46& unmarshaled, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshaled_com& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
+	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_declaration' of type 'NamespaceResolver': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____declarationException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshal_com_back(const NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshaled_com& marshaled, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s': Reference type field marshaling is not supported.", NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_____declaration_FieldInfo_var, NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_0_0_0_var);
+	Exception_t* ____declarationException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '_declaration' of type 'NamespaceResolver': Reference type field marshaling is not supported.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(____declarationException, NULL);
 }
 IL2CPP_EXTERN_C void NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshal_com_cleanup(NamespaceResolver_tD689E47F9BD1966D743E2401E5C7D387FC5A4E46_marshaled_com& marshaled)
@@ -10171,11 +10125,12 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR XNamespace_t86B6F8515F5E20D387B83EBDE0890C455
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XNamespace_t86B6F8515F5E20D387B83EBDE0890C4559A4012C_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	{
-		String_t* L_0 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_0 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		XNamespace_t86B6F8515F5E20D387B83EBDE0890C4559A4012C* L_1;
 		L_1 = XNamespace_EnsureNamespace_mFBE191305CF760E4F2FC15B3E3DA1BFAD147A55C((&((XNamespace_t86B6F8515F5E20D387B83EBDE0890C4559A4012C_StaticFields*)il2cpp_codegen_static_fields_for(XNamespace_t86B6F8515F5E20D387B83EBDE0890C4559A4012C_il2cpp_TypeInfo_var))->___s_refNone), L_0, NULL);
 		return L_1;
@@ -10885,6 +10840,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* XObject_get_BaseUri_mC14446B876AC5E
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&XObject_Annotation_TisBaseUriAnnotation_t3E8EF7050D4B9D097C974B45CF5AB93DDC04A350_m0203F2C37609F14D96CB64AB04D130AA07372B7A_RuntimeMethod_var);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -10959,7 +10915,7 @@ IL_002a:
 
 IL_0033:
 	{
-		String_t* L_13 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_13 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		return L_13;
 	}
 }
@@ -11144,6 +11100,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* XObject_AnnotationForSealedTyp
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918* V_0 = NULL;
@@ -11171,7 +11128,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* XObject_AnnotationForSealedTyp
 		Type_t* L_4;
 		L_4 = Object_GetType_mE10A8FC1E57F3DF29972CCBC026C2DC3942263B3(L_3, NULL);
 		Type_t* L_5 = ___0_type;
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		bool L_6;
 		L_6 = Type_op_Equality_m99930A0E44E420A685FABA60E60BA1CC5FA0EBDC(L_4, L_5, NULL);
 		if (!L_6)
@@ -11210,7 +11167,7 @@ IL_0035:
 		Type_t* L_14;
 		L_14 = Object_GetType_mE10A8FC1E57F3DF29972CCBC026C2DC3942263B3(L_13, NULL);
 		Type_t* L_15 = ___0_type;
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		bool L_16;
 		L_16 = Type_op_Equality_m99930A0E44E420A685FABA60E60BA1CC5FA0EBDC(L_14, L_15, NULL);
 		if (!L_16)
@@ -11647,6 +11604,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t XObject_GetSaveOptionsFromAnnotations
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&SaveOptions_t9AB03C2B1CF04E8EFD8DE36C647D84C22095F332_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&SaveOptions_t9AB03C2B1CF04E8EFD8DE36C647D84C22095F332_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	XObject_t1E867FBE626AA0DC878BDDFC1ABCF19F1A4B5C29* V_0 = NULL;
@@ -11698,7 +11656,7 @@ IL_001b:
 	{
 		XObject_t1E867FBE626AA0DC878BDDFC1ABCF19F1A4B5C29* L_6 = V_0;
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_7 = { reinterpret_cast<intptr_t> (SaveOptions_t9AB03C2B1CF04E8EFD8DE36C647D84C22095F332_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_8;
 		L_8 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_7, NULL);
 		NullCheck(L_6);
@@ -11713,7 +11671,7 @@ IL_001b:
 	}
 	{
 		RuntimeObject* L_11 = V_1;
-		return ((*(int32_t*)UnBox(L_11, SaveOptions_t9AB03C2B1CF04E8EFD8DE36C647D84C22095F332_il2cpp_TypeInfo_var)));
+		return ((*(int32_t*)((int32_t*)(int32_t*)UnBox(L_11, SaveOptions_t9AB03C2B1CF04E8EFD8DE36C647D84C22095F332_il2cpp_TypeInfo_var))));
 	}
 
 IL_0036:

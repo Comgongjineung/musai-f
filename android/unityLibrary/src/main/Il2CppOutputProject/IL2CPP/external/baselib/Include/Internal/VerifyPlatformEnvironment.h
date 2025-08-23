@@ -11,24 +11,8 @@
     #error "BaselibPlatformSpecificEnvironment is expected to define IMPORTED_SYMBOL."
 #endif
 
-#ifndef PLATFORM_HAS_NATIVE_FUTEX
-    #error "BaselibPlatformSpecificEnvironment is expected to define PLATFORM_HAS_NATIVE_FUTEX to 0 or 1."
-#endif
-
-#ifndef PLATFORM_HAS_NATIVE_LLSC
-    #error "BaselibPlatformSpecificEnvironment is expected to define PLATFORM_HAS_NATIVE_LLSC to 0 or 1."
-#endif
-
-#ifndef PLATFORM_HAS_POSIX_SOCKET_IPV6_SUPPORT
-    #error "BaselibPlatformSpecificEnvironment is expected to define PLATFORM_HAS_POSIX_SOCKET_IPV6_SUPPORT to 0 or 1."
-#endif
-
-#ifndef PLATFORM_PROPERTY_MEMORY_MALLOC_MIN_ALIGNMENT
-    #error "BaselibPlatformSpecificEnvironment is expected to define PLATFORM_PROPERTY_MEMORY_MALLOC_MIN_ALIGNMENT to a value platform specific value."
-#endif
-
-#ifndef PLATFORM_PROPERTY_CACHE_LINE_SIZE
-    #error "BaselibPlatformSpecificEnvironment is expected to define PLATFORM_PROPERTY_CACHE_LINE_SIZE to a value platform specific value."
+#ifndef PLATFORM_FUTEX_NATIVE_SUPPORT
+    #error "BaselibPlatformSpecificEnvironment is expected to define PLATFORM_FUTEX_NATIVE_SUPPORT to 0 or 1."
 #endif
 
 // define all other platforms to 0
@@ -88,8 +72,16 @@
     #define BASELIB_PLATFORM_VISIONOS 0
 #endif
 
+#ifndef BASELIB_PLATFORM_XBOXONE
+    #define BASELIB_PLATFORM_XBOXONE 0
+#endif
+
 #ifndef BASELIB_PLATFORM_SWITCH
     #define BASELIB_PLATFORM_SWITCH 0
+#endif
+
+#ifndef BASELIB_PLATFORM_STADIA
+    #define BASELIB_PLATFORM_STADIA 0
 #endif
 
 #ifndef BASELIB_PLATFORM_NETBSD
@@ -104,10 +96,6 @@
 
 #ifndef COMPILER_MSVC
     #define COMPILER_MSVC 0
-#endif
-
-#ifndef COMPILER_MSVC_EMULATED_BY_CLANG
-    #define COMPILER_MSVC_EMULATED_BY_CLANG 0
 #endif
 
 #ifndef COMPILER_GCC
@@ -135,7 +123,9 @@
     BASELIB_PLATFORM_IOS + \
     BASELIB_PLATFORM_TVOS + \
     BASELIB_PLATFORM_VISIONOS + \
+    BASELIB_PLATFORM_XBOXONE + \
     BASELIB_PLATFORM_SWITCH + \
+    BASELIB_PLATFORM_STADIA + \
     BASELIB_PLATFORM_NETBSD \
     > 1
     #error "Only a single BASELIB_PLATFORM_X is allowed to be set to 1"

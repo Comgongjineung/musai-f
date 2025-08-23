@@ -1,5 +1,7 @@
 #include "os/c-api/il2cpp-config-platforms.h"
 
+#if !RUNTIME_TINY
+
 #include "os/File.h"
 #include "os/c-api/File-c-api.h"
 #include "os/c-api/Allocator.h"
@@ -54,3 +56,5 @@ extern "C"
         return il2cpp::os::File::IsExecutable(filename).Get();
     }
 }
+
+#endif

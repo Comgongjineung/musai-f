@@ -29,16 +29,16 @@ BASELIB_INLINE_API void Baselib_ReentrantLock_CreateInplace(Baselib_ReentrantLoc
 }
 
 COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_ReentrantLock_TrySpinAcquire(Baselib_ReentrantLock* lock, const uint32_t maxSpinCount)
+BASELIB_INLINE_API bool Baselib_ReentrantLock_TryAcquire(Baselib_ReentrantLock* lock)
 {
     const Baselib_Thread_Id currentThreadId = Baselib_Thread_GetCurrentThreadId();
     const Baselib_Thread_Id lockOwner       = Baselib_atomic_load_ptr_relaxed(&lock->owner);
     if (OPTIMIZER_LIKELY(currentThreadId != lockOwner))
     {
-        if (!Baselib_Lock_TrySpinAcquire(&lock->lock, maxSpinCount))
+        if (!Baselib_Lock_TryAcquire(&lock->lock))
             return false;
-
-        Baselib_atomic_store_ptr_relaxed(&lock->owner, currentThreadId);
+        lock->owner = currentThreadId;
+        lock->count = 1;
         return true;
     }
     lock->count++;
@@ -52,7 +52,8 @@ BASELIB_INLINE_API void Baselib_ReentrantLock_Acquire(Baselib_ReentrantLock* loc
     if (OPTIMIZER_LIKELY(currentThreadId != lockOwner))
     {
         Baselib_Lock_Acquire(&lock->lock);
-        Baselib_atomic_store_ptr_relaxed(&lock->owner, currentThreadId);
+        lock->owner = currentThreadId;
+        lock->count = 1;
         return;
     }
     lock->count++;
@@ -67,7 +68,8 @@ BASELIB_INLINE_API bool Baselib_ReentrantLock_TryTimedAcquire(Baselib_ReentrantL
     {
         if (!Baselib_Lock_TryTimedAcquire(&lock->lock, timeoutInMilliseconds))
             return false;
-        Baselib_atomic_store_ptr_relaxed(&lock->owner, currentThreadId);
+        lock->owner = currentThreadId;
+        lock->count = 1;
         return true;
     }
     lock->count++;
@@ -76,18 +78,18 @@ BASELIB_INLINE_API bool Baselib_ReentrantLock_TryTimedAcquire(Baselib_ReentrantL
 
 BASELIB_INLINE_API void Baselib_ReentrantLock_Release(Baselib_ReentrantLock* lock)
 {
-    BaselibAssert(
-        Baselib_atomic_load_ptr_relaxed(&lock->owner) == Baselib_Thread_GetCurrentThreadId() ||
-        Baselib_atomic_load_ptr_relaxed(&lock->owner) == Baselib_Thread_InvalidId,
-        "A recursive lock can only be unlocked by the locking thread");
-
-    if (OPTIMIZER_LIKELY(lock->count == 0))
+    if (lock->count > 0)
     {
-        Baselib_atomic_store_ptr_relaxed(&lock->owner, Baselib_Thread_InvalidId);
-        Baselib_Lock_Release(&lock->lock);
-        return;
+        BaselibAssert(Baselib_atomic_load_ptr_relaxed(&lock->owner) == Baselib_Thread_GetCurrentThreadId(), "A recursive lock can only be unlocked by the locking thread");
+        if (OPTIMIZER_LIKELY(lock->count == 1))
+        {
+            lock->owner = Baselib_Thread_InvalidId;
+            lock->count = 0;
+            Baselib_Lock_Release(&lock->lock);
+            return;
+        }
+        lock->count--;
     }
-    lock->count--;
 }
 
 BASELIB_INLINE_API void Baselib_ReentrantLock_Free(Baselib_ReentrantLock* lock)
