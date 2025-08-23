@@ -23,7 +23,11 @@ union IntFloatUnion
     float f_val;
 };
 
+#if RUNTIME_TINY
+namespace tiny
+#else
 namespace il2cpp
+#endif
 {
 namespace icalls
 {

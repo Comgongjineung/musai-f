@@ -602,7 +602,7 @@ namespace vm
                 Type::GetNameInternal(
                     str,
                     &elementClass->byval_arg,
-                    format >= IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED ? IL2CPP_TYPE_NAME_FORMAT_FULL_NAME : format,
+                    format == IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED ? IL2CPP_TYPE_NAME_FORMAT_FULL_NAME : format,
                     false);
 
                 str += '[';
@@ -620,15 +620,9 @@ namespace vm
 
                 if (format == IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED)
                 {
-                    const Il2CppAssembly* ta = elementClass->image->assembly;
+                    const Il2CppAssembly *ta = elementClass->image->assembly;
                     str += ", " + vm::AssemblyName::AssemblyNameToString(ta->aname);
                 }
-                else if (format == IL2CPP_TYPE_NAME_FORMAT_REFLECTION_QUALIFIED)
-                {
-                    str += ", ";
-                    str.append(elementClass->image->nameNoExt);
-                }
-
 
                 break;
             }
@@ -639,7 +633,7 @@ namespace vm
                 Type::GetNameInternal(
                     str,
                     &elementClass->byval_arg,
-                    format >= IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED ? IL2CPP_TYPE_NAME_FORMAT_FULL_NAME : format,
+                    format == IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED ? IL2CPP_TYPE_NAME_FORMAT_FULL_NAME : format,
                     false);
 
                 str += "[]";
@@ -652,11 +646,6 @@ namespace vm
                     const Il2CppAssembly *ta = elementClass->image->assembly;
                     str += ", " + vm::AssemblyName::AssemblyNameToString(ta->aname);
                 }
-                else if (format == IL2CPP_TYPE_NAME_FORMAT_REFLECTION_QUALIFIED)
-                {
-                    str += ", ";
-                    str.append(elementClass->image->nameNoExt);
-                }
                 break;
             }
 
@@ -665,7 +654,7 @@ namespace vm
                 Type::GetNameInternal(
                     str,
                     type->data.type,
-                    format >= IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED ? IL2CPP_TYPE_NAME_FORMAT_FULL_NAME : format,
+                    format == IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED ? IL2CPP_TYPE_NAME_FORMAT_FULL_NAME : format,
                     false);
 
                 str += '*';
@@ -677,11 +666,6 @@ namespace vm
                 {
                     const Il2CppAssembly *ta = Class::FromIl2CppType(type->data.type)->image->assembly;
                     str += ", " + vm::AssemblyName::AssemblyNameToString(ta->aname);
-                }
-                else if (format == IL2CPP_TYPE_NAME_FORMAT_REFLECTION_QUALIFIED)
-                {
-                    str += ", ";
-                    str.append(Class::FromIl2CppType(type->data.type)->image->nameNoExt);
                 }
                 break;
             }
@@ -739,18 +723,18 @@ namespace vm
                         if (i)
                             str += ',';
 
-                        if ((format >= IL2CPP_TYPE_NAME_FORMAT_FULL_NAME) && (t->type != IL2CPP_TYPE_VAR) && (type->type != IL2CPP_TYPE_MVAR))
+                        if ((nested_format == IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED) && (t->type != IL2CPP_TYPE_VAR) && (type->type != IL2CPP_TYPE_MVAR))
                             str += '[';
 
                         Type::GetNameInternal(str, inst->type_argv[i], nested_format, false);
 
-                        if ((format >= IL2CPP_TYPE_NAME_FORMAT_FULL_NAME) && (t->type != IL2CPP_TYPE_VAR) && (type->type != IL2CPP_TYPE_MVAR))
+                        if ((nested_format == IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED) && (t->type != IL2CPP_TYPE_VAR) && (type->type != IL2CPP_TYPE_MVAR))
                             str += ']';
                     }
 
                     str += (format == IL2CPP_TYPE_NAME_FORMAT_IL ? '>' : ']');
                 }
-                else if (Class::IsGeneric(klass) && format < IL2CPP_TYPE_NAME_FORMAT_FULL_NAME)
+                else if (Class::IsGeneric(klass) && (format != IL2CPP_TYPE_NAME_FORMAT_FULL_NAME) && (format != IL2CPP_TYPE_NAME_FORMAT_ASSEMBLY_QUALIFIED))
                 {
                     Il2CppMetadataGenericContainerHandle containerHandle = Class::GetGenericContainer(klass);
 
@@ -778,12 +762,6 @@ namespace vm
                     const Il2CppAssembly *ta = klass->image->assembly;
                     str += ", " + vm::AssemblyName::AssemblyNameToString(ta->aname);
                 }
-                else if (format == IL2CPP_TYPE_NAME_FORMAT_REFLECTION_QUALIFIED)
-                {
-                    str += ", ";
-                    str.append(klass->image->nameNoExt);
-                }
-
                 break;
             }
         }
@@ -1161,6 +1139,9 @@ namespace vm
 
     bool Type::IsReference(const Il2CppType* type)
     {
+        if (!type)
+            return false;
+
         if (type->type == IL2CPP_TYPE_STRING ||
             type->type == IL2CPP_TYPE_SZARRAY ||
             type->type == IL2CPP_TYPE_CLASS ||
@@ -1193,6 +1174,12 @@ namespace vm
         return false;
     }
 
+    bool Type::GenericInstIsValuetype(const Il2CppType* type)
+    {
+        IL2CPP_ASSERT(IsGenericInstance(type));
+        return GenericClass::IsValueType(type->data.generic_class);
+    }
+
     bool Type::HasVariableRuntimeSizeWhenFullyShared(const Il2CppType* type)
     {
         // This needs to align with TypeRuntimeStoage::RuntimeFieldLayout
@@ -1205,19 +1192,19 @@ namespace vm
         if (IsGenericParameter(type))
             return MetadataCache::IsReferenceTypeGenericParameter(MetadataCache::GetGenericParameterFromType(type)) != GenericParameterRestrictionReferenceType;
 
+        // If we're not a generic instance then we'll be a concrete type
+        if (!IsGenericInstance(type))
+            return false;
+
         // If a reference type or pointer then we aren't variable sized
-        if (!IsValueType(type))
+        if (!GenericInstIsValuetype(type))
             return false;
 
         Il2CppClass* klass = Class::FromIl2CppType(type);
-
-        // If we're not a generic instance or generic type definition then we'll be a concrete type
-        if (!vm::Class::IsInflated(klass) && !vm::Class::IsGeneric(klass))
-            return false;
-
+        Il2CppClass* typeDef = GenericClass::GetTypeDefinition(klass->generic_class);
         FieldInfo* field;
         void* iter = NULL;
-        while ((field = Class::GetFields(klass, &iter)))
+        while ((field = Class::GetFields(typeDef, &iter)))
         {
             if (Field::IsInstance(field) && HasVariableRuntimeSizeWhenFullyShared(Field::GetType(field)))
                 return true;
@@ -1238,6 +1225,11 @@ namespace vm
 
         Il2CppClass* klass = GetClass(type);
         return klass->enumtype;
+    }
+
+    bool Type::IsValueType(const Il2CppType *type)
+    {
+        return type->valuetype;
     }
 
     bool Type::IsPointerType(const Il2CppType *type)
@@ -1307,17 +1299,25 @@ namespace vm
 */
     void Type::ConstructClosedDelegate(Il2CppDelegate* delegate, Il2CppObject* target, Il2CppMethodPointer addr, const MethodInfo* method)
     {
+#if IL2CPP_TINY
+        IL2CPP_ASSERT(0 && "Type::ConstructClosedDelegate should not be called with the Tiny profile.");
+#else
         InvokeDelegateConstructor(delegate, target, method);
         SetClosedDelegateInvokeMethod(delegate, target, addr);
+#endif
     }
 
     void Type::SetClosedDelegateInvokeMethod(Il2CppDelegate* delegate, Il2CppObject* target, Il2CppMethodPointer addr)
     {
+#if IL2CPP_TINY
+        IL2CPP_ASSERT(0 && "Type::SetClosedDelegateInvokeMethod should not be called with the Tiny profile.");
+#else
         // For a closed delegate we set our invoke_impl to the method we want to invoke and the "this" we'll pass to the invoke_impl to the target
         // This reduces the cost of a closed delegate call to normal virtual call
         delegate->method_ptr = addr;
         delegate->invoke_impl = addr;
         delegate->invoke_impl_this = target;
+#endif
     }
 
 /**
@@ -1330,6 +1330,9 @@ namespace vm
 */
     void Type::ConstructDelegate(Il2CppDelegate* delegate, Il2CppObject* target, const MethodInfo* method)
     {
+#if IL2CPP_TINY
+        IL2CPP_ASSERT(0 && "Type::ConstructDelegate should not be called with the Tiny profile.");
+#else
         IL2CPP_ASSERT(delegate);
 
         if (method)
@@ -1347,6 +1350,7 @@ namespace vm
         // that the ctor will choose, so override it with the direct method
         if (target == NULL && method != NULL && Class::IsValuetype(method->klass))
             delegate->method_ptr = method->methodPointer;
+#endif
     }
 
     Il2CppString* Type::AppendAssemblyNameIfNecessary(Il2CppString* typeName, const MethodInfo* callingMethod)

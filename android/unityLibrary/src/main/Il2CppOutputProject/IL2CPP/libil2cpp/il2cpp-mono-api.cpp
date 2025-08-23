@@ -435,7 +435,7 @@ int32_t mono_type_is_struct(MonoType *type)
 
 int32_t mono_type_is_reference(MonoType *type)
 {
-    return type && il2cpp::vm::Type::IsReference((Il2CppType*)type);
+    return il2cpp::vm::Type::IsReference((Il2CppType*)type);
 }
 
 int32_t mono_type_generic_inst_is_valuetype(MonoType *monoType)
@@ -1196,17 +1196,17 @@ void* mono_gchandle_new_weakref_internal(MonoObject *obj, int32_t track_resurrec
 {
     auto weakRef = il2cpp::gc::GCHandle::NewWeakref((Il2CppObject*)obj, track_resurrection == 0 ? false : true);
     il2cpp::vm::Exception::RaiseIfError(weakRef.GetError());
-    return (void*)weakRef.Get();
+    return (void*)(uintptr_t)weakRef.Get();
 }
 
 MonoObject* mono_gchandle_get_target_internal(void* gchandle)
 {
-    return (MonoObject*)il2cpp::gc::GCHandle::GetTarget((Il2CppGCHandle)gchandle);
+    return (MonoObject*)il2cpp::gc::GCHandle::GetTarget((uint32_t)(uintptr_t)gchandle);
 }
 
 void mono_gchandle_free_internal(void* gchandle)
 {
-    il2cpp::gc::GCHandle::Free((Il2CppGCHandle)gchandle);
+    il2cpp::gc::GCHandle::Free((uint32_t)(uintptr_t)gchandle);
 }
 
 MonoThread* mono_thread_current()

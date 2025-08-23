@@ -33,13 +33,8 @@ namespace os
     // It is thread local for thread safety
     static ThreadLocalValue s_IsCleaningUpThreads;
 
-    struct ThreadContext
-    {
-        baselib::ReentrantLock m_AliveThreadsMutex;
-        il2cpp::utils::dynamic_array<Thread*> m_AliveThreads;
-    };
-
-    ThreadContext* s_ThreadContext = nullptr;
+    static baselib::ReentrantLock s_AliveThreadsMutex;
+    static il2cpp::utils::dynamic_array<Thread*> s_AliveThreads;
 
     int64_t Thread::s_DefaultAffinityMask = kThreadAffinityAll;
 
@@ -62,8 +57,8 @@ namespace os
         , m_CleanupFunc(NULL)
         , m_CleanupFuncArg(NULL)
     {
-        FastAutoLock lock(&s_ThreadContext->m_AliveThreadsMutex);
-        s_ThreadContext->m_AliveThreads.push_back(this);
+        FastAutoLock lock(&s_AliveThreadsMutex);
+        s_AliveThreads.push_back(this);
     }
 
     Thread::Thread(ThreadImpl* thread)
@@ -73,8 +68,8 @@ namespace os
         , m_CleanupFunc(NULL)
         , m_CleanupFuncArg(NULL)
     {
-        FastAutoLock lock(&s_ThreadContext->m_AliveThreadsMutex);
-        s_ThreadContext->m_AliveThreads.push_back(this);
+        FastAutoLock lock(&s_AliveThreadsMutex);
+        s_AliveThreads.push_back(this);
     }
 
     Thread::~Thread()
@@ -83,13 +78,13 @@ namespace os
 
         if (!GetIsCleaningUpThreads())
         {
-            FastAutoLock lock(&s_ThreadContext->m_AliveThreadsMutex);
-            size_t count = s_ThreadContext->m_AliveThreads.size();
+            FastAutoLock lock(&s_AliveThreadsMutex);
+            size_t count = s_AliveThreads.size();
             for (size_t i = 0; i < count; i++)
             {
-                if (s_ThreadContext->m_AliveThreads[i] == this)
+                if (s_AliveThreads[i] == this)
                 {
-                    s_ThreadContext->m_AliveThreads.erase_swap_back(&s_ThreadContext->m_AliveThreads[i]);
+                    s_AliveThreads.erase_swap_back(&s_AliveThreads[i]);
                     break;
                 }
             }
@@ -98,10 +93,6 @@ namespace os
 
     void Thread::Init()
     {
-        il2cpp::os::ThreadImpl::AllocateStaticData();
-
-        s_ThreadContext = new ThreadContext();
-
         Thread* thread = GetOrCreateCurrentThread();
         if (thread->GetApartment() == kApartmentStateUnknown)
             thread->SetApartment(kApartmentStateInMTA);
@@ -114,39 +105,33 @@ namespace os
 
         SetIsCleaningUpThreads(true);
 
+        FastAutoLock lock(&s_AliveThreadsMutex);
+        size_t count = s_AliveThreads.size();
+        for (size_t i = 0; i < count; i++)
         {
-            FastAutoLock lock(&s_ThreadContext->m_AliveThreadsMutex);
-            size_t count = s_ThreadContext->m_AliveThreads.size();
-            for (size_t i = 0; i < count; i++)
+            // If this is not the current thread, wait a bit for it to exit. This will avoid an
+            // infinite wait on shutdown, but it should give the thread enough time to complete its
+            // use of the os::Thread object before we delete it. Note that we don't call Join here,
+            // as we want to explicitly do a non-interruptable wait because we are pretty late in
+            // the shutdown process. The VM thread code should have already caused any running
+            // threads to get a thread abort exception, meaning that any running OS threads will
+            // be exiting soon, with no need to check for APCs.
+            if (s_AliveThreads[i] != currentThread)
             {
-                // If this is not the current thread, wait a bit for it to exit. This will avoid an
-                // infinite wait on shutdown, but it should give the thread enough time to complete its
-                // use of the os::Thread object before we delete it. Note that we don't call Join here,
-                // as we want to explicitly do a non-interruptable wait because we are pretty late in
-                // the shutdown process. The VM thread code should have already caused any running
-                // threads to get a thread abort exception, meaning that any running OS threads will
-                // be exiting soon, with no need to check for APCs.
-                if (s_ThreadContext->m_AliveThreads[i] != currentThread)
-                {
-                    s_ThreadContext->m_AliveThreads[i]->m_ThreadExitedEvent.Wait(10, false);
-                    delete s_ThreadContext->m_AliveThreads[i];
-                }
+                s_AliveThreads[i]->m_ThreadExitedEvent.Wait(10, false);
+                delete s_AliveThreads[i];
             }
-
-            // Wait to delete the current thread last, as waiting on an event may need to access the current thread
-            delete currentThread;
-
-            s_ThreadContext->m_AliveThreads.clear();
         }
+
+        // Wait to delete the current thread last, as waiting on an event may need to access the current thread
+        delete currentThread;
+
+        s_AliveThreads.clear();
 
         SetIsCleaningUpThreads(false);
 #if IL2CPP_ENABLE_RELOAD
         s_CurrentThread.SetValue(NULL);
 #endif
-        delete s_ThreadContext;
-        s_ThreadContext = nullptr;
-
-        il2cpp::os::ThreadImpl::FreeStaticData();
     }
 
     Thread::ThreadId Thread::Id()

@@ -12,3 +12,14 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# ---- Unity / IL2CPP large build artifacts (do not commit) ----
+unityLibrary/build/
+unityLibrary/symbols/
+unityLibrary/**/libil2cpp*.so
+unityLibrary/**/libs/*.so
+unityLibrary/**/il2cpp*.so
+unityLibrary/**/il2cpp*.dbg.so
+# Unity export packages
+unityLibrary/*.apk
+unityLibrary/*.aab

@@ -86,7 +86,6 @@ typedef struct Il2CppMetadataMethodInfo
     uint16_t iflags;
     uint16_t slot;
     uint16_t parameterCount;
-    bool isUnmangedCallersOnly;
 } Il2CppMetadataMethodInfo;
 
 typedef struct Il2CppMetadataParameterInfo

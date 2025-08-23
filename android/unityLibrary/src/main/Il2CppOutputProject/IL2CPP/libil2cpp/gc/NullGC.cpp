@@ -29,11 +29,6 @@ il2cpp::gc::GarbageCollector::MakeDescriptorForObject(size_t *bitmap, int numbit
     return NULL;
 }
 
-void* il2cpp::gc::GarbageCollector::MakeEmptyDescriptor()
-{
-    return NULL;
-}
-
 void* il2cpp::gc::GarbageCollector::MakeDescriptorForString()
 {
     return NULL;

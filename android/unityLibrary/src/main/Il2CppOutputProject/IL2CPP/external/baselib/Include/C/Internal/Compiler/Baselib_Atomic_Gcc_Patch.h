@@ -1,6 +1,6 @@
 #pragma once
 
-#if PLATFORM_REQUIRES_GCC_ATOMIC_CMPXCHG128_PATCH
+#if PLATFORM_USE_GCC_ATOMIC_CMPXCHG128_PATCH
 
 // Patch for GCC (version 7.0 and later). 128-bit__atomic_compare_exchange intrinsic producing code calling libatomic
 // __atomic_compare_exchange_16. Libatomic is not used by baselib due to known performance issues and we instead use inline assembly.

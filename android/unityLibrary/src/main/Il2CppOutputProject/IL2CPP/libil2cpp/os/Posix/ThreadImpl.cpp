@@ -1,6 +1,6 @@
 #include "il2cpp-config.h"
 
-#if !IL2CPP_THREADS_STD && IL2CPP_THREADS_PTHREAD
+#if !IL2CPP_THREADS_STD && IL2CPP_THREADS_PTHREAD && !RUNTIME_TINY
 
 #include <limits>
 #include <unistd.h>
@@ -21,21 +21,15 @@ namespace il2cpp
 {
 namespace os
 {
+/// An Event that we never signal. This is used for sleeping threads in an alertable state. They
+/// simply wait on this object with the sleep timer as the timeout. This way we don't need a separate
+/// codepath for implementing sleep logic.
+    static Event s_ThreadSleepObject;
+
+
 #define ASSERT_CALLED_ON_CURRENT_THREAD \
     IL2CPP_ASSERT(pthread_equal (pthread_self (), m_Handle) && "Must be called on current thread!");
 
-    static Event* s_ThreadSleepObject = nullptr;
-
-    void ThreadImpl::AllocateStaticData()
-    {
-        s_ThreadSleepObject = new Event();
-    }
-
-    void ThreadImpl::FreeStaticData()
-    {
-        delete s_ThreadSleepObject;
-        s_ThreadSleepObject = nullptr;
-    }
 
     ThreadImpl::ThreadImpl()
         : m_Handle(0)
@@ -252,11 +246,7 @@ namespace os
 
     void ThreadImpl::Sleep(uint32_t milliseconds, bool interruptible)
     {
-        /// An Event that we never signal. This is used for sleeping threads in an alertable state. They
-        /// simply wait on this object with the sleep timer as the timeout. This way we don't need a separate
-        /// codepath for implementing sleep logic.
-
-        s_ThreadSleepObject->Wait(milliseconds, interruptible);
+        s_ThreadSleepObject.Wait(milliseconds, interruptible);
     }
 
     uint64_t ThreadImpl::CurrentThreadId()

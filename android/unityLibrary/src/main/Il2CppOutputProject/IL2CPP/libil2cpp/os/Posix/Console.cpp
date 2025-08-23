@@ -22,6 +22,7 @@ namespace os
 {
 namespace Console
 {
+#if !RUNTIME_TINY
     static bool setupComplete = false;
     static int32_t s_terminalSize;
     static struct termios s_initialAttr;
@@ -330,6 +331,8 @@ namespace Console
 
         return true;
     }
+
+#endif
 
     const char* NewLine()
     {

@@ -1,5 +1,10 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
 
@@ -3039,6 +3044,14 @@ struct Task_1_t65DD22766038CC419979FC66D2CFEF60381EE84B_StaticFields
 struct Task_1_t1253923251256D5BDFC2FDA8EFF422DBBAB7C239_StaticFields
 {
 	TaskFactory_1_t1FC6F041AB46A11726B4503E01C3D2C937910EC2* ___s_defaultFactory;
+};
+struct SynchronizationContext_tCDB842BBE53B050802CBBB59C6E6DC45B5B06DC0_StaticFields
+{
+	Type_t* ___s_cachedPreparedType1;
+	Type_t* ___s_cachedPreparedType2;
+	Type_t* ___s_cachedPreparedType3;
+	Type_t* ___s_cachedPreparedType4;
+	Type_t* ___s_cachedPreparedType5;
 };
 struct Task_1_tEFEAE70575CF6F04BF8FB37590483461AC941964_StaticFields
 {

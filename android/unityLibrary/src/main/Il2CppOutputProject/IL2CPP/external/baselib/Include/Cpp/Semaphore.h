@@ -54,29 +54,19 @@ namespace baselib
             // Wait for semaphore token to become available
             //
             // This function is guaranteed to emit an acquire barrier.
-            //
-            // \param maxSpinCount  Max number of times to spin in user space before falling back to the kernel. The actual number
-            //                      may differ depending on the underlying implementation but will never exceed the maxSpinCount
-            //                      value.
-            inline void Acquire(const uint32_t maxSpinCount = 0)
+            inline void Acquire()
             {
-                if (maxSpinCount && Baselib_Semaphore_TrySpinAcquire(&m_SemaphoreData, maxSpinCount))
-                    return;
-
                 return Baselib_Semaphore_Acquire(&m_SemaphoreData);
             }
 
-            // Try to consume a token.
+            // Try to consume a token and return immediately.
             //
             // When successful this function is guaranteed to emit an acquire barrier.
             //
-            // \param maxSpinCount  Max number of times to spin in user space before falling back to the kernel. The actual number
-            //                      may differ depending on the underlying implementation but will never exceed the maxSpinCount
-            //                      value.
-            // \returns             true if token was consumed. false if not.
-            inline bool TryAcquire(const uint32_t maxSpinCount = 0)
+            // Return:          true if token was consumed. false if not.
+            inline bool TryAcquire()
             {
-                return Baselib_Semaphore_TrySpinAcquire(&m_SemaphoreData, maxSpinCount);
+                return Baselib_Semaphore_TryAcquire(&m_SemaphoreData);
             }
 
             // Wait for semaphore token to become available
@@ -89,16 +79,12 @@ namespace baselib
             // Timeout passed to this function may be subject to system clock resolution.
             // If the system clock has a resolution of e.g. 16ms that means this function may exit with a timeout error 16ms earlier than originally scheduled.
             //
-            // \param timeout       Time to wait for token to become available.
-            // \param maxSpinCount  Max number of times to spin in user space before falling back to the kernel. The actual number
-            //                      may differ depending on the underlying implementation but will never exceed the maxSpinCount
-            //                      value.
-            // \returns             true if token was consumed. false if timeout was reached.
-            inline bool TryTimedAcquire(const timeout_ms timeoutInMilliseconds, const uint32_t maxSpinCount = 0)
+            // Arguments:
+            // - timeout:       Time to wait for token to become available.
+            //
+            // Return:          true if token was consumed. false if timeout was reached.
+            inline bool TryTimedAcquire(const timeout_ms timeoutInMilliseconds)
             {
-                if (maxSpinCount && Baselib_Semaphore_TrySpinAcquire(&m_SemaphoreData, maxSpinCount))
-                    return true;
-
                 return Baselib_Semaphore_TryTimedAcquire(&m_SemaphoreData, timeoutInMilliseconds.count());
             }
 
@@ -108,7 +94,7 @@ namespace baselib
             //
             // Increase the number of available tokens on the semaphore by `count`. Any waiting threads will be notified there are new tokens available.
             // If count reach `Baselib_Semaphore_MaxGuaranteedCount` this function may silently discard any overflow.
-            inline void Release(uint16_t count = 1)
+            inline void Release(uint16_t count)
             {
                 return Baselib_Semaphore_Release(&m_SemaphoreData, count);
             }

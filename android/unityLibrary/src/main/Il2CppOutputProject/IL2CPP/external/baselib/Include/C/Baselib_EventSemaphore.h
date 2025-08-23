@@ -13,7 +13,7 @@
 // https://en.wikipedia.org/w/index.php?title=Event_(synchronization_primitive)&oldid=781517732
 
 
-#if PLATFORM_HAS_NATIVE_FUTEX
+#if PLATFORM_FUTEX_NATIVE_SUPPORT
     #include "Internal/Baselib_EventSemaphore_FutexBased.inl.h"
 #else
     #include "Internal/Baselib_EventSemaphore_SemaphoreBased.inl.h"
@@ -37,27 +37,13 @@ BASELIB_INLINE_API Baselib_EventSemaphore Baselib_EventSemaphore_Create(void);
 // For optimal performance, the Baselib_EventSemaphore should be stored at a cache aligned memory location.
 BASELIB_INLINE_API void Baselib_EventSemaphore_CreateInplace(Baselib_EventSemaphore* semaphoreData);
 
-// Try to acquire semaphore and return immediately.
-//
-// When semaphore is acquired this function is guaranteed to emit an acquire barrier.
-//
-// \returns true if event is set, false other wise.
-COMPILER_WARN_UNUSED_RESULT
-BASELIB_FORCEINLINE_API bool Baselib_EventSemaphore_TryAcquire(Baselib_EventSemaphore* semaphore)
-{
-    return Baselib_EventSemaphore_TrySpinAcquire(semaphore, 0);
-}
-
 // Try to acquire semaphore.
 //
 // When semaphore is acquired this function is guaranteed to emit an acquire barrier.
 //
-// \param maxSpinCount  Max number of times to spin in user space before falling back to the kernel. The actual number
-//                      may differ depending on the underlying implementation but will never exceed the maxSpinCount
-//                      value.
 // \returns true if event is set, false other wise.
 COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_EventSemaphore_TrySpinAcquire(Baselib_EventSemaphore* semaphore, uint32_t maxSpinCount);
+BASELIB_INLINE_API bool Baselib_EventSemaphore_TryAcquire(Baselib_EventSemaphore* semaphore);
 
 // Acquire semaphore.
 //
@@ -78,7 +64,7 @@ BASELIB_INLINE_API void Baselib_EventSemaphore_Acquire(Baselib_EventSemaphore* s
 //
 // \returns     true if semaphore was acquired.
 COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_EventSemaphore_TryTimedAcquire(Baselib_EventSemaphore* semaphore, uint32_t timeoutInMilliseconds);
+BASELIB_INLINE_API bool Baselib_EventSemaphore_TryTimedAcquire(Baselib_EventSemaphore* semaphore, const uint32_t timeoutInMilliseconds);
 
 // Sets the event
 //

@@ -40,24 +40,7 @@ BASELIB_INLINE_API void Baselib_ReentrantLock_CreateInplace(Baselib_ReentrantLoc
 //
 // \returns         true if lock was acquired.
 COMPILER_WARN_UNUSED_RESULT
-BASELIB_FORCEINLINE_API bool Baselib_ReentrantLock_TryAcquire(Baselib_ReentrantLock* lock)
-{
-    return Baselib_ReentrantLock_TrySpinAcquire(lock, 0);
-}
-
-// Try to acquire lock.
-//
-// If lock is already acquired by the current thread this function increase the lock count so that an equal number of calls to Baselib_ReentrantLock_Release needs
-// to be made before the lock is released.
-//
-// When lock is acquired this function is guaranteed to emit an acquire barrier.
-//
-// \param maxSpinCount  Max number of times to spin in user space before falling back to the kernel. The actual number
-//                      may differ depending on the underlying implementation but will never exceed the maxSpinCount
-//                      value.
-// \returns         true if lock was acquired.
-COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_ReentrantLock_TrySpinAcquire(Baselib_ReentrantLock* lock, uint32_t maxSpinCount);
+BASELIB_INLINE_API bool Baselib_ReentrantLock_TryAcquire(Baselib_ReentrantLock* lock);
 
 // Acquire lock.
 //

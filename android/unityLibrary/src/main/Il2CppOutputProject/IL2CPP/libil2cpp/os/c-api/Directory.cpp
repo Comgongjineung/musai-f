@@ -1,5 +1,7 @@
 #include "os/c-api/il2cpp-config-platforms.h"
 
+#if !RUNTIME_TINY
+
 #include "os/Directory.h"
 #include "os/c-api/Directory-c-api.h"
 #include "Allocator.h"
@@ -50,3 +52,5 @@ extern "C"
         return retVal;
     }
 }
+
+#endif

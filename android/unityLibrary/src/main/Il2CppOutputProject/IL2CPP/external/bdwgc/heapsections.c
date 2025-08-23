@@ -53,7 +53,7 @@ void GC_foreach_heap_section(void* user_data, GC_heap_section_proc callback)
 					continue;
 				}
 #endif
-				callback(user_data, blockStart, blockEnd, GC_HEAP_SECTION_TYPE_FREE);
+				callback(user_data, blockStart, blockEnd);
 
 				blockStart = blockEnd;
 			}
@@ -65,12 +65,25 @@ void GC_foreach_heap_section(void* user_data, GC_heap_section_proc callback)
 				ptr_t usedBlocknEnd = blockStart + hhdr->hb_sz;
 
 				if (usedBlocknEnd > blockStart)
-					callback(user_data, blockStart, usedBlocknEnd, GC_HEAP_SECTION_TYPE_USED);
+					callback(user_data, blockStart, usedBlocknEnd);
 				if (blockEnd > usedBlocknEnd)
-					callback(user_data, usedBlocknEnd, blockEnd, GC_HEAP_SECTION_TYPE_PADDING);
+					callback(user_data, usedBlocknEnd, blockEnd);
 
 				blockStart = blockEnd;
 			}
 		}
 	}
+}
+
+void HeapSectionCountIncrementer(void* context, GC_PTR start, GC_PTR end)
+{
+	GC_word* countPtr = (GC_word*)context;
+	(*countPtr)++;
+}
+
+GC_word GC_get_heap_section_count()
+{
+	GC_word count = 0;
+	GC_foreach_heap_section(&count, HeapSectionCountIncrementer);
+	return count;
 }

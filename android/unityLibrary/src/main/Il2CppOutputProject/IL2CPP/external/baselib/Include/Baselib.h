@@ -1,8 +1,5 @@
 #pragma once
 
-// See comments inside header regarding the temporary existence of this header and the corresponding post-include.
-#include "Internal/BaselibDeprecatedDefinesPreInclude.h"
-
 #include "Internal/PlatformDetection.h"
 #include "Internal/ArchitectureDetection.h"
 #include "Internal/PlatformEnvironment.h"
@@ -42,5 +39,3 @@
 #include "Internal/BasicTypes.h"
 #include "Internal/CoreMacros.h"
 #include "Internal/Assert.h"
-
-#include "Internal/BaselibDeprecatedDefinesPostInclude.h"

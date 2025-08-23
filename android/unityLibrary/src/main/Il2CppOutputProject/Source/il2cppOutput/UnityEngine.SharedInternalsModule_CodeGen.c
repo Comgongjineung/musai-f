@@ -1,4 +1,9 @@
 ﻿#include "pch-c.h"
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
 #include "codegen/il2cpp-codegen-metadata.h"
@@ -19,14 +24,14 @@ extern void UnityString_Format_m98A0629641086A1BE20BBF7F4EADDE3FE3877D85 (void);
 extern void VisibleToOtherModulesAttribute__ctor_m2F00FAC0C9348472A15E93AD256145DCDD967E59 (void);
 extern void VisibleToOtherModulesAttribute__ctor_m2FC15A41D7218FFD29ECA4F70323F6DF8F19EC35 (void);
 extern void NativeConditionalAttribute_set_Condition_m96107E75DC095D9B4A9A7CCE0EB0C3EFAA2F0053 (void);
-extern void NativeConditionalAttribute_set_StubReturnStatement_mAA961429C06F0E4DC9149C26CC092ED29AF5331E (void);
 extern void NativeConditionalAttribute_set_Enabled_m379DA383CBBF2539C080D5DC0E8B97F4DB27DA64 (void);
 extern void NativeConditionalAttribute__ctor_mD9C6F4E343C06314DF5DCFDDE9B5495E78F711ED (void);
-extern void NativeConditionalAttribute__ctor_m5EC9368A4D06044907451D8C77B356E9ADBD241E (void);
 extern void NativeHeaderAttribute_set_Header_mC431D0143381F2B35B08E211C2D5DD011372ADAB (void);
 extern void NativeHeaderAttribute__ctor_mD0D73B93BC695BC42CBF7E7FC6FB044131C3D0BC (void);
 extern void NativeNameAttribute_set_Name_mA5639D9FDBEADE899CBE13AFA4FCFB61A95ADAE7 (void);
 extern void NativeNameAttribute__ctor_m9F46C053270D9DBCC9F9AB32C545A7696F0638D0 (void);
+extern void NativeWritableSelfAttribute_set_WritableSelf_mB4B342C1D1678307EB4CF174BEAF8D1E94CDF3E6 (void);
+extern void NativeWritableSelfAttribute__ctor_mF59616C59BA935E75ED688DCBAF1966036CD039B (void);
 extern void NativeMethodAttribute_set_Name_mE223393EB6EEA9E94A8A9CC093CB3CBBCB7C40B8 (void);
 extern void NativeMethodAttribute_set_IsThreadSafe_m443623C95A2E3552D0A791DC65E20ADFC447AE3F (void);
 extern void NativeMethodAttribute_set_IsFreeFunction_mCF665BA0A4CA25DA0EA8C3C5EDDB9A03315C9C4F (void);
@@ -49,7 +54,8 @@ extern void NativeTypeAttribute__ctor_mC1B7AC76546C88B8314DBDE006BF54739A8D2BCD 
 extern void NativeTypeAttribute__ctor_m42A2C59E33BA5B0DD88A44BA5C9A1C0FDDFBCF46 (void);
 extern void NativeTypeAttribute__ctor_m3E053B25317A9630A5D4D9C8730A776A3C8F0487 (void);
 extern void NativeTypeAttribute__ctor_mAAAA100D0F13ECBDEB655342889B7D82CF920A75 (void);
-extern void NotNullAttribute__ctor_mFFF7228A8C668381869056F3C8FD1A9CDC25D8FD (void);
+extern void NotNullAttribute_set_Exception_m04F458FD91F138C58DC3A11E7C8E945701ECA528 (void);
+extern void NotNullAttribute__ctor_m739C06B242B13C7519C17D0796F1A8FD18CDB7AA (void);
 extern void UnmarshalledAttribute__ctor_m77164A228BF4D50B6CF784E319456DD0A74D0E8A (void);
 extern void FreeFunctionAttribute__ctor_m0F9BA14FE9193D3CDE593EBF1EA06531F8400388 (void);
 extern void FreeFunctionAttribute__ctor_m379A417DDF33E9D2BB5227D05DD365584E15DDAC (void);
@@ -68,7 +74,6 @@ extern void UsedByNativeCodeAttribute__ctor_m7C07CF71798D5A94EB849622EA3883E5479
 extern void UsedByNativeCodeAttribute__ctor_m3C75236A1A2C7E364179A7DEDE9E53E7C3CE334D (void);
 extern void UsedByNativeCodeAttribute_set_Name_mF39ED6FE6040AF11CDCAE417EE6FE7DD6BD67E99 (void);
 extern void RequiredByNativeCodeAttribute__ctor_mBCF284DE0C8F84F211ACE616928BE47E29055920 (void);
-extern void RequiredByNativeCodeAttribute__ctor_m6FB8966FBCB6CC8B3989B0846EE7ED1DBFF60C87 (void);
 extern void RequiredByNativeCodeAttribute_set_Optional_m009CBA1D24E7F6EDAE1411CB6A7A01CB2A13B541 (void);
 extern void RequiredByNativeCodeAttribute_set_GenerateProxy_m63E4D29F468D0F254136F1596AEA106BD9EDC89B (void);
 static Il2CppMethodPointer s_methodPointers[64] = 
@@ -85,14 +90,14 @@ static Il2CppMethodPointer s_methodPointers[64] =
 	VisibleToOtherModulesAttribute__ctor_m2F00FAC0C9348472A15E93AD256145DCDD967E59,
 	VisibleToOtherModulesAttribute__ctor_m2FC15A41D7218FFD29ECA4F70323F6DF8F19EC35,
 	NativeConditionalAttribute_set_Condition_m96107E75DC095D9B4A9A7CCE0EB0C3EFAA2F0053,
-	NativeConditionalAttribute_set_StubReturnStatement_mAA961429C06F0E4DC9149C26CC092ED29AF5331E,
 	NativeConditionalAttribute_set_Enabled_m379DA383CBBF2539C080D5DC0E8B97F4DB27DA64,
 	NativeConditionalAttribute__ctor_mD9C6F4E343C06314DF5DCFDDE9B5495E78F711ED,
-	NativeConditionalAttribute__ctor_m5EC9368A4D06044907451D8C77B356E9ADBD241E,
 	NativeHeaderAttribute_set_Header_mC431D0143381F2B35B08E211C2D5DD011372ADAB,
 	NativeHeaderAttribute__ctor_mD0D73B93BC695BC42CBF7E7FC6FB044131C3D0BC,
 	NativeNameAttribute_set_Name_mA5639D9FDBEADE899CBE13AFA4FCFB61A95ADAE7,
 	NativeNameAttribute__ctor_m9F46C053270D9DBCC9F9AB32C545A7696F0638D0,
+	NativeWritableSelfAttribute_set_WritableSelf_mB4B342C1D1678307EB4CF174BEAF8D1E94CDF3E6,
+	NativeWritableSelfAttribute__ctor_mF59616C59BA935E75ED688DCBAF1966036CD039B,
 	NativeMethodAttribute_set_Name_mE223393EB6EEA9E94A8A9CC093CB3CBBCB7C40B8,
 	NativeMethodAttribute_set_IsThreadSafe_m443623C95A2E3552D0A791DC65E20ADFC447AE3F,
 	NativeMethodAttribute_set_IsFreeFunction_mCF665BA0A4CA25DA0EA8C3C5EDDB9A03315C9C4F,
@@ -115,7 +120,8 @@ static Il2CppMethodPointer s_methodPointers[64] =
 	NativeTypeAttribute__ctor_m42A2C59E33BA5B0DD88A44BA5C9A1C0FDDFBCF46,
 	NativeTypeAttribute__ctor_m3E053B25317A9630A5D4D9C8730A776A3C8F0487,
 	NativeTypeAttribute__ctor_mAAAA100D0F13ECBDEB655342889B7D82CF920A75,
-	NotNullAttribute__ctor_mFFF7228A8C668381869056F3C8FD1A9CDC25D8FD,
+	NotNullAttribute_set_Exception_m04F458FD91F138C58DC3A11E7C8E945701ECA528,
+	NotNullAttribute__ctor_m739C06B242B13C7519C17D0796F1A8FD18CDB7AA,
 	UnmarshalledAttribute__ctor_m77164A228BF4D50B6CF784E319456DD0A74D0E8A,
 	FreeFunctionAttribute__ctor_m0F9BA14FE9193D3CDE593EBF1EA06531F8400388,
 	FreeFunctionAttribute__ctor_m379A417DDF33E9D2BB5227D05DD365584E15DDAC,
@@ -134,76 +140,75 @@ static Il2CppMethodPointer s_methodPointers[64] =
 	UsedByNativeCodeAttribute__ctor_m3C75236A1A2C7E364179A7DEDE9E53E7C3CE334D,
 	UsedByNativeCodeAttribute_set_Name_mF39ED6FE6040AF11CDCAE417EE6FE7DD6BD67E99,
 	RequiredByNativeCodeAttribute__ctor_mBCF284DE0C8F84F211ACE616928BE47E29055920,
-	RequiredByNativeCodeAttribute__ctor_m6FB8966FBCB6CC8B3989B0846EE7ED1DBFF60C87,
 	RequiredByNativeCodeAttribute_set_Optional_m009CBA1D24E7F6EDAE1411CB6A7A01CB2A13B541,
 	RequiredByNativeCodeAttribute_set_GenerateProxy_m63E4D29F468D0F254136F1596AEA106BD9EDC89B,
 };
 static const int32_t s_InvokerIndices[64] = 
 {
-	5512,
-	14160,
-	14160,
-	14160,
-	10738,
-	10738,
-	10738,
-	5512,
-	19628,
-	14160,
-	10738,
-	10738,
-	10738,
-	10566,
-	10738,
-	5512,
-	10738,
-	10738,
-	10738,
-	10738,
-	10738,
-	10566,
-	10566,
-	10566,
-	10566,
-	14160,
-	10738,
-	5487,
-	2511,
-	10686,
-	14160,
-	10738,
-	2513,
-	1750,
-	14160,
-	10738,
-	10738,
-	10686,
-	14160,
-	10686,
-	10738,
-	5067,
-	14160,
-	14160,
-	14160,
-	10738,
-	5487,
-	14160,
-	10738,
-	10686,
-	10738,
-	5503,
-	10566,
-	14160,
-	10566,
-	14160,
-	14160,
-	14160,
-	10738,
-	10738,
-	14160,
-	10566,
-	10566,
-	10566,
+	3284,
+	7625,
+	7625,
+	7625,
+	5992,
+	5992,
+	5992,
+	3284,
+	9897,
+	7625,
+	5992,
+	5992,
+	5882,
+	5992,
+	5992,
+	5992,
+	5992,
+	5992,
+	5882,
+	7625,
+	5992,
+	5882,
+	5882,
+	5882,
+	5882,
+	7625,
+	5992,
+	3269,
+	1709,
+	5959,
+	7625,
+	5992,
+	1711,
+	1182,
+	7625,
+	5992,
+	5992,
+	5959,
+	7625,
+	5959,
+	5992,
+	3017,
+	5992,
+	5992,
+	7625,
+	7625,
+	5992,
+	3269,
+	7625,
+	5992,
+	5959,
+	5992,
+	3279,
+	5882,
+	7625,
+	5882,
+	7625,
+	7625,
+	7625,
+	5992,
+	5992,
+	7625,
+	5882,
+	5882,
 };
 IL2CPP_EXTERN_C const Il2CppCodeGenModule g_UnityEngine_SharedInternalsModule_CodeGenModule;
 const Il2CppCodeGenModule g_UnityEngine_SharedInternalsModule_CodeGenModule = 

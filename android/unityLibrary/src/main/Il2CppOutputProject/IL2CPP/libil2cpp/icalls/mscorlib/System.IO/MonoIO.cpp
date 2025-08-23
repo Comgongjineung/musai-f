@@ -60,9 +60,13 @@ namespace IO
         il2cpp::os::FileHandle** input = (il2cpp::os::FileHandle**)read_handle;
         il2cpp::os::FileHandle** output = (il2cpp::os::FileHandle**)write_handle;
 
+#if IL2CPP_TARGET_WINRT || IL2CPP_TARGET_XBOXONE
+        vm::Exception::Raise(vm::Exception::GetNotSupportedException("Pipes are not supported on WinRT based platforms."));
+#else
         auto result = il2cpp::os::File::CreatePipe(input, output, error);
         vm::Exception::RaiseIfError(result.GetError());
         return result.Get();
+#endif
     }
 
     bool MonoIO::DeleteFile(Il2CppChar* path, int32_t* error)
@@ -81,24 +85,8 @@ namespace IO
         return result.Get();
     }
 
-    struct SMonoIOContext
-    {
-        utils::dynamic_array<os::Directory::FindHandle*> m_OpenFindHandles;
-        baselib::ReentrantLock m_OpenFindHandlesMutex;
-    };
-
-    SMonoIOContext* s_MonoIOContext = nullptr;
-
-    void MonoIO::AllocateStaticData()
-    {
-        s_MonoIOContext = new SMonoIOContext();
-    }
-
-    void MonoIO::FreeStaticData()
-    {
-        delete s_MonoIOContext;
-        s_MonoIOContext = nullptr;
-    }
+    static utils::dynamic_array<os::Directory::FindHandle*> s_OpenFindHandles;
+    static baselib::ReentrantLock s_OpenFindHandlesMutex;
 
     static int32_t CloseFindHandle(os::Directory::FindHandle* findHandle)
     {
@@ -116,20 +104,20 @@ namespace IO
 
         // Manually managed the mutex here because we don't want to hold the lock during a call to
         // CloseOSFindHandleDirectly, as that call can be expensive.
-        s_MonoIOContext->m_OpenFindHandlesMutex.Acquire();
+        s_OpenFindHandlesMutex.Acquire();
 
-        auto knownFindHandle = std::find(s_MonoIOContext->m_OpenFindHandles.begin(), s_MonoIOContext->m_OpenFindHandles.end(), possibleFindHandle);
-        if (knownFindHandle == s_MonoIOContext->m_OpenFindHandles.end())
+        auto knownFindHandle = std::find(s_OpenFindHandles.begin(), s_OpenFindHandles.end(), possibleFindHandle);
+        if (knownFindHandle == s_OpenFindHandles.end())
         {
-            s_MonoIOContext->m_OpenFindHandlesMutex.Release();
+            s_OpenFindHandlesMutex.Release();
             // We did not find the handle in the list of ones the VM allocated - assume it is
             // a directly allocated OS handle.
             return os::Directory::CloseOSFindHandleDirectly(hnd);
         }
         else
         {
-            s_MonoIOContext->m_OpenFindHandles.erase(knownFindHandle);
-            s_MonoIOContext->m_OpenFindHandlesMutex.Release();
+            s_OpenFindHandles.erase(knownFindHandle);
+            s_OpenFindHandlesMutex.Release();
             return CloseFindHandle(possibleFindHandle);
         }
     }
@@ -348,8 +336,8 @@ namespace IO
 
         // Keep track of the handles we allocated, so we can tell later if this is an OS handle
         // or one we allocated.
-        os::FastAutoLock lock(&s_MonoIOContext->m_OpenFindHandlesMutex);
-        s_MonoIOContext->m_OpenFindHandles.push_back(findHandle);
+        os::FastAutoLock lock(&s_OpenFindHandlesMutex);
+        s_OpenFindHandles.push_back(findHandle);
 
         return reinterpret_cast<intptr_t>(findHandle);
     }

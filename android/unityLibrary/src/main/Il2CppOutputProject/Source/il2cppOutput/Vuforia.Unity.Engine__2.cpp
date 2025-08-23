@@ -1,7 +1,13 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
+#include <limits>
 
 
 struct VirtualActionInvoker0
@@ -226,6 +232,7 @@ struct Action_3_t97455905548E3D074144AB3D2CE675FDB45653BD;
 struct Action_3_tE6E38953567A47D52A1C6421A2C9E10423DFB6B1;
 struct Action_3_t2DDA476626C83E61B40D2231D251968B93E6DFF3;
 struct BlockingCollection_1_t4DCC1026BF9096DC145A24B46735A05429DCCC88;
+struct ConditionalWeakTable_2_t815A43BFBA64EC1F9F92AD042622E80EED65712E;
 struct Dictionary_2_tE5D4ECB1C28AD95EA44B000F8BD48F5CFBFFB85E;
 struct Dictionary_2_tE681BF49926A2D8C5145F5FB12691412A4D52C87;
 struct Dictionary_2_t0B3381E4FD59192C6F5E66EF3DEA1A86A6F5432B;
@@ -730,6 +737,7 @@ IL2CPP_EXTERN_C RuntimeClass* IVuRenderState_tA8027C7AC4DB8AFBCC04C57B6B432B010B
 IL2CPP_EXTERN_C RuntimeClass* IVuState_t45C1B55543EF01A58A0FA2A5DC02A58691CE9E29_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ImageTargetObserver_t37CA9AEAE11535DFD06CD5C9D7D2F356A5D20252_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* InitError_tC04517E3DB17E87FEB08460A1ADB5DEE0F6FDF12_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Lazy_1_t591DC30870074E8A02ABA62243C1B9521932D152_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Lazy_1_tB428453715E8B263356E1D76C3D1490D857494C0_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* List_1_t05915E9237850A58106982B7FE4BC5DA4E872E73_il2cpp_TypeInfo_var;
@@ -761,8 +769,10 @@ IL2CPP_EXTERN_C RuntimeClass* Quaternion_tDA59F214EF07D7700B26E40E562F267AF73069
 IL2CPP_EXTERN_C RuntimeClass* Queue_1_tDCDB1CEF747EF8D38C6708645EC5FD3799C168BA_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* SingleThreadTaskScheduler_t5B89753B7A24B9960ED0F4DC983F274197FEDA22_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* String_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* TaskCanceledException_tDF877A81B2CD292CC0FBC2332962A8C07DE2A08E_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Transform_tB27202C6F4E36D225EE28A13E4D662BF99785DB1_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Type_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CSetChildOfVuforiaAnchorU3Ed__28_t4ADE53A9FD8E68CC10873ACAD764E5700A7D4ECE_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CShowGuideViewAfterU3Ed__27_t4BC126C4BDC63833364F62AFF700CB18053180B0_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CU3Ec__DisplayClass10_0_tD4D5A74C0BB3868E63C9E7ADD52397E3455DDD52_il2cpp_TypeInfo_var;
@@ -3235,7 +3245,6 @@ struct BehaviourFromObserverDelegate_t981D2B8B68938732E343E2CA196DAE07DF48D926  
 };
 struct Camera_tA92CC927D7439999BC82DBEDC0AA45B470F9E184  : public Behaviour_t01970CFBBA658497AE30F311C447DB0440BAB7FA
 {
-	uint32_t ___m_NonSerializedVersion;
 };
 struct MeshCollider_tB525E4DDE383252364ED0BDD32CF2B53914EE455  : public Collider_t1CC3163924FCD6C4CC2E816373A929C1E3D55E76
 {
@@ -3904,11 +3913,6 @@ struct SingleThreadTaskScheduler_t5B89753B7A24B9960ED0F4DC983F274197FEDA22_Threa
 struct AsyncTaskMethodBuilder_t7A5128C134547B5918EB1AA24FE47ED4C1DF3F06_StaticFields
 {
 	Task_1_tE41CFF640EB7C045550D9D0D92BE67533B084C17* ___s_cachedCompleted;
-};
-struct Material_t18053F08F347D0DCA5E1140EC7EC4533DD8A14E3_StaticFields
-{
-	int32_t ___k_ColorId;
-	int32_t ___k_MainTexId;
 };
 struct Texture_t791CBB51219779964E0E8A2ED7C1AA5F92A4A700_StaticFields
 {
@@ -10487,6 +10491,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void CylinderTargetBehaviour_CreateFromSerial
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEngine_t1840136F87C8826E605686CEB7FDA35D257A8C0C_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral34B239E91F63A7E2E91326CAF12DC51530652ED2);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -10503,7 +10508,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void CylinderTargetBehaviour_CreateFromSerial
 		V_0 = L_2;
 		String_t* L_3;
 		L_3 = DataSetTrackableBehaviour_get_DataSetName_m1168861A5B55388D3100C51A139D71ACF70D7BEC(__this, NULL);
-		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		bool L_5;
 		L_5 = String_op_Inequality_m8C940F3CFC42866709D7CA931B3D77B4BE94BCB6(L_3, L_4, NULL);
 		if (!L_5)
@@ -13465,6 +13470,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ModelTargetBehaviour_CreateFromSerialize
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEngine_t1840136F87C8826E605686CEB7FDA35D257A8C0C_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral34B239E91F63A7E2E91326CAF12DC51530652ED2);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -13481,7 +13487,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void ModelTargetBehaviour_CreateFromSerialize
 		V_0 = L_2;
 		String_t* L_3;
 		L_3 = DataSetTrackableBehaviour_get_DataSetName_m1168861A5B55388D3100C51A139D71ACF70D7BEC(__this, NULL);
-		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		bool L_5;
 		L_5 = String_op_Inequality_m8C940F3CFC42866709D7CA931B3D77B4BE94BCB6(L_3, L_4, NULL);
 		if (!L_5)
@@ -14160,7 +14166,7 @@ IL_0090:
 		Texture2D_tE6505BC111DD8A424A9DBE8E05D7D09E11FFFCF4* L_29 = __this->___mGuideViewTexture;
 		NullCheck(L_29);
 		int32_t L_30;
-		L_30 = VirtualFuncInvoker0< int32_t >::Invoke(5, L_29);
+		L_30 = VirtualFuncInvoker0< int32_t >::Invoke(4, L_29);
 		if (!L_30)
 		{
 			goto IL_00b8;
@@ -14170,7 +14176,7 @@ IL_0090:
 		Texture2D_tE6505BC111DD8A424A9DBE8E05D7D09E11FFFCF4* L_31 = __this->___mGuideViewTexture;
 		NullCheck(L_31);
 		int32_t L_32;
-		L_32 = VirtualFuncInvoker0< int32_t >::Invoke(7, L_31);
+		L_32 = VirtualFuncInvoker0< int32_t >::Invoke(6, L_31);
 		if (L_32)
 		{
 			goto IL_00ba;
@@ -14589,7 +14595,7 @@ IL_000f:
 		Texture2D_tE6505BC111DD8A424A9DBE8E05D7D09E11FFFCF4* L_2 = ___0_texture;
 		NullCheck(L_2);
 		int32_t L_3;
-		L_3 = VirtualFuncInvoker0< int32_t >::Invoke(7, L_2);
+		L_3 = VirtualFuncInvoker0< int32_t >::Invoke(6, L_2);
 		if (L_3)
 		{
 			goto IL_001d;
@@ -14604,11 +14610,11 @@ IL_001d:
 		Texture2D_tE6505BC111DD8A424A9DBE8E05D7D09E11FFFCF4* L_4 = ___0_texture;
 		NullCheck(L_4);
 		int32_t L_5;
-		L_5 = VirtualFuncInvoker0< int32_t >::Invoke(5, L_4);
+		L_5 = VirtualFuncInvoker0< int32_t >::Invoke(4, L_4);
 		Texture2D_tE6505BC111DD8A424A9DBE8E05D7D09E11FFFCF4* L_6 = ___0_texture;
 		NullCheck(L_6);
 		int32_t L_7;
-		L_7 = VirtualFuncInvoker0< int32_t >::Invoke(7, L_6);
+		L_7 = VirtualFuncInvoker0< int32_t >::Invoke(6, L_6);
 		return ((float)(((float)L_5)/((float)L_7)));
 	}
 }
@@ -15729,6 +15735,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* GuideViewRenderingBehaviour_GetGuid
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral75AC7011EA63C5308B9FC3C666815C37B7AE123F);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -15736,7 +15743,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* GuideViewRenderingBehaviour_GetGuid
 		String_t* L_0 = ___0_TrackableName;
 		int32_t L_1 = ___1_GuideViewIndex;
 		int32_t L_2 = L_1;
-		RuntimeObject* L_3 = Box(il2cpp_defaults.int32_class, &L_2);
+		RuntimeObject* L_3 = Box(Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var, &L_2);
 		String_t* L_4;
 		L_4 = String_Format_mFB7DA489BD99F4670881FF50EC017BFB0A5C0987(_stringLiteral75AC7011EA63C5308B9FC3C666815C37B7AE123F, L_0, L_3, NULL);
 		return L_4;
@@ -16878,6 +16885,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void MultiTargetBehaviour_CreateFromSerialize
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEngine_t1840136F87C8826E605686CEB7FDA35D257A8C0C_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral34B239E91F63A7E2E91326CAF12DC51530652ED2);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -16894,7 +16902,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void MultiTargetBehaviour_CreateFromSerialize
 		V_0 = L_2;
 		String_t* L_3;
 		L_3 = DataSetTrackableBehaviour_get_DataSetName_m1168861A5B55388D3100C51A139D71ACF70D7BEC(__this, NULL);
-		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_4 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		bool L_5;
 		L_5 = String_op_Inequality_m8C940F3CFC42866709D7CA931B3D77B4BE94BCB6(L_3, L_4, NULL);
 		if (!L_5)
@@ -18857,6 +18865,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RuntimeMeshRenderingBehaviour_OnMeshBloc
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Dictionary_2_TryGetValue_m00316B143BFF1198333B3BA22CB7FC71B3356009_RuntimeMethod_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Log_tE698D5B9CA2AAF2311B1A54609412BACAEFB065E_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral4B61BB7DDFC689AE1CB0EE9CE5B81043ECBB1954);
 		s_Il2CppMethodInitialized = true;
@@ -18881,7 +18890,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RuntimeMeshRenderingBehaviour_OnMeshBloc
 	{
 		int32_t L_5 = V_0;
 		int32_t L_6 = L_5;
-		RuntimeObject* L_7 = Box(il2cpp_defaults.int32_class, &L_6);
+		RuntimeObject* L_7 = Box(Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var, &L_6);
 		String_t* L_8;
 		L_8 = String_Format_mA8DBB4C2516B9723C5A41E6CB1E2FAF4BBE96DD8(_stringLiteral4B61BB7DDFC689AE1CB0EE9CE5B81043ECBB1954, L_7, NULL);
 		il2cpp_codegen_runtime_class_init_inline(Log_tE698D5B9CA2AAF2311B1A54609412BACAEFB065E_il2cpp_TypeInfo_var);
@@ -18913,6 +18922,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RuntimeMeshRenderingBehaviour_OnMeshBloc
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Dictionary_2_Remove_m490238E76437FE84FE24943CAB36C994DC458914_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Dictionary_2_TryGetValue_m00316B143BFF1198333B3BA22CB7FC71B3356009_RuntimeMethod_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Log_tE698D5B9CA2AAF2311B1A54609412BACAEFB065E_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Object_tC12DECB6760A7F2CBF65D9DCF18D044C2D97152C_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral4B61BB7DDFC689AE1CB0EE9CE5B81043ECBB1954);
@@ -18938,7 +18948,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RuntimeMeshRenderingBehaviour_OnMeshBloc
 	{
 		int32_t L_5 = V_0;
 		int32_t L_6 = L_5;
-		RuntimeObject* L_7 = Box(il2cpp_defaults.int32_class, &L_6);
+		RuntimeObject* L_7 = Box(Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var, &L_6);
 		String_t* L_8;
 		L_8 = String_Format_mA8DBB4C2516B9723C5A41E6CB1E2FAF4BBE96DD8(_stringLiteral4B61BB7DDFC689AE1CB0EE9CE5B81043ECBB1954, L_7, NULL);
 		il2cpp_codegen_runtime_class_init_inline(Log_tE698D5B9CA2AAF2311B1A54609412BACAEFB065E_il2cpp_TypeInfo_var);
@@ -20047,6 +20057,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMarkBehaviour_CreateFromSerializedTarg
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IEngine_t1840136F87C8826E605686CEB7FDA35D257A8C0C_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral34B239E91F63A7E2E91326CAF12DC51530652ED2);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -20054,7 +20065,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void VuMarkBehaviour_CreateFromSerializedTarg
 	{
 		String_t* L_0;
 		L_0 = DataSetTrackableBehaviour_get_DataSetName_m1168861A5B55388D3100C51A139D71ACF70D7BEC(__this, NULL);
-		String_t* L_1 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_1 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		bool L_2;
 		L_2 = String_op_Inequality_m8C940F3CFC42866709D7CA931B3D77B4BE94BCB6(L_0, L_1, NULL);
 		if (!L_2)
@@ -22724,6 +22735,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* ObserverFactory_CreateBehaviou
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&List_1_t1EA702D7F85898C235B9DC0957406D03172C12D3_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ModelTargetObserver_t8DB65FB8B1F8BDEDE4748446C8854EA4E55E0778_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&MultiTargetObserver_tB6334B101B7951C31EDF80EDEB8A85DADAF8AF33_0_0_0_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&U3CU3Ec__DisplayClass58_0_U3CCreateBehavioursFromDatabaseU3Eb__0_m26B06C88B0C29A6721CA38D9BA6387ABB0BD53E5_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&U3CU3Ec__DisplayClass58_0_U3CCreateBehavioursFromDatabaseU3Eb__1_mF2001EBB57DFB3A7AF2A7344AA2FB55A340E342F_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&U3CU3Ec__DisplayClass58_0_U3CCreateBehavioursFromDatabaseU3Eb__2_m7D3C726931712AC9F91703A6262269472C4E582C_RuntimeMethod_var);
@@ -22768,7 +22780,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR RuntimeObject* ObserverFactory_CreateBehaviou
 		Dictionary_2__ctor_m23A23CB92AAE01107F6CCBEDDD1C279D8C13706A(L_9, Dictionary_2__ctor_m23A23CB92AAE01107F6CCBEDDD1C279D8C13706A_RuntimeMethod_var);
 		Dictionary_2_tFA69DD04EEE7631660F51EA1CBE5D3A52AAC3158* L_10 = L_9;
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_11 = { reinterpret_cast<intptr_t> (AreaTargetObserver_t191886B652A282A97824E675FC1BA4E060D2BB06_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_12;
 		L_12 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_11, NULL);
 		U3CU3Ec__DisplayClass58_0_t0EFDCCD5E6DBE992BD9B9C42CCD501CC066C24BC* L_13 = V_0;

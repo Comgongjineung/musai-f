@@ -6,7 +6,7 @@
 // "Lock (computer science)", Wikipedia: The Free Encyclopedia
 // https://en.wikipedia.org/w/index.php?title=Lock_(computer_science)&oldid=875674239
 
-#if PLATFORM_HAS_NATIVE_FUTEX
+#if PLATFORM_FUTEX_NATIVE_SUPPORT
 #include "Internal/Baselib_Lock_FutexBased.inl.h"
 #else
 #include "Internal/Baselib_Lock_SemaphoreBased.inl.h"
@@ -37,23 +37,7 @@ BASELIB_INLINE_API void Baselib_Lock_CreateInplace(Baselib_Lock* lockData);
 //
 // \returns          true if lock was acquired.
 COMPILER_WARN_UNUSED_RESULT
-BASELIB_FORCEINLINE_API bool Baselib_Lock_TryAcquire(Baselib_Lock* lock)
-{
-    return Baselib_Lock_TrySpinAcquire(lock, 0);
-}
-
-// Try to acquire lock.
-//
-// If lock is held, either by this or another thread, then lock is not acquired and function return false.
-//
-// If successful this function is guaranteed to emit an acquire barrier.
-//
-// \param maxSpinCount  Max number of times to spin in user space before falling back to the kernel. The actual number
-//                      may differ depending on the underlying implementation but will never exceed the maxSpinCount
-//                      value.
-// \returns          true if lock was acquired.
-COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_Lock_TrySpinAcquire(Baselib_Lock* lock, uint32_t maxSpinCount);
+BASELIB_INLINE_API bool Baselib_Lock_TryAcquire(Baselib_Lock* lock);
 
 // Acquire lock.
 //

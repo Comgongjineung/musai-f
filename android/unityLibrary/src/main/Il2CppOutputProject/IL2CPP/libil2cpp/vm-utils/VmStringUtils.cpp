@@ -1,11 +1,13 @@
 #include "il2cpp-config.h"
 
+#if !RUNTIME_TINY
+
 #include "VmStringUtils.h"
 #include "il2cpp-object-internals.h"
 #include "../char-conversions.h"
 #include "utils/Functional.h"
 #include "utils/StringUtils.h"
-#include "External/utfcpp/source/utf8.h"
+#include "utils/utf8-cpp/source/utf8/unchecked.h"
 
 namespace il2cpp
 {
@@ -137,3 +139,5 @@ namespace utils
     }
 }
 }
+
+#endif

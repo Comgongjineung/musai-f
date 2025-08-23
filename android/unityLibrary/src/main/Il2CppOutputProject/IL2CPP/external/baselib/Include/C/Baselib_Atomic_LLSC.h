@@ -49,7 +49,7 @@
 //  The values of 'expected' and 'obj' value to determine if SC should succeed and store 'value'.
 //
 // Example:
-//  struct Data { BASELIB_ALIGN_AS(PLATFORM_PROPERTY_CACHE_LINE_SIZE) int32_t obj = 0; } data;
+//  struct Data { BASELIB_ALIGN_AS(PLATFORM_CACHE_LINE_SIZE) int32_t obj = 0; } data;
 //  int32_t expected = 1, value = 2;
 //  Baselib_atomic_llsc_32_relaxed_relaxed_v(&data.obj, &expected, &value, { if (expected == 0) value = 3; } );
 //  <-- obj is now 3
@@ -107,7 +107,16 @@
 
 #endif
 
-#if PLATFORM_HAS_NATIVE_LLSC
+// Enable LLSC native support for supported compilers and architectures/profiles
+#ifndef PLATFORM_LLSC_NATIVE_SUPPORT
+    #if (COMPILER_CLANG) && ((__ARM_ARCH >= 7) && (__ARM_ARCH < 9) && (__ARM_ARCH_PROFILE == 'A'))
+        #define PLATFORM_LLSC_NATIVE_SUPPORT 1
+    #else
+        #define PLATFORM_LLSC_NATIVE_SUPPORT 0
+    #endif
+#endif
+
+#if PLATFORM_LLSC_NATIVE_SUPPORT
 // Arm specific implementation of LLSC macros
 #include "Internal/Compiler/Baselib_Atomic_LLSC_Gcc.inl.h"
 #else
@@ -138,4 +147,4 @@
 #define detail_Baselib_atomic_llsc_128_v(obj, expected, value, code, loadbarrier, storebarrier) \
     detail_Baselib_atomic_llsc_v(obj, expected, value, code, 128, loadbarrier, storebarrier)
 
-#endif // PLATFORM_HAS_NATIVE_LLSC
+#endif // PLATFORM_LLSC_NATIVE_SUPPORT

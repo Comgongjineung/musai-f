@@ -1,6 +1,6 @@
 #include "il2cpp-config.h"
 
-#if IL2CPP_TARGET_WINRT
+#if IL2CPP_TARGET_WINRT || IL2CPP_TARGET_XBOXONE
 
 #include <io.h>
 
@@ -15,9 +15,19 @@ namespace os
 {
     static inline std::wstring GetDirectoryForStandardOutput()
     {
+#if IL2CPP_TARGET_XBOXONE
+
+        return L"D:\\";
+
+#elif IL2CPP_TARGET_WINRT
+
         wchar_t buffer[MAX_PATH + 2];
         uint32_t tempPathLength = GetTempPathW(MAX_PATH + 2, buffer);
         return std::wstring(buffer, tempPathLength);
+
+#else
+#error Unknown platform
+#endif
     }
 
     static FileHandle* GetOrCreateRedirectedHandle(FILE* stdFile, const wchar_t* fileNameOnDisk)
@@ -59,4 +69,4 @@ namespace os
 } //os
 } //il2cpp
 
-#endif // IL2CPP_TARGET_WINRT
+#endif

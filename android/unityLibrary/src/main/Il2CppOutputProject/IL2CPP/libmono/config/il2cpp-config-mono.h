@@ -19,8 +19,6 @@
 #include "il2cpp-config-mono-android.h"
 #elif IL2CPP_TARGET_JAVASCRIPT
 #include "il2cpp-config-mono-web.h"
-#elif IL2CPP_USE_PLATFORM_CONFIG
-#include "il2cpp-config-mono-platform.h"
 #else
 //Uncomment out after all platforms defines moved to header file
 //#error "Mono Code Compiled on Unimplemented Platform"

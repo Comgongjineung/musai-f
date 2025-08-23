@@ -1,7 +1,13 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
+#include <limits>
 
 
 struct VirtualActionInvoker0
@@ -370,6 +376,7 @@ IL2CPP_EXTERN_C RuntimeClass* AttitudeSensor_tA85F0C6E285FC1137DE8AB1CFB7357C7E8
 IL2CPP_EXTERN_C RuntimeClass* AxisControl_tD6613A2445A3C2BFA22C77E16CA3201AF72354A7_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ButtonControl_t85949109B98AAF5B7ADC0285F0EC98A61EC88ECF_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* ControlBitRangeNodeU5BU5D_t912A404149DE6D350D1735A026182C409C510F27_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* DeltaControl_t63053AF5E0CD02B62F3CDE79821E4A12F72D573B_il2cpp_TypeInfo_var;
@@ -408,6 +415,7 @@ IL2CPP_EXTERN_C RuntimeClass* InputStateBuffers_t338A1714D01276EEEF5F8CD6AE81DFE
 IL2CPP_EXTERN_C RuntimeClass* InputSystem_t4120CA4FE7DCFD56AF9391933FC3F1F485350164_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* InputUpdateDelegate_tF78891F6BFB57DCD649569B8E3673F33A11B5E55_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* InputUpdate_t3D4F0AD6CD83C86A73B8165929FF0CB151A07CCD_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* IntegerControl_tA24544EFF42204852F638FF5147F754962C997AB_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* InternedStringU5BU5D_t0B851758733FC0B118D84BE83AED10A0404C18D5_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77AC2844905735_il2cpp_TypeInfo_var;
@@ -434,24 +442,25 @@ IL2CPP_EXTERN_C RuntimeClass* StepCounter_t892F78E1286E3B4DF254DFB6A5D28F2618BD3
 IL2CPP_EXTERN_C RuntimeClass* Stopwatch_tA188A210449E22C07053A7D3014DD182C7369043_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringBuilder_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* StringU5BU5D_t7674CD946EC0CE7B3AE0BE70E6EE85F2ECD9F248_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* String_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Subscriber_t0FD48507D961A57BB24A3C74867C385428FFB58F_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Subscriber_t63E20F12ACB64582EEE0294EBD24F345AE88EC26_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* TouchControlU5BU5D_t339733075857CFF82B4E43BFB310F2350225836D_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* TouchControl_t3A64A795FF61A8B27E5EBD61632F23AFCC725079_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Touchscreen_t5A3B494C10A53A822AEDB3508093860D142D84CE_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* Type_t_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CListControlLayoutsU3Ed__97_tC8C680F2D4C28E488ED3C7C627EABE2B7B0CBE7B_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CU3Ec_t1A6FF70A85EA1FAD3304AB735467C1B6AF004661_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CU3Ec_t2F59D3C7F103A3C15826D9B6BB87FDD6759709FD_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* U3CU3Ec_t79F7AB25146CC61FC01D465D804919D4F425FD9C_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* UInt16U5BU5D_tEB7C42D811D999D2AA815BADC3FCCDD9C67B3F83_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* UInt32U5BU5D_t02FBD658AD156A17574ECE6106CF1FBFCC9807FA_il2cpp_TypeInfo_var;
+IL2CPP_EXTERN_C RuntimeClass* UInt32_t1833D51FFA667B18A5AA4B8D34DE284F8495D29B_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* UnityAction_1_tA5B7125BEF9EB3092B91D1E2AA64249C44903A60_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* UnityAction_1_tE32574C71B51DFED36AB235C69E2777243DCB5D2_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* UpdateMode_tCD49766B755C4CD8E1F2DE8D57798DAC2C5CBF32_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Vector2Control_t8D1B4021A1D82671AF916D3C0A476AA94E46A432_il2cpp_TypeInfo_var;
 IL2CPP_EXTERN_C RuntimeClass* Vector2_t1FD6F485C871E832B347AB2DC8CBA08B739D8DF7_il2cpp_TypeInfo_var;
-IL2CPP_EXTERN_C RuntimeField* Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var;
-IL2CPP_EXTERN_C RuntimeField* Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var;
 IL2CPP_EXTERN_C RuntimeField* U3CPrivateImplementationDetailsU3E_tF62B85DD2C59D87BA6C8DA02965E1F3203A64E53____BD3331923AE2D87F6296377CB80C86CE12BF445ED38D4485D28FACFEC06BFF5B_FieldInfo_var;
 IL2CPP_EXTERN_C RuntimeField* U3CPrivateImplementationDetailsU3E_tF62B85DD2C59D87BA6C8DA02965E1F3203A64E53____D9D05356900CBD90C107CDBD184BC94526EC3F9228772F900FC7C60E3FE82B5A_FieldInfo_var;
 IL2CPP_EXTERN_C RuntimeField* U3CPrivateImplementationDetailsU3E_tF62B85DD2C59D87BA6C8DA02965E1F3203A64E53____FFCB0A1E90587D61767DBCE765CBEC8743DC4A67B865900B464ED065E4625BD5_FieldInfo_var;
@@ -923,8 +932,6 @@ IL2CPP_EXTERN_C const RuntimeType* ButtonWithTwoModifiers_tCA30378981527D0F30688
 IL2CPP_EXTERN_C const RuntimeType* ClampProcessor_tF3D734C88BDFC3618BA525B51A0244942A5E1E33_0_0_0_var;
 IL2CPP_EXTERN_C const RuntimeType* CompensateDirectionProcessor_tD37E3634AA6A1D86A67B21CFFFF5BDD0F39183BE_0_0_0_var;
 IL2CPP_EXTERN_C const RuntimeType* CompensateRotationProcessor_t1D14AFF56CF5C0B6615C8448470ABF88F7480D02_0_0_0_var;
-IL2CPP_EXTERN_C const RuntimeType* Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var;
-IL2CPP_EXTERN_C const RuntimeType* Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var;
 IL2CPP_EXTERN_C const RuntimeType* DeltaControl_t63053AF5E0CD02B62F3CDE79821E4A12F72D573B_0_0_0_var;
 IL2CPP_EXTERN_C const RuntimeType* DiscreteButtonControl_t3F3349EABF0E553E7E451EF43441B8EAF105813C_0_0_0_var;
 IL2CPP_EXTERN_C const RuntimeType* DoubleControl_t3707A6260424A2F3636669A2BAFF5CB5E91D2486_0_0_0_var;
@@ -11259,13 +11266,14 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77A
 	static bool s_Il2CppMethodInitialized;
 	if (!s_Il2CppMethodInitialized)
 	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral9356966FE7FE8C8E3001B2D95F5177F6D1E4717D);
 		s_Il2CppMethodInitialized = true;
 	}
 	{
 		int32_t L_0 = ___0_senderId;
 		int32_t L_1 = L_0;
-		RuntimeObject* L_2 = Box(il2cpp_defaults.int32_class, &L_1);
+		RuntimeObject* L_2 = Box(Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var, &L_1);
 		String_t* L_3;
 		L_3 = String_Format_mA8DBB4C2516B9723C5A41E6CB1E2FAF4BBE96DD8(_stringLiteral9356966FE7FE8C8E3001B2D95F5177F6D1E4717D, L_2, NULL);
 		InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77AC2844905735 L_4;
@@ -11479,14 +11487,20 @@ IL2CPP_EXTERN_C void Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshal_p
 }
 IL2CPP_EXTERN_C void Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshal_pinvoke_back(const Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshaled_pinvoke& marshaled, Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E& unmarshaled)
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
 	int32_t unmarshaledparticipantId_temp_0 = 0;
 	unmarshaledparticipantId_temp_0 = marshaled.___participantId;
 	unmarshaled.___participantId = unmarshaledparticipantId_temp_0;
 	int32_t unmarshaledtype_temp_1 = 0;
 	unmarshaledtype_temp_1 = marshaled.___type;
 	unmarshaled.___type = unmarshaledtype_temp_1;
-	unmarshaled.___data = (ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, il2cpp_defaults.byte_class, marshaled.___data);
-	Il2CppCodeGenWriteBarrier((void**)(&unmarshaled.___data), (void*)(ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, il2cpp_defaults.byte_class, marshaled.___data));
+	unmarshaled.___data = (ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_il2cpp_TypeInfo_var, marshaled.___data);
+	Il2CppCodeGenWriteBarrier((void**)(&unmarshaled.___data), (void*)(ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_il2cpp_TypeInfo_var, marshaled.___data));
 }
 IL2CPP_EXTERN_C void Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshal_pinvoke_cleanup(Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshaled_pinvoke& marshaled)
 {
@@ -11501,14 +11515,20 @@ IL2CPP_EXTERN_C void Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshal_c
 }
 IL2CPP_EXTERN_C void Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshal_com_back(const Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshaled_com& marshaled, Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E& unmarshaled)
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
 	int32_t unmarshaledparticipantId_temp_0 = 0;
 	unmarshaledparticipantId_temp_0 = marshaled.___participantId;
 	unmarshaled.___participantId = unmarshaledparticipantId_temp_0;
 	int32_t unmarshaledtype_temp_1 = 0;
 	unmarshaledtype_temp_1 = marshaled.___type;
 	unmarshaled.___type = unmarshaledtype_temp_1;
-	unmarshaled.___data = (ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, il2cpp_defaults.byte_class, marshaled.___data);
-	Il2CppCodeGenWriteBarrier((void**)(&unmarshaled.___data), (void*)(ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, il2cpp_defaults.byte_class, marshaled.___data));
+	unmarshaled.___data = (ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_il2cpp_TypeInfo_var, marshaled.___data);
+	Il2CppCodeGenWriteBarrier((void**)(&unmarshaled.___data), (void*)(ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)il2cpp_codegen_com_marshal_safe_array_result(IL2CPP_VT_I1, Byte_t94D9231AC217BE4D2E004C4CD32DF6D099EA41A3_il2cpp_TypeInfo_var, marshaled.___data));
 }
 IL2CPP_EXTERN_C void Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshal_com_cleanup(Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E_marshaled_com& marshaled)
 {
@@ -12358,6 +12378,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NewDeviceMsg_Process_m220C7375D2A21BFD51
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputDeviceDescription_tE86DD77422AAF60ADDAC788B31E5A05E739B708F_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputRemoting_DeserializeData_TisData_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_m123C085D6286995C127C85F350236D686AB4D1EB_RuntimeMethod_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ObjectU5BU5D_t8061030B0A12A55D5AD8652A20C922FE99450918_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral7EABC29EBD9BD52BA963D8983452A4A7407EBE6F);
 		s_Il2CppMethodInitialized = true;
@@ -12435,7 +12456,7 @@ IL_0036:
 		Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9 L_22 = V_1;
 		int32_t L_23 = L_22.___deviceId;
 		int32_t L_24 = L_23;
-		RuntimeObject* L_25 = Box(il2cpp_defaults.int32_class, &L_24);
+		RuntimeObject* L_25 = Box(Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var, &L_24);
 		NullCheck(L_21);
 		ArrayElementTypeCheck (L_21, L_25);
 		(L_21)->SetAt(static_cast<il2cpp_array_size_t>(0), (RuntimeObject*)L_25);
@@ -12449,7 +12470,7 @@ IL_0036:
 		Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E L_30 = ___1_msg;
 		int32_t L_31 = L_30.___participantId;
 		int32_t L_32 = L_31;
-		RuntimeObject* L_33 = Box(il2cpp_defaults.int32_class, &L_32);
+		RuntimeObject* L_33 = Box(Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var, &L_32);
 		NullCheck(L_29);
 		ArrayElementTypeCheck (L_29, L_33);
 		(L_29)->SetAt(static_cast<il2cpp_array_size_t>(2), (RuntimeObject*)L_33);
@@ -12676,26 +12697,12 @@ IL_01a6:
 
 IL2CPP_EXTERN_C void Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshal_pinvoke(const Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9& unmarshaled, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshaled_pinvoke& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshal_pinvoke_back(const Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshaled_pinvoke& marshaled, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshal_pinvoke_cleanup(Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshaled_pinvoke& marshaled)
@@ -12705,26 +12712,12 @@ IL2CPP_EXTERN_C void Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshal_pinv
 
 IL2CPP_EXTERN_C void Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshal_com(const Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9& unmarshaled, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshaled_com& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshal_com_back(const Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshaled_com& marshaled, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9____usages_FieldInfo_var, Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshal_com_cleanup(Data_t6043413CF02BCA5D92233B1F6EFF4CD170A397F9_marshaled_com& marshaled)
@@ -12936,7 +12929,7 @@ IL_0052:
 		uint8_t* L_14 = V_4;
 		InputEvent_t10F727342D1A79DCFC06529C203BB61C194AEBC5* L_15 = ___0_events;
 		uint32_t L_16 = V_0;
-		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177((void*)L_14, (void*)L_15, ((int64_t)(uint64_t)((uint32_t)L_16)), NULL);
+		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177((void*)L_14, (void*)L_15, ((int64_t)(uint64_t)L_16), NULL);
 		V_5 = (ByteU5BU5D_tA6237BF417AE52AD70CFB4EF24A7A82613DF9031*)NULL;
 		il2cpp_codegen_initobj((&V_6), sizeof(Message_tCF2C708DDBE3016FEF4313A2D1C4ADE12201CD2E));
 		(&V_6)->___type = 4;
@@ -13372,26 +13365,12 @@ IL_00da:
 #endif
 IL2CPP_EXTERN_C void Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshal_pinvoke(const Data_tEBB3D708778E8658163A56C2E56F3512738AFE74& unmarshaled, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshaled_pinvoke& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshal_pinvoke_back(const Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshaled_pinvoke& marshaled, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshal_pinvoke_cleanup(Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshaled_pinvoke& marshaled)
@@ -13399,26 +13378,12 @@ IL2CPP_EXTERN_C void Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshal_pinv
 }
 IL2CPP_EXTERN_C void Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshal_com(const Data_tEBB3D708778E8658163A56C2E56F3512738AFE74& unmarshaled, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshaled_com& marshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshal_com_back(const Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshaled_com& marshaled, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74& unmarshaled)
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
-	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field '%s' of type '%s'.", Data_tEBB3D708778E8658163A56C2E56F3512738AFE74____usages_FieldInfo_var, Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_0_0_0_var);
+	Exception_t* ___usagesException = il2cpp_codegen_get_marshal_directive_exception("Cannot marshal field 'usages' of type 'Data'.");
 	IL2CPP_RAISE_MANAGED_EXCEPTION(___usagesException, NULL);
 }
 IL2CPP_EXTERN_C void Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshal_com_cleanup(Data_tEBB3D708778E8658163A56C2E56F3512738AFE74_marshaled_com& marshaled)
@@ -16315,7 +16280,7 @@ IL_00a3:
 		StateEvent_tB93D5F08B084A2BC9FFC71B084409DBBD2516C0F* L_29 = V_0;
 		uint32_t L_30;
 		L_30 = StateEvent_get_stateSizeInBytes_m07E8E8D19DA4D9B58A23DC19680794764AE8FA21((StateEvent_tB93D5F08B084A2BC9FFC71B084409DBBD2516C0F*)L_29, NULL);
-		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(L_26, L_28, ((int64_t)(uint64_t)((uint32_t)L_30)), NULL);
+		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(L_26, L_28, ((int64_t)(uint64_t)L_30), NULL);
 	}
 
 IL_00c4:
@@ -18045,13 +18010,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR int32_t InputManager_get_scrollDeltaBehavior_
 }
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_set_scrollDeltaBehavior_m353CBB039273B4BC543003C65C5C9AA4A5B776D3 (InputManager_t69FCFDAC90F8EBB8EF4950CC0BE617D842A39210* __this, int32_t ___0_value, const RuntimeMethod* method) 
 {
-	static bool s_Il2CppMethodInitialized;
-	if (!s_Il2CppMethodInitialized)
-	{
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&IInputRuntime_t97E0310F85D952B7B42F6FEB50A1C8D88A0C0C09_il2cpp_TypeInfo_var);
-		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputRuntime_t225BBC258A47D8CC1DE6C04E13FB51C375EEB4C3_il2cpp_TypeInfo_var);
-		s_Il2CppMethodInitialized = true;
-	}
 	{
 		int32_t L_0 = __this->___m_ScrollDeltaBehavior;
 		int32_t L_1 = ___0_value;
@@ -18068,10 +18026,6 @@ IL_000a:
 	{
 		int32_t L_2 = ___0_value;
 		__this->___m_ScrollDeltaBehavior = L_2;
-		RuntimeObject* L_3 = ((InputRuntime_t225BBC258A47D8CC1DE6C04E13FB51C375EEB4C3_StaticFields*)il2cpp_codegen_static_fields_for(InputRuntime_t225BBC258A47D8CC1DE6C04E13FB51C375EEB4C3_il2cpp_TypeInfo_var))->___s_Instance;
-		int32_t L_4 = __this->___m_ScrollDeltaBehavior;
-		NullCheck(L_3);
-		InterfaceActionInvoker1< bool >::Invoke(28, IInputRuntime_t97E0310F85D952B7B42F6FEB50A1C8D88A0C0C09_il2cpp_TypeInfo_var, L_3, (bool)((((int32_t)L_4) == ((int32_t)0))? 1 : 0));
 		return;
 	}
 }
@@ -18487,6 +18441,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_RegisterControlLayout_m1482
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&KeyValuePair_2_get_Key_mE8768535ABCD24F453DC1EC5127CBD303DEC29A5_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&KeyValuePair_2_get_Value_m9803DE61209750BB22E4E1A58A5DFB943EAFCB80_RuntimeMethod_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	bool V_0 = false;
@@ -18518,7 +18473,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_RegisterControlLayout_m1482
 IL_0013:
 	{
 		Type_t* L_3 = ___1_type;
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		bool L_4;
 		L_4 = Type_op_Equality_m99930A0E44E420A685FABA60E60BA1CC5FA0EBDC(L_3, (Type_t*)NULL, NULL);
 		if (!L_4)
@@ -18535,7 +18490,7 @@ IL_0013:
 IL_0027:
 	{
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_6 = { reinterpret_cast<intptr_t> (InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_7;
 		L_7 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_6, NULL);
 		Type_t* L_8 = ___1_type;
@@ -18656,7 +18611,7 @@ IL_00dc_1:
 				Type_t* L_43;
 				L_43 = KeyValuePair_2_get_Value_m9803DE61209750BB22E4E1A58A5DFB943EAFCB80_inline((&V_7), KeyValuePair_2_get_Value_m9803DE61209750BB22E4E1A58A5DFB943EAFCB80_RuntimeMethod_var);
 				Type_t* L_44 = V_5;
-				il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+				il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 				bool L_45;
 				L_45 = Type_op_Equality_m99930A0E44E420A685FABA60E60BA1CC5FA0EBDC(L_43, L_44, NULL);
 				if (!L_45)
@@ -18712,7 +18667,7 @@ IL_0127:
 	{
 		Type_t* L_52 = V_5;
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_53 = { reinterpret_cast<intptr_t> (InputControl_t74F06B623518F992BF8E38656A5E0857169E3E2E_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_54;
 		L_54 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_53, NULL);
 		bool L_55;
@@ -19770,13 +19725,14 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_RegisterControlLayoutMatche
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputDeviceMatcher_tF9BA551C8BB4AE41672366A7EBEA951543E0C555_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77AC2844905735 V_0;
 	memset((&V_0), 0, sizeof(V_0));
 	{
 		Type_t* L_0 = ___0_type;
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		bool L_1;
 		L_1 = Type_op_Equality_m99930A0E44E420A685FABA60E60BA1CC5FA0EBDC(L_0, (Type_t*)NULL, NULL);
 		if (!L_1)
@@ -20459,13 +20415,14 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR InputControlLayout_t46A40BE4C976BE33E85F61E63
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputControl_t74F06B623518F992BF8E38656A5E0857169E3E2E_0_0_0_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77AC2844905735 V_0;
 	memset((&V_0), 0, sizeof(V_0));
 	{
 		Type_t* L_0 = ___0_type;
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		bool L_1;
 		L_1 = Type_op_Equality_m99930A0E44E420A685FABA60E60BA1CC5FA0EBDC(L_0, (Type_t*)NULL, NULL);
 		if (!L_1)
@@ -20482,7 +20439,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR InputControlLayout_t46A40BE4C976BE33E85F61E63
 IL_0014:
 	{
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_3 = { reinterpret_cast<intptr_t> (InputControl_t74F06B623518F992BF8E38656A5E0857169E3E2E_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_4;
 		L_4 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_3, NULL);
 		Type_t* L_5 = ___0_type;
@@ -20563,6 +20520,8 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77A
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputDeviceExecuteCommandDelegate_t94A8BB806676141BFD8EFA497EC51C685778718A_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputManager_U3CTryFindMatchingControlLayoutU3Eb__94_0_m07060B52C91F52438BF3B58E26D104721A00B4BB_RuntimeMethod_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77AC2844905735 V_0;
@@ -20575,7 +20534,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77A
 	String_t* V_5 = NULL;
 	il2cpp::utils::ExceptionSupportStack<RuntimeObject*, 1> __active_exceptions;
 	{
-		String_t* L_0 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_0 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		InternedString__ctor_m2E9672D46D84C82F705DE799CE8B6123EB95E935((&V_0), L_0, NULL);
 	}
 	{
@@ -20625,7 +20584,7 @@ FINALLY_0136:
 				L_13 = Collection_GetControlTypeForLayout_m45CC21C9ADD4E107623067E46329994920D2E206(L_11, L_12, NULL);
 				V_2 = L_13;
 				Type_t* L_14 = V_2;
-				il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+				il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 				bool L_15;
 				L_15 = Type_op_Inequality_m83209C7BB3C05DFBEA3B6199B0BEFE8037301172(L_14, (Type_t*)NULL, NULL);
 				if (!L_15)
@@ -20635,7 +20594,7 @@ FINALLY_0136:
 			}
 			{
 				RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_16 = { reinterpret_cast<intptr_t> (InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B_0_0_0_var) };
-				il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+				il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 				Type_t* L_17;
 				L_17 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_16, NULL);
 				Type_t* L_18 = V_2;
@@ -21233,13 +21192,19 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_NotifyUsageChanged_m5385879
 }
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B* InputManager_AddDevice_m688350A31B6124E696B5A6C7467E0B67A7C337AA (InputManager_t69FCFDAC90F8EBB8EF4950CC0BE617D842A39210* __this, Type_t* ___0_type, String_t* ___1_name, const RuntimeMethod* method) 
 {
+	static bool s_Il2CppMethodInitialized;
+	if (!s_Il2CppMethodInitialized)
+	{
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
+		s_Il2CppMethodInitialized = true;
+	}
 	InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77AC2844905735 V_0;
 	memset((&V_0), 0, sizeof(V_0));
 	InternedString_t8D62A48CB7D85AAE9CFCCCFB0A77AC2844905735 V_1;
 	memset((&V_1), 0, sizeof(V_1));
 	{
 		Type_t* L_0 = ___0_type;
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		bool L_1;
 		L_1 = Type_op_Equality_m99930A0E44E420A685FABA60E60BA1CC5FA0EBDC(L_0, (Type_t*)NULL, NULL);
 		if (!L_1)
@@ -22182,7 +22147,7 @@ IL_0115:
 		uint32_t L_50;
 		L_50 = InputStateBlock_get_byteOffset_m6EADE5C9C8B346D38E543E38777ED67ED2AEA0AC_inline(L_49, NULL);
 		NullCheck(L_47);
-		InputControl_BakeOffsetIntoStateBlockRecursive_mBC0790413F113D658F541F4903457F9B89D49D04(L_47, ((int32_t)(uint32_t)((-((int64_t)(uint64_t)((uint32_t)L_50))))), NULL);
+		InputControl_BakeOffsetIntoStateBlockRecursive_mBC0790413F113D658F541F4903457F9B89D49D04(L_47, ((int32_t)(uint32_t)((-((int64_t)(uint64_t)L_50)))), NULL);
 		InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B* L_51 = ___0_device;
 		il2cpp_codegen_runtime_class_init_inline(InputActionState_t780948EA293BAA800AD8699518B58B59FFB8A700_il2cpp_TypeInfo_var);
 		InputActionState_OnDeviceChange_m493E1B0AE0CFD5A22FFEFCDD6440A5605D7E8CFA(L_51, 1, NULL);
@@ -22567,7 +22532,7 @@ FINALLY_01ac:
 				uint32_t L_58;
 				L_58 = InputStateBlock_get_byteOffset_m6EADE5C9C8B346D38E543E38777ED67ED2AEA0AC_inline(L_57, NULL);
 				uint32_t L_59 = V_5;
-				UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(L_55, ((void*)il2cpp_codegen_add((intptr_t)L_56, (intptr_t)((uintptr_t)L_58))), ((int64_t)(uint64_t)((uint32_t)L_59)), NULL);
+				UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(L_55, ((void*)il2cpp_codegen_add((intptr_t)L_56, (intptr_t)((uintptr_t)L_58))), ((int64_t)(uint64_t)L_59), NULL);
 				goto IL_018e_1;
 			}
 
@@ -22588,7 +22553,7 @@ IL_0145_1:
 				uint32_t L_67;
 				L_67 = InputStateBlock_get_byteOffset_m6EADE5C9C8B346D38E543E38777ED67ED2AEA0AC_inline(L_66, NULL);
 				uint32_t L_68 = V_5;
-				UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(L_64, ((void*)il2cpp_codegen_add((intptr_t)L_65, (intptr_t)((uintptr_t)L_67))), ((int64_t)(uint64_t)((uint32_t)L_68)), NULL);
+				UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(L_64, ((void*)il2cpp_codegen_add((intptr_t)L_65, (intptr_t)((uintptr_t)L_67))), ((int64_t)(uint64_t)L_68), NULL);
 				void* L_69 = V_9;
 				void* L_70 = V_4;
 				InputStateBlock_t0E05211ACF29A99C0FE7FC9EA7042196BFF1F3B5* L_71 = V_11;
@@ -23747,6 +23712,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_InitializeData_m451E19C8498
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Touchscreen_t5A3B494C10A53A822AEDB3508093860D142D84CE_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&TrackedDevice_t9B8AC60AAD52E906174449ED57660F3F8A3599E9_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&TwoModifiersComposite_t7B84C109D0750D4F515629DD0D3D5C6373F42CA3_0_0_0_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Vector2Composite_tCAE11D025FE085E66E963DCCD6559D042A713908_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Vector2Control_t8D1B4021A1D82671AF916D3C0A476AA94E46A432_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Vector3Composite_t014892920D73110CD43E6CC997E0FAA5860A62E0_0_0_0_var);
@@ -23844,7 +23810,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_InitializeData_m451E19C8498
 		__this->___m_ScrollDeltaBehavior = 0;
 		__this->___m_PollingFrequency = (60.0f);
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_6 = { reinterpret_cast<intptr_t> (AxisControl_tD6613A2445A3C2BFA22C77E16CA3201AF72354A7_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_7;
 		L_7 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_6, NULL);
 		InputManager_RegisterControlLayout_m1482E761F375E98DFA54E5A4B3FCE2AAE12C9274(__this, _stringLiteralEE71910C7E19B0D89B96AF6011CDFDAF6EA1CF1C, L_7, NULL);
@@ -24212,6 +24178,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_RegisterCustomTypes_mA1C4E5
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputBindingComposite_tA9230435A30FB5B2D4967D6FAE7EFABBBF26C0C0_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputProcessor_t71DA6677A0295DC87736E1D8D208FEA75D860457_0_0_0_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputSystem_t4120CA4FE7DCFD56AF9391933FC3F1F485350164_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	TypeU5BU5D_t97234E1129B564EB38B8D85CAC2AD8B5B9522FFB* V_0 = NULL;
@@ -24263,7 +24230,7 @@ IL_0006:
 	}
 	{
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_11 = { reinterpret_cast<intptr_t> (InputProcessor_t71DA6677A0295DC87736E1D8D208FEA75D860457_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_12;
 		L_12 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_11, NULL);
 		Type_t* L_13 = V_2;
@@ -24285,7 +24252,7 @@ IL_0006:
 IL_003d:
 	{
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_16 = { reinterpret_cast<intptr_t> (IInputInteraction_t689E6823744061ED815FB936C3EB3FDD3594B844_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_17;
 		L_17 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_16, NULL);
 		Type_t* L_18 = V_2;
@@ -24307,7 +24274,7 @@ IL_003d:
 IL_0058:
 	{
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_21 = { reinterpret_cast<intptr_t> (InputBindingComposite_tA9230435A30FB5B2D4967D6FAE7EFABBBF26C0C0_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_22;
 		L_22 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_21, NULL);
 		Type_t* L_23 = V_2;
@@ -24351,6 +24318,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_RegisterCustomTypes_m1FB7D3
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&InputProcessor_t71DA6677A0295DC87736E1D8D208FEA75D860457_0_0_0_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Type_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	Assembly_t* V_0 = NULL;
@@ -24363,7 +24331,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_RegisterCustomTypes_m1FB7D3
 	il2cpp::utils::ExceptionSupportStack<RuntimeObject*, 1> __active_exceptions;
 	{
 		RuntimeTypeHandle_t332A452B8B6179E4469B69525D0FE82A88030F7B L_0 = { reinterpret_cast<intptr_t> (InputProcessor_t71DA6677A0295DC87736E1D8D208FEA75D860457_0_0_0_var) };
-		il2cpp_codegen_runtime_class_init_inline(il2cpp_defaults.systemtype_class);
+		il2cpp_codegen_runtime_class_init_inline(Type_t_il2cpp_TypeInfo_var);
 		Type_t* L_1;
 		L_1 = Type_GetTypeFromHandle_m6062B81682F79A4D6DF2640692EE6D9987858C57(L_0, NULL);
 		NullCheck(L_1);
@@ -25052,7 +25020,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_AssignUniqueDeviceId_mACF8C
 		int32_t L_7;
 		L_7 = InputDevice_get_deviceId_mC65E69E6117B78DB2F4963F5CF9BF031488AD588_inline(L_6, NULL);
 		int32_t L_8 = L_7;
-		RuntimeObject* L_9 = Box(il2cpp_defaults.int32_class, &L_8);
+		RuntimeObject* L_9 = Box(((RuntimeClass*)il2cpp_codegen_initialize_runtime_metadata_inline((uintptr_t*)&Int32_t680FF22E76F6EFAD4375103CBBFFA0421349384C_il2cpp_TypeInfo_var)), &L_8);
 		InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B* L_10 = ___0_device;
 		NullCheck(L_10);
 		String_t* L_11;
@@ -25823,6 +25791,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JsonString_tE22CDDA995FEFF514F3F334C93B6AB31B
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&StringBuilder_t_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		s_Il2CppMethodInitialized = true;
 	}
 	StringBuilder_t* V_0 = NULL;
@@ -25843,7 +25812,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR JsonString_tE22CDDA995FEFF514F3F334C93B6AB31B
 	}
 	{
 		il2cpp_codegen_initobj((&V_3), sizeof(JsonString_tE22CDDA995FEFF514F3F334C93B6AB31B49773CB));
-		String_t* L_2 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_2 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		Substring_t2E16755269E6716C22074D6BC0A9099915E67849 L_3;
 		L_3 = Substring_op_Implicit_mABF0BF448C43C80A01DE18A232F89B9EE19CDF89(L_2, NULL);
 		(&V_3)->___text = L_3;
@@ -28309,6 +28278,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool InputManager_AreMaximumEventBytesPerUpda
 	if (!s_Il2CppMethodInitialized)
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&String_t_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral50D0DE568F9E10EB43CF8A55E71758DB7C76E2AF);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral6D0AB140EA02D5707E54092E08384766B2578AB0);
 		s_Il2CppMethodInitialized = true;
@@ -28330,13 +28300,13 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool InputManager_AreMaximumEventBytesPerUpda
 		NullCheck(L_3);
 		int32_t L_4;
 		L_4 = InputSettings_get_maxEventBytesPerUpdate_m5A26CC982D48C60B55243EEA49F9F1DC0E6E02F6_inline(L_3, NULL);
-		if ((((int64_t)((int64_t)(uint64_t)((uint32_t)L_2))) < ((int64_t)((int64_t)L_4))))
+		if ((((int64_t)((int64_t)(uint64_t)L_2)) < ((int64_t)((int64_t)L_4))))
 		{
 			goto IL_004e;
 		}
 	}
 	{
-		String_t* L_5 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(il2cpp_defaults.string_class))->___Empty;
+		String_t* L_5 = ((String_t_StaticFields*)il2cpp_codegen_static_fields_for(String_t_il2cpp_TypeInfo_var))->___Empty;
 		V_0 = L_5;
 		il2cpp_codegen_runtime_class_init_inline(Debug_t8394C7EEAECA3689C2C9B9DE9C7166D73596276F_il2cpp_TypeInfo_var);
 		bool L_6;
@@ -28376,6 +28346,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR String_t* InputManager_MakeStringWithEventsPr
 	{
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&ReadOnlyArray_1_get_Item_mCB4626E80069288BC1EEF0F558B1B806F59DAE43_RuntimeMethod_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&StringBuilder_t_il2cpp_TypeInfo_var);
+		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&UInt32_t1833D51FFA667B18A5AA4B8D34DE284F8495D29B_il2cpp_TypeInfo_var);
 		il2cpp_codegen_initialize_runtime_metadata((uintptr_t*)&_stringLiteral3E4B4DDAECBBA6FF33928773A00C1655FFAF20FC);
 		s_Il2CppMethodInitialized = true;
 	}
@@ -28422,7 +28393,7 @@ IL_000a:
 		NullCheck(L_8);
 		uint32_t L_9 = L_8->___m_CurrentProcessedEventBytesOnUpdate;
 		uint32_t L_10 = L_9;
-		RuntimeObject* L_11 = Box(il2cpp_defaults.uint32_class, &L_10);
+		RuntimeObject* L_11 = Box(UInt32_t1833D51FFA667B18A5AA4B8D34DE284F8495D29B_il2cpp_TypeInfo_var, &L_10);
 		InputDevice_t8BCF67533E872A75779C24C93D1D7085B72D364B* L_12 = V_2;
 		String_t* L_13;
 		L_13 = String_Format_mFB7DA489BD99F4670881FF50EC017BFB0A5C0987(_stringLiteral3E4B4DDAECBBA6FF33928773A00C1655FFAF20FC, L_11, L_12, NULL);
@@ -29151,7 +29122,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void InputManager_WriteStateChange_m6F53FA39B
 		uint32_t L_14;
 		L_14 = InputStateBlock_get_byteOffset_m6EADE5C9C8B346D38E543E38777ED67ED2AEA0AC_inline(L_13, NULL);
 		uint32_t L_15 = V_1;
-		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(((void*)il2cpp_codegen_add((intptr_t)L_9, (intptr_t)((uintptr_t)L_11))), ((void*)il2cpp_codegen_add((intptr_t)L_12, (intptr_t)((uintptr_t)L_14))), ((int64_t)(uint64_t)((uint32_t)L_15)), NULL);
+		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(((void*)il2cpp_codegen_add((intptr_t)L_9, (intptr_t)((uintptr_t)L_11))), ((void*)il2cpp_codegen_add((intptr_t)L_12, (intptr_t)((uintptr_t)L_14))), ((int64_t)(uint64_t)L_15), NULL);
 	}
 
 IL_003d:
@@ -29233,7 +29204,7 @@ IL_0088:
 		uint32_t L_42 = ___3_stateOffsetInDevice;
 		void* L_43 = ___4_statePtr;
 		uint32_t L_44 = ___5_stateSizeInBytes;
-		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(((void*)il2cpp_codegen_add((intptr_t)((void*)il2cpp_codegen_add((intptr_t)L_39, (intptr_t)((uintptr_t)L_41))), (intptr_t)((uintptr_t)L_42))), L_43, ((int64_t)(uint64_t)((uint32_t)L_44)), NULL);
+		UnsafeUtility_MemCpy_m5CEA91ACDADC522E584AE3A2AB2B0B74393A9177(((void*)il2cpp_codegen_add((intptr_t)((void*)il2cpp_codegen_add((intptr_t)L_39, (intptr_t)((uintptr_t)L_41))), (intptr_t)((uintptr_t)L_42))), L_43, ((int64_t)(uint64_t)L_44), NULL);
 		return;
 	}
 }

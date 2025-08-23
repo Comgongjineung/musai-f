@@ -57,7 +57,7 @@
             android:screenOrientation="fullUser"
             android:theme="@style/BaseUnityGameActivityTheme"
             android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
-            android:hardwareAccelerated="false"
+            android:hardwareAccelerated="true"
             tools:replace="android:exported">
             <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
             <meta-data android:name="android.app.lib_name" android:value="game" />

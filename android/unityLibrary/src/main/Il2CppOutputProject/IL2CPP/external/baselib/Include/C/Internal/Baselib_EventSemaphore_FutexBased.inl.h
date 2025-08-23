@@ -1,21 +1,20 @@
 #pragma once
 
-#include "../Baselib_Atomic_TypeSafe.h"
 #include "../Baselib_CountdownTimer.h"
+#include "../Baselib_Atomic_TypeSafe.h"
 #include "../Baselib_SystemFutex.h"
-#include "Baselib_SpinLoop.h"
 
-#if !PLATFORM_HAS_NATIVE_FUTEX
+#if !PLATFORM_FUTEX_NATIVE_SUPPORT
     #error "Only use this implementation on top of a proper futex, in all other situations us Baselib_EventSemaphore_SemaphoreBased.inl.h"
 #endif
 
 typedef struct Baselib_EventSemaphore
 {
     int32_t state;
-    char _cachelineSpacer1[PLATFORM_PROPERTY_CACHE_LINE_SIZE - sizeof(int32_t)];
+    char _cachelineSpacer1[PLATFORM_CACHE_LINE_SIZE - sizeof(int32_t)];
 } Baselib_EventSemaphore;
 
-BASELIB_STATIC_ASSERT(sizeof(Baselib_EventSemaphore) == PLATFORM_PROPERTY_CACHE_LINE_SIZE, "Baselib_EventSemaphore size should match cacheline size (64bytes)");
+BASELIB_STATIC_ASSERT(sizeof(Baselib_EventSemaphore) == PLATFORM_CACHE_LINE_SIZE, "Baselib_EventSemaphore size should match cacheline size (64bytes)");
 
 // The futex based event semaphore is in one of *three* states:
 // * ResetNoWaitingThreads: EventSemaphore blocks threads, but there aren't any blocked yet
@@ -79,17 +78,10 @@ BASELIB_INLINE_API Baselib_EventSemaphore Baselib_EventSemaphore_Create(void)
 }
 
 COMPILER_WARN_UNUSED_RESULT
-BASELIB_INLINE_API bool Baselib_EventSemaphore_TrySpinAcquire(Baselib_EventSemaphore* semaphore, uint32_t maxSpinCount)
+BASELIB_INLINE_API bool Baselib_EventSemaphore_TryAcquire(Baselib_EventSemaphore* semaphore)
 {
-    int32_t state = Baselib_atomic_load_32_acquire(&semaphore->state);
-    while (true)
-    {
-        if (state & Detail_Baselib_EventSemaphore_Set)
-            return true;
-
-        if (!Detail_Baselib_SpinLoop(&semaphore->state, &state, &maxSpinCount))
-            return false;
-    }
+    const int32_t state = Baselib_atomic_load_32_acquire(&semaphore->state);
+    return state & Detail_Baselib_EventSemaphore_Set ? true : false;
 }
 
 BASELIB_INLINE_API void Baselib_EventSemaphore_Acquire(Baselib_EventSemaphore* semaphore)
@@ -160,10 +152,7 @@ BASELIB_INLINE_API void Baselib_EventSemaphore_Set(Baselib_EventSemaphore* semap
     {
         const int32_t setState = Detail_Baselib_EventSemaphore_Generation(state) | Detail_Baselib_EventSemaphore_Set;
         if (Baselib_atomic_compare_exchange_weak_32_release_relaxed(&semaphore->state, &state, setState))
-        {
-            Baselib_Cpu_Hint_MonitorRelease();
             return;
-        }
     }
     // If this is not the case however, we do exactly that, increase the generation & wake all threads.
     while (state == resetState)
@@ -171,7 +160,6 @@ BASELIB_INLINE_API void Baselib_EventSemaphore_Set(Baselib_EventSemaphore* semap
         const int32_t nextGenSetState = Detail_Baselib_EventSemaphore_Generation(state + 1) | Detail_Baselib_EventSemaphore_Set;
         if (Baselib_atomic_compare_exchange_weak_32_release_relaxed(&semaphore->state, &state, nextGenSetState))
         {
-            Baselib_Cpu_Hint_MonitorRelease();
             Baselib_SystemFutex_Notify(&semaphore->state, UINT32_MAX, Baselib_WakeupFallbackStrategy_All);
             return;
         }

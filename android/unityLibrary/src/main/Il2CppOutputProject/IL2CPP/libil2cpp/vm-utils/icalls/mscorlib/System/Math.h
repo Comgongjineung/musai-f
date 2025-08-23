@@ -1,7 +1,11 @@
 #pragma once
 #include "il2cpp-config.h"
 
+#if RUNTIME_TINY
+namespace tiny
+#else
 namespace il2cpp
+#endif
 {
 namespace icalls
 {
@@ -40,6 +44,9 @@ namespace System
         static double Tan(double a);
         static double Tanh(double value);
         static float Abs(float value);
+#if IL2CPP_TINY
+        static double SplitFractionDouble(double* value);
+#endif
     };
 } /* namespace System */
 } /* namespace mscorlib */

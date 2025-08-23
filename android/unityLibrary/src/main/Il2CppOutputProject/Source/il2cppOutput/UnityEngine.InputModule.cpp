@@ -1,7 +1,13 @@
 ﻿#include "pch-cpp.hpp"
 
+#ifndef _MSC_VER
+# include <alloca.h>
+#else
+# include <malloc.h>
+#endif
 
 
+#include <limits>
 
 
 
@@ -816,32 +822,6 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeInputSystem_Update_m898216ECCA2612
 	if (!_il2cpp_icall_func)
 	_il2cpp_icall_func = (NativeInputSystem_Update_m898216ECCA26122D827C2FB45FC4A20296031036_ftn)il2cpp_codegen_resolve_icall ("UnityEngineInternal.Input.NativeInputSystem::Update(UnityEngineInternal.Input.NativeInputUpdateType)");
 	_il2cpp_icall_func(___0_updateType);
-}
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool NativeInputSystem_get_normalizeScrollWheelDelta_mF633DF00F7F5823179F3473BC5E07BE9BF75A04F (const RuntimeMethod* method) 
-{
-	typedef bool (*NativeInputSystem_get_normalizeScrollWheelDelta_mF633DF00F7F5823179F3473BC5E07BE9BF75A04F_ftn) ();
-	static NativeInputSystem_get_normalizeScrollWheelDelta_mF633DF00F7F5823179F3473BC5E07BE9BF75A04F_ftn _il2cpp_icall_func;
-	if (!_il2cpp_icall_func)
-	_il2cpp_icall_func = (NativeInputSystem_get_normalizeScrollWheelDelta_mF633DF00F7F5823179F3473BC5E07BE9BF75A04F_ftn)il2cpp_codegen_resolve_icall ("UnityEngineInternal.Input.NativeInputSystem::get_normalizeScrollWheelDelta()");
-	bool icallRetVal = _il2cpp_icall_func();
-	return icallRetVal;
-}
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void NativeInputSystem_set_normalizeScrollWheelDelta_mA6CCECFB417A30D7AEB05FDB313FEA28963F012D (bool ___0_value, const RuntimeMethod* method) 
-{
-	typedef void (*NativeInputSystem_set_normalizeScrollWheelDelta_mA6CCECFB417A30D7AEB05FDB313FEA28963F012D_ftn) (bool);
-	static NativeInputSystem_set_normalizeScrollWheelDelta_mA6CCECFB417A30D7AEB05FDB313FEA28963F012D_ftn _il2cpp_icall_func;
-	if (!_il2cpp_icall_func)
-	_il2cpp_icall_func = (NativeInputSystem_set_normalizeScrollWheelDelta_mA6CCECFB417A30D7AEB05FDB313FEA28963F012D_ftn)il2cpp_codegen_resolve_icall ("UnityEngineInternal.Input.NativeInputSystem::set_normalizeScrollWheelDelta(System.Boolean)");
-	_il2cpp_icall_func(___0_value);
-}
-IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR float NativeInputSystem_GetScrollWheelDeltaPerTick_mD4FBEBF03836656D5DE3D39A8CEB3CB395DB607B (const RuntimeMethod* method) 
-{
-	typedef float (*NativeInputSystem_GetScrollWheelDeltaPerTick_mD4FBEBF03836656D5DE3D39A8CEB3CB395DB607B_ftn) ();
-	static NativeInputSystem_GetScrollWheelDeltaPerTick_mD4FBEBF03836656D5DE3D39A8CEB3CB395DB607B_ftn _il2cpp_icall_func;
-	if (!_il2cpp_icall_func)
-	_il2cpp_icall_func = (NativeInputSystem_GetScrollWheelDeltaPerTick_mD4FBEBF03836656D5DE3D39A8CEB3CB395DB607B_ftn)il2cpp_codegen_resolve_icall ("UnityEngineInternal.Input.NativeInputSystem::GetScrollWheelDeltaPerTick()");
-	float icallRetVal = _il2cpp_icall_func();
-	return icallRetVal;
 }
 #ifdef __clang__
 #pragma clang diagnostic pop

@@ -1,5 +1,7 @@
 #include "il2cpp-config.h"
 
+#if !RUNTIME_TINY
+
 #include "MemoryMappedFile.h"
 
 #include "Baselib.h"
@@ -82,3 +84,5 @@ namespace utils
     }
 }
 }
+
+#endif

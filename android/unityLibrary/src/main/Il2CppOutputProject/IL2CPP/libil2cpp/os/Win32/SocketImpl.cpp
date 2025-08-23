@@ -11,7 +11,9 @@
 #include "WindowsHelpers.h"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#include <mswsock.h>
+#if !IL2CPP_TARGET_XBOXONE
+    #include <mswsock.h>
+#endif
 #include "os/Error.h"
 #include "os/Socket.h"
 #include "os/ErrorCodes.h"
