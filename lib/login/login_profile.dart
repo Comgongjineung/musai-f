@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../utils/auth_storage.dart';
 import 'preference_page.dart';
+import '../utils/profile_image.dart';
 
 class LoginProfileScreen extends StatelessWidget {
   final int userId;
@@ -192,13 +194,35 @@ class StepIndicator extends StatelessWidget {
   }
 }
 
-class ProfileAvatar extends StatelessWidget {
+class ProfileAvatar extends StatefulWidget {
   final double screenWidth;
   final double screenHeight;
   const ProfileAvatar({super.key, required this.screenWidth, required this.screenHeight});
 
   @override
+  State<ProfileAvatar> createState() => _ProfileAvatarState();
+}
+
+class _ProfileAvatarState extends State<ProfileAvatar> {
+  String? _imagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedProfileImage();
+  }
+
+  Future<void> _loadSavedProfileImage() async {
+    final path = await ProfileImageHelper.getSavedProfileImagePath();
+    if (path != null && File(path).existsSync()) {
+      if (!mounted) return;
+      setState(() => _imagePath = path);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final screenWidth = widget.screenWidth;
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
@@ -218,12 +242,15 @@ class ProfileAvatar extends StatelessWidget {
           child: CircleAvatar(
             radius: screenWidth * 0.135,
             backgroundColor: const Color(0xFFFEFDFC),
-            backgroundImage: const AssetImage('assets/images/profile.png'),
+            backgroundImage: _imagePath != null && File(_imagePath!).existsSync()
+                ? FileImage(File(_imagePath!))
+                : const AssetImage('assets/images/profile.png') as ImageProvider,
           ),
         ),
         GestureDetector(
-          onTap: () {
-            // To be implemented: open gallery and replace image
+          onTap: () async {
+            await ProfileImageHelper.pickAndSaveProfileImage();
+            await _loadSavedProfileImage(); // 즉시 반영
           },
           child: Container(
             width: screenWidth * 0.08,

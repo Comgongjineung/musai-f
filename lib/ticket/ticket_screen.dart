@@ -170,9 +170,9 @@ Future<void> _openShareSheet(BuildContext context) async {
   );
                   },
                 ),
-                const SizedBox(width: 25), // ← 아이콘 간 간격
+                const SizedBox(width: 24), // ← 아이콘 간 간격
                 _ShareSquareButton(
-                  background: const Color(0xFF8B7E74),
+                  background: const Color(0xFF837670),
                   label: 'URL',
                   labelColor: Colors.black,
                   child: const Icon(Icons.link, size: 20, color: Colors.white),
@@ -220,11 +220,11 @@ Future<void> _showUrlBottomSheet(BuildContext context, String url) async {
     isScrollControlled: false,
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     builder: (_) {
       return Padding(
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -234,7 +234,7 @@ Future<void> _showUrlBottomSheet(BuildContext context, String url) async {
                 color: Colors.black12, borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             const Text('공유 링크', style: TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
             Row(
@@ -250,7 +250,7 @@ Future<void> _showUrlBottomSheet(BuildContext context, String url) async {
                       url,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13),
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ),
                 ),
@@ -269,7 +269,7 @@ Future<void> _showUrlBottomSheet(BuildContext context, String url) async {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -279,7 +279,7 @@ Future<void> _showUrlBottomSheet(BuildContext context, String url) async {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(44),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
               ),
@@ -421,9 +421,9 @@ Widget _deletableTicketWrapper({
             children: [
               Column(
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -482,7 +482,7 @@ Positioned(
     showDialog(
       context: context,
       builder: (_) => Align(
-        alignment: Alignment.topRight,
+        alignment: Alignment.center,
         child: Padding(
           padding: const EdgeInsets.only(top: 70, right: 20),
           child: Material(
@@ -581,7 +581,7 @@ Positioned(
             Text(
               "티켓 만들기",
               style: TextStyle(
-                fontSize: 14.85,
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
                 color: buttonColor,
               ),
@@ -641,7 +641,7 @@ Positioned(
             },
           ),
         ),
-        const SizedBox(height: 53),
+        const SizedBox(height: 52),
         SmoothPageIndicator(
           controller: controller,
           count: tickets.length,
@@ -653,7 +653,7 @@ Positioned(
             activeDotColor: Color(0xFF706B66),
           ),
         ),
-        const SizedBox(height: 37),
+        const SizedBox(height: 36),
       ],
     );
   }
@@ -917,7 +917,7 @@ class _ShareSquareButton extends StatelessWidget {
             child: child,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Text(
           label,
           style: TextStyle(

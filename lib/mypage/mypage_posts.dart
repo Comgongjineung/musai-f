@@ -4,14 +4,15 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:musai_f/utils/auth_storage.dart';
 import 'package:musai_f/community/community_detail_screen.dart';
+import '../app_bar_widget.dart';
 
 const String BASE_URL = 'http://43.203.23.173:8080';
 
 // ------------------ 색상 토큰 (디자인 톤) ------------------
 const _cTextPrimary = Color(0xFF343231); // 닉네임, musai
-const _cTextSecondary = Color(0xFF646363); // 내용
-const _cTextHint = Color(0xFF9E9E9E); // 날짜
-const _cBorder = Color(0xFFEFEFEF); // 카드 테두리
+const _cTextSecondary = Color(0xFF706B66); // 내용
+const _cTextHint = Color(0xFF706B66); // 날짜
+const _cBorder = Color(0xFFEBEBEB); // 카드 테두리
 const _cInfoIcon = Color(0xFF837670); // info 아이콘
 
 // ------------------ 모델 ------------------
@@ -143,12 +144,12 @@ class MyPostsEntryTile extends StatelessWidget {
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const MyPostsPage()),
       ),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: _cBorder),
         ),
         child: Row(
@@ -215,39 +216,14 @@ class _MyPostsPageState extends State<MyPostsPage> {
     const h = 844.0;
 
     // 요구 간격을 비율로 계산
-    final top40  = screenHeight * (40 / h);   // musai / back 버튼 상단 40
     final left24 = screenWidth  * (24 / w);   // 좌우 24
     final gap20  = screenHeight * (20 / h);   // musai 아래 첫 카드까지 20
     final gap8   = screenHeight * (8  / h);   // 카드 간 8
     final bot10  = screenHeight * (10 / h);   // 하단 10
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.transparent,
-        centerTitle: true,
-        toolbarHeight: kToolbarHeight + top40,
-        leading: Padding(
-          padding: EdgeInsets.only(left: left24, top: top40),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, size: 25, color: _cTextPrimary),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ),
-        title: Padding(
-          padding: EdgeInsets.only(top: top40),
-          child: const Text(
-            'musai',
-            style: TextStyle(
-              color: _cTextPrimary, // #343231
-              fontWeight: FontWeight.w600,
-              fontSize: 32, // 요청 반영
-            ),
-          ),
-        ),
+      appBar: AppBarWidget(
+        showBackButton: true,
       ),
       body: SafeArea(
         child: FutureBuilder<_LoadedData>(
@@ -264,7 +240,7 @@ class _MyPostsPageState extends State<MyPostsPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text('불러오기에 실패했습니다.', style: TextStyle(color: _cTextPrimary)),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       Text('${snap.error}', textAlign: TextAlign.center, style: const TextStyle(color: _cTextSecondary)),
                       const SizedBox(height: 12),
                       OutlinedButton(
@@ -300,7 +276,7 @@ class _MyPostsPageState extends State<MyPostsPage> {
                 final p = items[i];
 
                 return InkWell(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -310,18 +286,11 @@ class _MyPostsPageState extends State<MyPostsPage> {
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: _cBorder), // #EFEFEF
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x0A000000),
-                          blurRadius: 12,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,11 +313,11 @@ class _MyPostsPageState extends State<MyPostsPage> {
                               _fmt(p.createdAt),
                               style: const TextStyle(fontSize: 12, color: _cTextHint), // #9E9E9E
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 4),
                             const Icon(Icons.info_outline, size: 15, color: _cInfoIcon), // #837670
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
 
                         // 본문: 내용 우선, 없으면 제목
                         Text(

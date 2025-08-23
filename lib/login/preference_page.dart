@@ -20,6 +20,14 @@ class _PreferencePageState extends State<PreferencePage> {
   ArtStyle? _pickedInThisRound;          // 현재 단계에서 사용자가 고른 항목
   late Map<String, int> _scores;         // 사조별 점수
 
+  // 이름 안에 여러 사조가 들어올 수 있으므로 구분자로 나눠서 사용
+  // ⚠ '/'는 '서아시아 / 중동'처럼 단일 사조 이름에 쓰이므로 분리 대상에서 제외합니다.
+  // 다중 사조는 ',', '·', '&', '+' 로만 구분하세요. (예: "르네상스+바로크", "르네상스 & 바로크")
+  List<String> _splitStyles(String raw) {
+    final parts = raw.split(RegExp(r"\s*[,·&+]\s*"));
+    return parts.map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -77,7 +85,11 @@ class _PreferencePageState extends State<PreferencePage> {
   void _initStylesAndScores() {
     final seed = _artStylesSeed();
     _shuffled = List<ArtStyle>.from(seed)..shuffle();
-    _scores = { for (final s in _shuffled) s.name : 0 };
+    final allKeys = <String>{};
+    for (final a in seed) {
+      allKeys.addAll(_splitStyles(a.name));
+    }
+    _scores = { for (final k in allKeys) k : 0 };
   }
 
   // 현재 단계의 8개 (0~7, 8~15, 16~23)
@@ -241,8 +253,10 @@ class _PreferencePageState extends State<PreferencePage> {
   Future<void> _onNext() async {
     if (_pickedInThisRound == null) return;
 
-    // 선택 시 점수 +1
-    _scores[_pickedInThisRound!.name] = (_scores[_pickedInThisRound!.name] ?? 0) + 1;
+    // 선택 시, 이름을 분해하여 포함된 모든 사조에 +1
+    for (final key in _splitStyles(_pickedInThisRound!.name)) {
+      _scores[key] = (_scores[key] ?? 0) + 1;
+    }
 
     // 다음 단계로
     if (_round < 2) {
@@ -312,6 +326,7 @@ class _PreferencePageState extends State<PreferencePage> {
   }
 
   // --- 데이터 정의부, image path ---
+  // 다중 사조는 '+' 로 구분함 (예: "르네상스+바로크")
   List<ArtStyle> _artStylesSeed() {
     const entries = <Map<String, String>>[
       {"name": "로코코", "image": "assets/styles/rococo.jpg"},
@@ -320,7 +335,7 @@ class _PreferencePageState extends State<PreferencePage> {
       {"name": "남아시아", "image": "assets/styles/south_asia.jpg"},
       {"name": "낭만주의", "image": "assets/styles/romanticism.jpg"},
       {"name": "동아시아", "image": "assets/styles/east_asia.jpg"},
-      {"name": "르네상스", "image": "assets/styles/renaissance.jpg"},
+      {"name": "르네상스 + 바로크", "image": "assets/styles/renaissance.jpg"},
       {"name": "사실주의", "image": "assets/styles/realism.jpg"},
       {"name": "아르누보", "image": "assets/styles/art_nouveau.jpg"},
       {"name": "인상주의", "image": "assets/styles/impressionism.jpg"},
