@@ -202,7 +202,10 @@ class _PreferencePageState extends State<PreferencePage> {
     return Image(
       image: s.imageProvider,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFFB1B1B1)),
+      errorBuilder: (_, Object error, __) {
+        print('⚠️ asset load failed: ${s.imagePath}  error=$error');
+        return const ColoredBox(color: Color(0xFFB1B1B1));
+      },
     );
   }
 
@@ -323,32 +326,32 @@ class _PreferencePageState extends State<PreferencePage> {
   }
 
   // --- 데이터 정의부, image path ---
-  // 다중 사조는 '+' 로 구분함 (예: "르네상스+바로크")
+  // 다중 사조는 '+' 로 구분함 (예: "르네상스 + 바로크")
   List<ArtStyle> _artStylesSeed() {
     const entries = <Map<String, String>>[
-      {"name": "로코코", "image": "assets/styles/rococo.jpg"},
-      {"name": "바로크", "image": "assets/styles/baroque.jpg"},
-      {"name": "팝아트", "image": "assets/styles/pop_art.jpg"},
+      {"name": "로코코", "image": "assets/styles/rococo.jpg"}, 
+      {"name": "바로크", "image": "assets/styles/baroque.jpg"}, 
+      {"name": "팝아트", "image": "assets/styles/pop_art.jpg"}, 
       {"name": "남아시아", "image": "assets/styles/south_asia.jpg"},
-      {"name": "낭만주의", "image": "assets/styles/romanticism.jpg"},
-      {"name": "동아시아", "image": "assets/styles/east_asia.jpg"},
-      {"name": "르네상스 + 바로크", "image": "assets/styles/renaissance.jpg"},
-      {"name": "사실주의", "image": "assets/styles/realism.jpg"},
-      {"name": "아르누보", "image": "assets/styles/art_nouveau.jpg"},
-      {"name": "인상주의", "image": "assets/styles/impressionism.jpg"},
-      {"name": "입체주의", "image": "assets/styles/cubism.jpg"},
+      {"name": "낭만주의 + 인상주의", "image": "assets/styles/romanticism.jpg"}, 
+      {"name": "동아시아", "image": "assets/styles/east_asia.jpg"}, 
+      {"name": "르네상스 + 바로크", "image": "assets/styles/renaissance.jpg"}, 
+      {"name": "사실주의", "image": "assets/styles/realism.jpg"}, 
+      {"name": "아르누보", "image": "assets/styles/art_nouveau.jpg"}, 
+      {"name": "인상주의", "image": "assets/styles/impressionism.jpg"}, 
+      {"name": "입체주의 + 표현주의", "image": "assets/styles/cubism.jpg"}, 
       {"name": "표현주의", "image": "assets/styles/expressionism.jpg"},
-      {"name": "현대미술", "image": "assets/styles/contemporary.jpg"},
-      {"name": "고대 미술", "image": "assets/styles/ancient.jpg"},
+      {"name": "현대미술", "image": "assets/styles/contemporary.jpg"}, 
+      {"name": "고대 미술", "image": "assets/styles/ancient.jpg"}, 
       {"name": "중세 미술", "image": "assets/styles/medieval.jpg"},
-      {"name": "동남아시아", "image": "assets/styles/sea.jpg"},
-      {"name": "신고전주의", "image": "assets/styles/neoclassicism.jpg"},
+      {"name": "동남아시아", "image": "assets/styles/eastsouth_asia.jpg"},
+      {"name": "신고전주의 + 낭만주의", "image": "assets/styles/neoclassicism.jpg"}, 
       {"name": "중앙아시아", "image": "assets/styles/central_asia.jpg"},
-      {"name": "초현실주의", "image": "assets/styles/surrealism.jpg"},
-      {"name": "추상표현주의", "image": "assets/styles/abstract_expressionism.jpg"},
-      {"name": "후기 인상주의", "image": "assets/styles/post_impressionism.jpg"},
+      {"name": "초현실주의", "image": "assets/styles/surrealism.jpg"}, 
+      {"name": "추상표현주의", "image": "assets/styles/abstract_expressionism.jpg"}, 
+      {"name": "후기 인상주의 + 입체주의", "image": "assets/styles/post_impressionism.jpg"}, 
       {"name": "서아시아 / 중동", "image": "assets/styles/westasia_middleeast.jpg"},
-      {"name": "인상주의", "image": "assets/styles/test_extra.jpg"}, // 24개 채우기용
+      {"name": "인상주의 + 후기 인상주의", "image": "assets/styles/impressionism2.jpg"},
       {"name": "북유럽/기타", "image": "assets/styles/northern_other.jpg"},
     ];
 

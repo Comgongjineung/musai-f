@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'camera_view.dart';
 import '../describe/describe_page.dart';
 import '../bottom_nav_bar.dart';
@@ -46,124 +47,123 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () async {
-          if (isRecognizing) {
-    print('⚠️ 인식 중에는 다시 촬영할 수 없습니다.');
-    return;
-  }
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light, // Android: white icons
+        statusBarBrightness: Brightness.dark,      // iOS: white icons
+      ),
+      child: Scaffold(
+        body: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () async {
+            if (isRecognizing) {
+      print('⚠️ 인식 중에는 다시 촬영할 수 없습니다.');
+      return;
+    }
 
-  // 터치 즉시 인식 중으로 설정 (race condition 방지)
-  setState(() {
-    isRecognizing = true;
-  });
-          print('🔍 터치 이벤트 발생');
-          print('🔍 _cameraViewKey.currentState: ${_cameraViewKey.currentState}');
-          
-          if (_cameraViewKey.currentState == null) {
-            print('❌ CameraView 상태가 null입니다');
-            setState(() {
-      isRecognizing = false; // 오류 발생 시 다시 false로 설정
+    // 터치 즉시 인식 중으로 설정 (race condition 방지)
+    setState(() {
+      isRecognizing = true;
     });
-            return;
-          }
-          
-          try {
-            final picture = await _cameraViewKey.currentState!.takePicture();
-            print('🔍 사진 촬영 결과: $picture');
+            print('🔍 터치 이벤트 발생');
+            print('🔍 _cameraViewKey.currentState: ${_cameraViewKey.currentState}');
             
-            if (picture != null) {
-              final bytes = await picture.readAsBytes();
-              final dir = await getTemporaryDirectory();
-              final file = File('${dir.path}/captured.jpg');
-              await file.writeAsBytes(bytes);
-              
-              print('🔍 파일 저장 완료: ${file.path}');
-              
-              // uploadImage 함수 호출 (API 호출 및 결과 처리)
-              await uploadImage(context, file);
-            } else {
-              print('❌ 사진 촬영 실패: picture가 null입니다');
+            if (_cameraViewKey.currentState == null) {
+              print('❌ CameraView 상태가 null입니다');
               setState(() {
-        isRecognizing = false; // 실패 시 복구
+        isRecognizing = false; // 오류 발생 시 다시 false로 설정
+      });
+              return;
+            }
+            
+            try {
+              final picture = await _cameraViewKey.currentState!.takePicture();
+              print('🔍 사진 촬영 결과: $picture');
+              
+              if (picture != null) {
+                final bytes = await picture.readAsBytes();
+                final dir = await getTemporaryDirectory();
+                final file = File('${dir.path}/captured.jpg');
+                await file.writeAsBytes(bytes);
+                
+                print('🔍 파일 저장 완료: ${file.path}');
+                
+                // uploadImage 함수 호출 (API 호출 및 결과 처리)
+                await uploadImage(context, file);
+              } else {
+                print('❌ 사진 촬영 실패: picture가 null입니다');
+                setState(() {
+          isRecognizing = false; // 실패 시 복구
+        });
+              }
+            } catch (e) {
+              print('❌ 사진 촬영 중 오류 발생: $e');
+              setState(() {
+        isRecognizing = false; // 예외 발생 시 복구
       });
             }
-          } catch (e) {
-            print('❌ 사진 촬영 중 오류 발생: $e');
-            setState(() {
-      isRecognizing = false; // 예외 발생 시 복구
-    });
-          }
-        },
-        onScaleStart: (details) {
-          _cameraViewKey.currentState?.onZoomStart(details);
-        },
-        onScaleUpdate: (details) {
-          _cameraViewKey.currentState?.onZoomUpdate(details);
-        },
-        child: Stack(
-          children: [
-            Positioned.fill(child: IgnorePointer(child: CameraView(key: _cameraViewKey))),
-            Positioned.fill(child: CustomPaint(painter: HolePainter())),
-            Positioned(
-              top: screenHeight * 0.215,
-              left: screenWidth * 0.065,
-              right: screenWidth * 0.065,
-              child: AspectRatio(
-                aspectRatio: 3 / 4.6,
-                child: DashedBorderContainer(child: Container()),
+          },
+          onScaleStart: (details) {
+            _cameraViewKey.currentState?.onZoomStart(details);
+          },
+          onScaleUpdate: (details) {
+            _cameraViewKey.currentState?.onZoomUpdate(details);
+          },
+          child: Stack(
+            children: [
+              Positioned.fill(child: IgnorePointer(child: CameraView(key: _cameraViewKey))),
+              Positioned.fill(child: CustomPaint(painter: HolePainter())),
+              Positioned(
+                top: screenHeight * 0.215,
+                left: screenWidth * 0.065,
+                right: screenWidth * 0.065,
+                child: AspectRatio(
+                  aspectRatio: 3 / 4.6,
+                  child: DashedBorderContainer(child: Container()),
+                ),
               ),
-            ),
-            SafeArea(
-              child: Column(
-                children: [
-                  SizedBox(height: screenHeight * 0.001),
-                  Text(
-                    'musai',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: screenWidth * 0.08,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.018),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: screenHeight * 0.01,
-                      horizontal: screenWidth * 0.05,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEAE1DC),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '영역 안에 작품을 위치시키고 화면을 터치해주세요',
+              SafeArea(
+                child: Column(
+                  children: [
+                    SizedBox(height: screenHeight * 0.001),
+                    Text(
+                      'musai',
                       style: TextStyle(
-                        color: const Color(0xFF706B66),
-                        fontSize: screenWidth * 0.035,
-                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        fontSize: screenWidth * 0.08,
+                        fontWeight: FontWeight.w600,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  SizedBox(height: screenHeight * 0.015),
-                  Expanded(child: Container()),
-                  BottomNavBarWidget(currentIndex: 1),
-                ],
+                    SizedBox(height: screenHeight * 0.018),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: screenHeight * 0.01,
+                        horizontal: screenWidth * 0.05,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF6F2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '영역 안에 작품을 위치시키고 화면을 터치해주세요',
+                        style: TextStyle(
+                          color: const Color(0xFF706B66),
+                          fontSize: screenWidth * 0.035,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.015),
+                    Expanded(child: Container()),
+                  ],
+                ),
               ),
-            ),
-            /*
-            if (isRecognizing)
-              SuccessDialog(
-                onCompleted: () {
-                  // SuccessDialog 내용은 describe_page에서
-                },
-              ),
-            */
-          ],
+            ],
+          ),
         ),
+        bottomNavigationBar: const BottomNavBarWidget(currentIndex: 1),
       ),
     );
   }
@@ -245,4 +245,4 @@ class HolePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-} 
+}
