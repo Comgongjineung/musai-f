@@ -482,7 +482,7 @@ Positioned(
     showDialog(
       context: context,
       builder: (_) => Align(
-        alignment: Alignment.center,
+        alignment: Alignment.topRight,
         child: Padding(
           padding: const EdgeInsets.only(top: 70, right: 20),
           child: Material(
@@ -531,7 +531,7 @@ Positioned(
       onTap: onTap,
       child: Container(
         height: 48,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
             Icon(icon, size: 20, color: const Color(0xFF837670)),
@@ -539,7 +539,7 @@ Positioned(
             Text(
               text,
               style:
-                  const TextStyle(fontSize: 14, color: Color(0xFF837670)),
+                  const TextStyle(fontSize: 16, color: Color(0xFF837670)),
             ),
           ],
         ),

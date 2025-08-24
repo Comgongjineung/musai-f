@@ -14,14 +14,11 @@ class PreferencePage extends StatefulWidget {
 }
 
 class _PreferencePageState extends State<PreferencePage> {
-  // --- 테스트 ---
   late List<ArtStyle> _shuffled;        // 24개 랜덤 정렬
   int _round = 0;                        // 0,1,2 (총 3단계)
   ArtStyle? _pickedInThisRound;          // 현재 단계에서 사용자가 고른 항목
   late Map<String, int> _scores;         // 사조별 점수
 
-  // 이름 안에 여러 사조가 들어올 수 있으므로 구분자로 나눠서 사용
-  // ⚠ '/'는 '서아시아 / 중동'처럼 단일 사조 이름에 쓰이므로 분리 대상에서 제외합니다.
   // 다중 사조는 ',', '·', '&', '+' 로만 구분하세요. (예: "르네상스+바로크", "르네상스 & 바로크")
   List<String> _splitStyles(String raw) {
     final parts = raw.split(RegExp(r"\s*[,·&+]\s*"));
