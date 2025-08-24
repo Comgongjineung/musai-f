@@ -312,309 +312,295 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFEFD),
       resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Stack(
-            children: [
-              // X 버튼
-              Positioned(
-                top: screenHeight * (23 / 844),
-                left: screenWidth * (24 / 390),
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFFFDFC),
+        elevation: 0,
+        leading: Padding(
+          padding: EdgeInsets.only(left: screenWidth * 0.06),
+          child: IconButton(
+            icon: const Icon(Icons.close, color: Color(0xFF343231)),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        title: Text(
+          widget.postId != null ? '수정하기' : '글쓰기',
+          style: TextStyle(
+            fontSize: screenWidth * 0.050, // ≈ 0.050 * 390
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF343231),
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: screenWidth * 0.06),
+            child: GestureDetector(
+              onTap: isLoading ? null : _submitPost,
+              child: Container(
+                width: screenWidth * 0.138,
+                height: screenHeight * 0.033,
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.031, // ≈12/390
+                  vertical: screenHeight * 0.002, // ≈2/844
                 ),
-              ),
-
-              // 글쓰기/수정 타이틀
-              Positioned(
-                top: screenHeight * (31 / 844),
-                left: 0,
-                right: 0,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF837670),
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromRGBO(177, 177, 177, 0.3),
+                      blurRadius: screenWidth * 0.008,
+                      spreadRadius: screenWidth * 0.002,
+                    ),
+                  ],
+                ),
                 child: Center(
-                  child: Text(
-                    widget.postId != null ? '수정하기' : '글쓰기',
-                    style: TextStyle(
-                      fontSize: screenWidth * (20 / 390),
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Pretendard',
-                    ),
-                  ),
-                ),
-              ),
-
-              // 완료 버튼
-              Positioned(
-                top: screenHeight * (31 / 844),
-                right: screenWidth * (24 / 390),
-                child: GestureDetector(
-                  onTap: isLoading ? null : _submitPost,
-                  child: Container(
-                    width: screenWidth * (52 / 390),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenWidth * (12 / 390),
-                      vertical: screenHeight * (4 / 844),
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF837670),
-                      borderRadius: BorderRadius.circular(screenWidth * (23.226 / 390)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color.fromRGBO(177, 177, 177, 0.3),
-                          blurRadius: screenWidth * (3.097 / 390),
-                          spreadRadius: screenWidth * (0.774 / 390),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: isLoading
-                          ? SizedBox(
-                              width: screenWidth * (16 / 390),
-                              height: screenWidth * (16 / 390),
-                              child: const CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Text(
-                              '완료',
-                              style: TextStyle(
-                                fontSize: screenWidth * (14 / 390), // 16 -> 14
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Pretendard',
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // 본문 입력 영역
-              Positioned(
-                top: screenHeight * (87 / 844),
-                left: screenWidth * (24 / 390),
-                right: screenWidth * (24 / 390),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                                            // 제목 입력란
-                      Container(
-                        width: screenWidth * (342 / 390),
-                        height: screenHeight * (48 / 844),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF6F2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: TextField(
-                          controller: _titleController,
+                  child: isLoading
+                      ? SizedBox(
+                          width: screenWidth * 0.04,
+                          height: screenWidth * 0.04,
+                          child: const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.0,
+                          ),
+                        )
+                      : Text(
+                          '완료',
                           style: TextStyle(
-                            color: Colors.black,
-                            fontSize: screenWidth * (20 / 390),
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Pretendard',
-                          ),
-                          decoration: InputDecoration(
-                            hintText: '제목',
-                            hintStyle: TextStyle(
-                              color: const Color(0xFFB1B1B1),
-                              fontSize: screenWidth * (20 / 390),
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Pretendard',
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * (20 / 390),
-                            ),
+                            fontSize: screenWidth * 0.041,
+                            color: const Color(0xFFFEFDFC),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
-                      SizedBox(height: screenHeight * (12 / 844)),
-
-                      // 내용 입력란
-                      Container(
-                        width: screenWidth * (342 / 390),
-                        height: screenHeight * (456 / 844),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFEBEBEB)),
-                        ),
-                        child: TextField(
-                          controller: _contentController,
-                          maxLines: null,
-                          expands: true,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: screenWidth * (16 / 390),
-                            fontFamily: 'Pretendard',
-                          ),
-                          decoration: InputDecoration(
-                            hintText: '내용을 입력하세요.',
-                            hintStyle: TextStyle(
-                              color: const Color(0xFFB1B1B1),
-                              fontSize: screenWidth * (16 / 390),
-                              fontFamily: 'Pretendard',
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(screenWidth * (20 / 390)),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * (20 / 844)),
-
-                      // --- 이미지 업로드 영역 (최대 4) ---
-                      Container(
-                        width: screenWidth * (342 / 390),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * (4 / 390),
-                          vertical: screenHeight * (8 / 844),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFEBEBEB)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 상단 라벨 + 개수
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * (12 / 390),
-                                vertical: screenHeight * (4 / 844),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '이미지',
-                                    style: TextStyle(
-                                      fontFamily: 'Pretendard',
-                                      fontSize: screenWidth * (14 / 390),
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF706B66),
-                                    ),
-                                  ),
-                                  Text(
-                                    '${_images.length}/4',
-                                    style: TextStyle(
-                                      fontFamily: 'Pretendard',
-                                      fontSize: screenWidth * (12 / 390),
-                                      color: const Color(0xFFB1B1B1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: screenHeight * (12 / 844)), // 4 -> 12
-
-                            // 2x2 그리드: 선택된 이미지 + 추가 버튼
-                            GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4, // 한 줄에 4칸(작은 정사각형)
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                              ),
-                              itemCount: 4,
-                              itemBuilder: (context, index) {
-                                final hasImage = index < _images.length;
-                                if (hasImage) {
-                                  final file = _images[index];
-                                  return Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                           borderRadius: BorderRadius.circular(12),
-                                           border: Border.all(color: const Color(0xFFEBEBEB)),
-                                           image: DecorationImage(
-                                             image: FileImage(
-                                               File(file.path),
-                                             ),
-                                             fit: BoxFit.cover,
-                                           ),
-                                           color: const Color(0xFFF8F8F8),
-                                         ),
-                                       ),
-                                       Positioned(
-                                         top: -6,
-                                         right: -6,
-                                         child: InkWell(
-                                           onTap: () => _removeImage(index),
-                                           child: Container(
-                                             width: 22,
-                                             height: 22,
-                                             decoration: const BoxDecoration(
-                                               color: Colors.black87,
-                                               shape: BoxShape.circle,
-                                             ),
-                                             child: const Icon(Icons.close, size: 14, color: Colors.white),
-                                           ),
-                                         ),
-                                       ),
-                                     ],
-                                   );
-                                 } else {
-                                   // 빈 슬롯(추가 버튼)
-                                   final canAdd = _images.length < 4;
-                                   return GestureDetector(
-                                     onTap: canAdd ? _pickImages : null,
-                                     child: Container(
-                                       decoration: BoxDecoration(
-                                         color: const Color(0xFFFEF6F2),
-                                         borderRadius: BorderRadius.circular(12),
-                                         border: Border.all(color: const Color(0xFFEBEBEB)),
-                                       ),
-                                       child: Center(
-                                         child: Icon(
-                                           Icons.add_photo_alternate_rounded,
-                                           size: screenWidth * (20 / 390),
-                                           color: const Color(0xFFB1B1B1),
-                                         ),
-                                       ),
-                                     ),
-                                   );
-                                 }
-                               },
-                             ),
-                           ],
-                         ),
-                       ),
-                        SizedBox(height: screenHeight * (12 / 844)),
-                      // 커뮤니티 이용 수칙
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: screenWidth * (16 / 390)),
-                          child: Text(
-                            '커뮤니티 이용 수칙\n비속어 사용 금지 등등..',
-                            style: TextStyle(
-                              color: const Color(0xFF706B66),
-                              fontSize: screenWidth * (12 / 390),
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'Pretendard',
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * (12 / 844)),
-                    ],
-                  ),
                 ),
               ),
-            ],
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: screenHeight * 0.024),
+                  _buildTitleField(context),
+                  SizedBox(height: screenHeight * 0.014),
+                  _buildContentField(context),
+                  SizedBox(height: screenHeight * 0.024),
+                  _buildImageSection(context),
+                  SizedBox(height: screenHeight * 0.014),
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _buildTitleField(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      height: screenHeight * 0.057,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF6F2),
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      child: TextField(
+        controller: _titleController,
+        style: TextStyle(
+          color: const Color(0xFF343231),
+          fontSize: screenWidth * 0.051,
+          fontWeight: FontWeight.w600,
+        ),
+        decoration: InputDecoration(
+          hintText: '제목',
+          hintStyle: TextStyle(
+            color: const Color(0xFFB1B1B1),
+            fontSize: screenWidth * 0.051,
+            fontWeight: FontWeight.w600,
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.051,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentField(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      height: screenHeight * 0.540,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEFDFC),
+        borderRadius: BorderRadius.circular(20.0),
+        border: Border.all(color: const Color(0xFFEBEBEB)),
+      ),
+      child: TextField(
+        controller: _contentController,
+        maxLines: null,
+        expands: true,
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: screenWidth * 0.041,
+        ),
+        decoration: InputDecoration(
+          hintText: '내용을 입력하세요.',
+          hintStyle: TextStyle(
+            color: const Color(0xFFB1B1B1),
+            fontSize: screenWidth * 0.041,
+          ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.all(screenWidth * 0.041),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageSection(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: screenWidth * 0.010,
+        vertical: screenHeight * 0.009,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEFDFC),
+        borderRadius: BorderRadius.circular(20.0),
+        border: Border.all(color: const Color(0xFFEBEBEB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.031,
+              vertical: screenHeight * 0.005,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '이미지',
+                  style: TextStyle(
+                    fontFamily: 'Pretendard',
+                    fontSize: screenWidth * 0.041,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF706B66),
+                  ),
+                ),
+                Text(
+                  '${_images.length}/4',
+                  style: TextStyle(
+                    fontFamily: 'Pretendard',
+                    fontSize: screenWidth * 0.031,
+                    color: const Color(0xFFB1B1B1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.014),
+          _buildImageGrid(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageGrid(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        final hasImage = index < _images.length;
+        if (hasImage) {
+          return _imageTile(context, index);
+        } else {
+          return _addSlotTile(context);
+        }
+      },
+    );
+  }
+
+  Widget _imageTile(BuildContext context, int index) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final file = _images[index];
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            border: Border.all(color: const Color(0xFFEBEBEB)),
+            image: DecorationImage(
+              image: FileImage(File(file.path)),
+              fit: BoxFit.cover,
+            ),
+            color: const Color(0xFFF8F8F8),
+          ),
+        ),
+        Positioned(
+          top: -6.0,
+          right: -6.0,
+          child: InkWell(
+            onTap: () => _removeImage(index),
+            child: Container(
+              width: 22.0,
+              height: 22.0,
+              decoration: const BoxDecoration(
+                color: Colors.black87,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.close, size: 14.0, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _addSlotTile(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final canAdd = _images.length < 4;
+    return GestureDetector(
+      onTap: canAdd ? _pickImages : null,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFFEF6F2),
+          borderRadius: BorderRadius.circular(12.0),
+          border: Border.all(color: const Color(0xFFEBEBEB)),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.add_photo_alternate_rounded,
+            size: screenWidth * 0.051,
+            color: const Color(0xFFB1B1B1),
+          ),
+        ),
+      ),
+    );
+  }
+
 }

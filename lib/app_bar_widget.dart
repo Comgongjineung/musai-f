@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'alarm_page.dart';
+import 'package:flutter/services.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final bool showBackButton;
@@ -14,6 +15,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final bool showNotificationIcon;
   final bool showSettingsIcon;
   final VoidCallback? onSettingsPressed;
+  final SystemUiOverlayStyle? systemOverlayStyle;
 
   const AppBarWidget({
     super.key,
@@ -28,6 +30,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.showNotificationIcon = false,
     this.showSettingsIcon = false,
     this.onSettingsPressed,
+    this.systemOverlayStyle,
   });
 
   @override
@@ -38,6 +41,11 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor ?? Colors.transparent,
       elevation: 0,
       centerTitle: centerTitle,
+      systemOverlayStyle: systemOverlayStyle ?? SystemUiOverlayStyle(
+        statusBarColor: (backgroundColor ?? Colors.white),
+        statusBarIconBrightness: Brightness.dark, // Android: dark icons
+        statusBarBrightness: Brightness.light,    // iOS: dark icons
+      ),
       leading: showBackButton
         ? Padding(
             padding: const EdgeInsets.only(left:24), 
@@ -119,6 +127,11 @@ class CameraAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
       backgroundColor: Colors.transparent,
       elevation: 0,
       centerTitle: true,
+      systemOverlayStyle: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light, // Android: light icons (white)
+        statusBarBrightness: Brightness.dark,       // iOS: light icons
+      ),
       leading: showBackButton
           ? IconButton(
               icon: const Icon(
