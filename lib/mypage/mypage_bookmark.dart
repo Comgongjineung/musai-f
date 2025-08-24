@@ -47,13 +47,6 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     '미상'
   ];
 
-  // 예술사조 버튼 폭 계산
-  double _styleButtonWidth(String style) {
-    if (style == '서아시아 / 중동') return 66;
-    final int charCount = style.replaceAll(' ', '').length;
-    return charCount <= 4 ? 58 : 62;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -135,68 +128,77 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
 
   // 예술사조 필터 UI 빌드
   Widget _buildStyleFilter(double screenWidth, double screenHeight) {
+    // Helper: chunk list into fixed-size groups
+    List<List<String>> _chunk(List<String> list, int size) {
+      final chunks = <List<String>>[];
+      for (var i = 0; i < list.length; i += size) {
+        chunks.add(list.sublist(i, i + size > list.length ? list.length : i + size));
+      }
+      return chunks;
+    }
+
+    final firstLine = artStyles.take(4).toList();
+    final rest = artStyles.skip(4).toList();
+    final restChunks = _chunk(rest, 4); // 원하는 기준: 4개씩
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 첫 줄: 처음 5개 + 우측 V 아이콘(고정)
-        SizedBox(
-          height: 24,
-          child: Row(
-            children: [
-              Expanded(
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: artStyles
-                      .take(5)
-                      .map((style) => _buildStyleButton(style))
-                      .toList(),
-                ),
+        // 첫 줄: 처음 4개 + 우측 토글 아이콘
+        Row(
+          children: [
+            // Wrap으로 4개 배치 (hug 크기)
+            Expanded(
+              child: Wrap(
+                spacing: screenWidth * 0.02,
+                runSpacing: screenWidth * 0.02,
+                children: firstLine
+                    .map((style) => _buildStyleButton(style, screenWidth, screenHeight))
+                    .toList(),
               ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isStyleExpanded = !isStyleExpanded;
-                  });
-                },
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: Center(
-                    child: Icon(
-                      isStyleExpanded
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      color: const Color(0xFF837670),
-                      size: 20,
-                    ),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  isStyleExpanded = !isStyleExpanded;
+                });
+              },
+              child: SizedBox(
+                width: screenWidth * 0.062,
+                height: screenHeight * 0.03,
+                child: Center(
+                  child: Icon(
+                    isStyleExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    color: const Color(0xFF837670),
+                    size: screenWidth * 0.065,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
 
-        // 둘째 줄: 확장 시 나머지 사조들 표시
+        // 확장 시: 5개씩 묶어 보여주되, 화면 폭이 부족하면 자동으로 다음 줄로 넘어감
         if (isStyleExpanded) ...[
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: artStyles
-                .skip(5)
-                .map((style) => _buildStyleButton(style))
-                .toList(),
-          ),
+          ...restChunks.map((chunk) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Wrap(
+                  spacing: screenWidth * 0.02,
+                  runSpacing: screenWidth * 0.02,
+                  children: chunk
+                      .map((style) => _buildStyleButton(style, screenWidth, screenHeight))
+                      .toList(),
+                ),
+              )),
         ],
       ],
     );
   }
 
-  // 개별 예술사조 버튼 빌드
-  Widget _buildStyleButton(String style) {
+  Widget _buildStyleButton(String style, double screenWidth, double screenHeight) {
     final isSelected = selectedStyle == style;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -208,21 +210,24 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
         });
         _loadBookmarks(); // 북마크 다시 로드
       },
-      child: Container(
-        width: _styleButtonWidth(style),
-        height: 24,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
+      child: UnconstrainedBox(
+        alignment: Alignment.centerLeft,
+        child: Material(
           color: isSelected ? const Color(0xFF837670) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF837670)),
-        ),
-        child: Text(
-          style,
-          style: TextStyle(
-            fontSize: 12,
-            color: isSelected ? Colors.white : const Color(0xFF837670),
-            fontWeight: FontWeight.w500,
+          shape: StadiumBorder(
+            side: BorderSide(color: const Color(0xFF837670)),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.028, vertical: screenHeight * 0.004),
+            child: Text(
+              style,
+              style: TextStyle(
+                fontSize: 12,
+                color: isSelected ? Colors.white : const Color(0xFF837670),
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ),
@@ -246,11 +251,10 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                             SizedBox(height: screenHeight * 0.02),
-               
-                               // 예술사조 필터
-                _buildStyleFilter(screenWidth, screenHeight),
-                SizedBox(height: screenHeight * 0.025),
+              SizedBox(height: screenHeight * 0.02),
+              // 예술사조 필터
+              _buildStyleFilter(screenWidth, screenHeight),
+              SizedBox(height: screenHeight * 0.025),
               Expanded(
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -265,125 +269,124 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                               final item = bookmarks[index];
 
                               return GestureDetector(
-    onTap: () async {
-      if (token == null || userId == null) return;
+                                onTap: () async {
+                                  if (token == null || userId == null) return;
 
-      final bookmarkId = item['bookmarkId'];
+                                  final bookmarkId = item['bookmarkId'];
 
-      final response = await http.get(
-        Uri.parse('http://43.203.23.173:8080/bookmark/read/$bookmarkId/$userId'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
+                                  final response = await http.get(
+                                    Uri.parse('http://43.203.23.173:8080/bookmark/read/$bookmarkId/$userId'),
+                                    headers: {
+                                      'Authorization': 'Bearer $token',
+                                    },
+                                  );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(utf8.decode(response.bodyBytes));
-        print('🔍 북마크 상세 조회 응답: $data');
-        print('🎭 북마크 style 값: ${data['style']}');
+                                  if (response.statusCode == 200) {
+                                    final data = jsonDecode(utf8.decode(response.bodyBytes));
+                                    print('🔍 북마크 상세 조회 응답: $data');
+                                    print('🎭 북마크 style 값: ${data['style']}');
 
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DescriptionScreen(
-              title: data['title'],
-              artist: data['artist'],
-              year: '', // 북마크 데이터엔 year 없음
-              description: data['description'],
-              imagePath: '', // 사용되지 않음
-              imageUrl: data['imageUrl'],
-              style: data['style'], // 예술사조 추가
-              scrollController: ScrollController(),
-              fromBookmark: true,
-            ),
-          ),
-        );
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => DescriptionScreen(
+                                          title: data['title'],
+                                          artist: data['artist'],
+                                          year: '', // 북마크 데이터엔 year 없음
+                                          description: data['description'],
+                                          imagePath: '', // 사용되지 않음
+                                          imageUrl: data['imageUrl'],
+                                          style: data['style'], // 예술사조 추가
+                                          scrollController: ScrollController(),
+                                          fromBookmark: true,
+                                        ),
+                                      ),
+                                    );
 
-        // 북마크 목록 새로고침
-        await _loadBookmarks();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('상세 정보 조회 실패: ${response.statusCode}')),
-        );
-      }
-    },
-                              child: Stack(
-  children: [
-    Container(
-      padding: EdgeInsets.symmetric(
-    horizontal: screenWidth * 0.04,
-    vertical: screenHeight * 0.02, 
-  ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFEFDFC),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEAEAEA)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: screenWidth * 0.18,
-            height: screenHeight * 0.1,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8),
-              image: item['imageUrl'] != null
-                  ? DecorationImage(
-                      image: NetworkImage(item['imageUrl']),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-            ),
-          ),
-          SizedBox(width: screenWidth * 0.037),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: screenWidth * 0.5,
-                  child: Text(
-                    (item['title'] ?? '').replaceAll('*', ''),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.042,
-                      height: 1.1875,
-                      color: const Color(0xFF343231),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.005), 
-                SizedBox(
-                  width: screenWidth * 0.5,
-                  child:
-                  Text(
-                    (item['artist'] ?? '').replaceAll('*', ''),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.032,
-                      color: const Color(0xFF706B66),
-                    )
-                  )
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    ),
-    Positioned(
-      right: 0,
-      child: IconButton(
-        icon: Icon(Icons.close, size: screenWidth * 0.045, color: const Color(0xFFA28F7D)),
-        onPressed: () => _deleteBookmark(item['bookmarkId']),
-      ),
-    ),
-  ],
-),
+                                    // 북마크 목록 새로고침
+                                    await _loadBookmarks();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('상세 정보 조회 실패: ${response.statusCode}')),
+                                    );
+                                  }
+                                },
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: screenWidth * 0.04,
+                                        vertical: screenHeight * 0.02, 
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFEFDFC),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(color: const Color(0xFFEAEAEA)),
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: screenWidth * 0.18,
+                                            height: screenHeight * 0.1,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius: BorderRadius.circular(12),
+                                              image: item['imageUrl'] != null
+                                                  ? DecorationImage(
+                                                      image: NetworkImage(item['imageUrl']),
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : null,
+                                            ),
+                                          ),
+                                          SizedBox(width: screenWidth * 0.037),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  width: screenWidth * 0.5,
+                                                  child: Text(
+                                                    (item['title'] ?? '').replaceAll('*', ''),
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: screenWidth * 0.042,
+                                                      height: 1.1875,
+                                                      color: const Color(0xFF343231),
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: screenHeight * 0.005), 
+                                                SizedBox(
+                                                  width: screenWidth * 0.5,
+                                                  child: Text(
+                                                    (item['artist'] ?? '').replaceAll('*', ''),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      fontSize: screenWidth * 0.032,
+                                                      color: const Color(0xFF706B66),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: 0,
+                                      child: IconButton(
+                                        icon: Icon(Icons.close, size: screenWidth * 0.045, color: const Color(0xFFA28F7D)),
+                                        onPressed: () => _deleteBookmark(item['bookmarkId']),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               );
                             },
                           ),
@@ -396,7 +399,3 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
     );
   }
 }
-
-
-
-

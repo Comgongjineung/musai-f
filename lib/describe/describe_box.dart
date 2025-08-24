@@ -329,10 +329,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   maxChildSize: 0.85,
   builder: (context, scrollController) {
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: screenWidth * ((390 - 367) / 2 / 390),
-      ),
-      width: screenWidth * (367 / 390),
+      margin: EdgeInsets.zero,
+      width: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xFFFAF5F0),
         borderRadius: const BorderRadius.vertical(
@@ -493,7 +491,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   Text(
                     widget.title.replaceAll('*', ''),
                     style: TextStyle(
-                      color: Colors.black,
+                      color: const Color(0xFF343231),
                       fontSize: screenWidth * 0.05,
                       fontWeight: FontWeight.bold,
                     ),
@@ -503,19 +501,19 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   Text(
                     '${widget.artist.replaceAll('*', '')}, ${widget.year.replaceAll('*', '')}',
                     style: TextStyle(
-                      color: const Color(0xFFB1B1B1),
+                      color: const Color(0xFF343231),
                       fontSize: screenWidth * 0.031, // 12/390
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   // 예술사조 표시
-                  SizedBox(height: screenHeight * 0.01),
+                  SizedBox(height: screenHeight * 0.005),
                   Text(
-                    '예술사조: ${widget.style != null && widget.style!.isNotEmpty ? widget.style!.replaceAll('*', '') : '미상'}',
+                    '예술사조  ${widget.style != null && widget.style!.isNotEmpty ? widget.style!.replaceAll('*', '') : '미상'}',
                     style: TextStyle(
-                      color: const Color(0xFF8B7355),
-                      fontSize: screenWidth * 0.028, // 11/390
+                      color: const Color(0xFF706B66),
+                      fontSize: screenWidth * 0.031,
                       fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
