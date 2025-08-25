@@ -352,7 +352,7 @@ class _PreferencePageState extends State<PreferencePage> {
       {"name": "후기 인상주의 + 입체주의", "image": "assets/styles/post_impressionism.jpg"}, 
       {"name": "서아시아 / 중동", "image": "assets/styles/westasia_middleeast.jpg"},
       {"name": "인상주의 + 후기 인상주의", "image": "assets/styles/impressionism2.jpg"},
-      {"name": "북유럽/기타", "image": "assets/styles/northern_other.jpg"},
+      {"name": "미래주의", "image": "assets/styles/futurism.jpg"},
     ];
 
     return entries.map((e) => ArtStyle(name: e['name']!, imagePath: e['image']!)).toList();
