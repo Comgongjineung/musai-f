@@ -30,7 +30,7 @@ android {
     namespace "com.unity3d.player"
     ndkVersion "27.0.12077973"
     compileSdkVersion 35
-    buildToolsVersion '34.0.0'
+    buildToolsVersion '35.0.0'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -59,6 +59,10 @@ android {
 
     packagingOptions {
         doNotStrip '*/arm64-v8a/*.so'
+        // Unity 네이티브 포장 경로 문제 방지
+        jniLibs {
+            useLegacyPackaging true
+        }
     }
 }
 
