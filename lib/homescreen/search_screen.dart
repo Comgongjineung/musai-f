@@ -6,6 +6,17 @@ import '../app_bar_widget.dart';
 import 'exhibition_detail_page.dart';
 import 'package:intl/intl.dart';
 import '../utils/auth_storage.dart';
+import 'home_screen.dart';
+
+
+// 검색 타입
+enum SearchType { title, place }
+
+String _hintByType(SearchType t) =>
+    t == SearchType.title ? '전시회를 검색하세요' : '전시관을 검색하세요';
+
+String _labelByType(SearchType t) =>
+    t == SearchType.title ? '전시회 검색' : '전시관 검색';
 
 // 상태별 태그 색상 함수
 Color getTagBgColor(String status) {
@@ -69,6 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   bool isSearchDone = false;
   List<dynamic> exhibitionList = [];
+  SearchType _searchType = SearchType.title; // 기본: 전시회 제목 검색
 
  Future<void> fetchExhibitions(String query) async {
   if (query.trim().isEmpty) {
@@ -84,7 +96,11 @@ class _SearchScreenState extends State<SearchScreen> {
     return;
   }
 
-  final uri = Uri.parse('http://43.203.23.173:8080/exhibition/search/title?keyword=${Uri.encodeQueryComponent(query)}');
+  final base = 'http://43.203.23.173:8080/exhibition/search';
+  final path = _searchType == SearchType.title ? 'title' : 'place';
+  final paramKey = _searchType == SearchType.title ? 'keyword' : 'place';
+  final uri = Uri.parse('$base/$path?$paramKey=${Uri.encodeQueryComponent(query)}');
+
   final response = await http.get(
     uri,
     headers: {
@@ -97,12 +113,12 @@ class _SearchScreenState extends State<SearchScreen> {
     final utf8Decoded = utf8.decode(response.bodyBytes);
     final List<dynamic> data = json.decode(utf8Decoded);
 
+    // 최신 시작일 순으로 정렬
     data.sort((a, b) {
-  final aDate = DateTime.tryParse(a['startDate'] ?? '') ?? DateTime(1900);
-  final bDate = DateTime.tryParse(b['startDate'] ?? '') ?? DateTime(1900);
-  return bDate.compareTo(aDate); // 최신순 (내림차순)
-});
-
+      final aDate = DateTime.tryParse(a['startDate'] ?? '') ?? DateTime(1900);
+      final bDate = DateTime.tryParse(b['startDate'] ?? '') ?? DateTime(1900);
+      return bDate.compareTo(aDate);
+    });
 
     setState(() {
       isSearchDone = true;
@@ -121,13 +137,13 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFDFC),
       resizeToAvoidBottomInset: true,
       appBar: const AppBarWidget(
         showBackButton: true,
-        backgroundColor: Color(0xFFFFFDFC),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -136,25 +152,33 @@ class _SearchScreenState extends State<SearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _searchBar(context),
-              const SizedBox(height: 20),
-              if (exhibitionList.isNotEmpty) ...[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: const [
-                    _SortDropdown(label: '최신순'),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
-              const SizedBox(height: 20),
+              SizedBox(height: height * 0.024),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const _SortDropdown(label: '최신순'),
+                  const SizedBox(width: 8),
+                  _SearchTypeDropdown(
+                    label: _labelByType(_searchType),
+                    onSelected: (SearchType t) {
+                      setState(() => _searchType = t);
+                      final q = _controller.text.trim();
+                      if (q.isNotEmpty && isSearchDone) {
+                        fetchExhibitions(q);
+                      }
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: height * 0.024),
               exhibitionList.isEmpty
                   ? Center(
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 250),
+                        padding: EdgeInsets.only(top: height * 0.237),
                         child: Text(
                           isSearchDone
                               ? '검색 결과가 없습니다.'
-                              : '전시 제목, 장소, 카테고리 등을 검색하여\n원하는 전시회를 찾아보세요.',
+                              : '전시 제목, 장소를 검색하여\n원하는 전시회를 찾아보세요.',
                           style: const TextStyle(
                             color: Color(0xFF706B66),
                             fontSize: 16,
@@ -180,10 +204,10 @@ class _SearchScreenState extends State<SearchScreen> {
         fetchExhibitions(value);
       },
       decoration: InputDecoration(
-        hintText: '전시회를 검색하세요',
+        hintText: _hintByType(_searchType),
         hintStyle: const TextStyle(color: Color(0xFFB1B1B1)),
         suffixIcon: IconButton(
-          icon: const Icon(Icons.search),
+          icon: const Icon(Icons.search, color: Color(0xFFB1B1B1)),
           onPressed: () => fetchExhibitions(_controller.text),
         ),
         filled: true,
@@ -192,6 +216,60 @@ class _SearchScreenState extends State<SearchScreen> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(width * 0.06),
           borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  Widget _SearchTypeDropdown({required String label, required ValueChanged<SearchType> onSelected}) {
+    final width = MediaQuery.of(context).size.width;
+    // 드롭다운 트리거(칩 모양)
+    return PopupMenuButton<SearchType>(
+      onSelected: onSelected,
+      color: const Color(0xFFA28F7D),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      itemBuilder: (context) => <PopupMenuEntry<SearchType>>[
+        PopupMenuItem<SearchType>(
+          value: SearchType.title,
+          child: const SizedBox(
+            width: 90,
+            child: Text(
+              '전시회 검색',
+              style: TextStyle(color: Color(0xFFFEFDFC)),
+            ),
+          ),
+        ),
+        PopupMenuItem<SearchType>(
+          value: SearchType.place,
+          child: const SizedBox(
+            width: 90,
+            child: Text(
+              '전시관 검색',
+              style: TextStyle(color: Color(0xFFFEFDFC)),
+            ),
+          ),
+        ),
+      ],
+      child: Container(
+        width: 120,
+        decoration: BoxDecoration(
+          color: const Color(0xFFA28F7D), 
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFFFEFDFC), 
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, color: Color(0xFFFEFDFC), size: 18),
+          ],
         ),
       ),
     );
@@ -215,15 +293,14 @@ class _SortDropdown extends StatelessWidget {
         isPrimary ? null : Border.all(color: const Color(0xFF837670));
 
     return SizedBox(
-      width: 84,
-      height: 28,
+      width: 90,
       child: Container(
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(20),
           border: border,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -249,11 +326,13 @@ class _ExhibitionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: exhibitionList.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, __) => SizedBox(height: sh * 0.012),
       itemBuilder: (context, index) {
         final exhi = exhibitionList[index];
         final startDate = exhi['startDate'] ?? '';
@@ -272,49 +351,24 @@ class _ExhibitionList extends StatelessWidget {
             );
           },
           child: Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.symmetric(horizontal: sw * 0.04, vertical: sh * 0.02),
             decoration: BoxDecoration(
               color: const Color(0xFFFEFDFC),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               border: Border.all(color: const Color(0xFFEAEAEA)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  children: [
-                    _Tag(
-                      text: '카테고리',
-                      bgColor: const Color(0xFFA28F7D),
-                      textColor: const Color(0xFFFEFDFC),
-                      radius: 15,
-                      width: 60,
-                      height: 20,
-                      fontSize: 12,
-                    ),
-                    const SizedBox(width: 4),
-                    _Tag(
-                      text: status,
-                      bgColor: getTagBgColor(status),
-                      textColor: getTagTextColor(status),
-                      radius: 15,
-                      border: getTagBorder(status),
-                      width: 49,
-                      height: 20,
-                      fontSize: 12,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: 67,
-                      height: 67,
+                      width: sw * 0.174,
+                      height: sh * 0.090,
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: exhi['thumbnail'] == null || exhi['thumbnail'] == 'null'
     ? const SizedBox.shrink()
@@ -322,8 +376,8 @@ class _ExhibitionList extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         child: Image.network(
           exhi['thumbnail'],
-          width: 67,
-          height: 67,
+          width: sw * 0.174,
+          height: sh * 0.090,
           fit: BoxFit.cover,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
@@ -340,33 +394,51 @@ class _ExhibitionList extends StatelessWidget {
         ),
       ),
                     ),
-                    const SizedBox(width: 14),
+                    SizedBox(width: sw * 0.04),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            exhi['title'] ?? '제목 없음',
+                            decodeHtml(exhi['title'] ?? '제목 없음'),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: sh * 0.005),
                           Text(
                             exhi['place'] ?? '',
                             style: const TextStyle(
-                              fontSize: 13,
+                              fontSize: 12,
                               color: Color(0xFF706B66),
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            period,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
+                          SizedBox(height: sh * 0.014),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  period,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                              _Tag(
+                                text: status,
+                                bgColor: getTagBgColor(status),
+                                textColor: getTagTextColor(status),
+                                radius: 16,
+                                border: getTagBorder(status),
+                                width: sw * 0.128,
+                                height: sh * 0.024,
+                                fontSize: 12,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -404,10 +476,10 @@ class _Tag extends StatelessWidget {
   const _Tag({
     required this.text,
     required this.bgColor,
-    this.textColor = Colors.black,
+    this.textColor = const Color(0xFF343231),
     this.radius = 6,
     this.border,
-    this.width = 49,
+    this.width = 50,
     this.height = 20,
     this.fontSize = 12,
   });
