@@ -30,7 +30,7 @@ android {
     namespace "com.unity3d.player"
     ndkVersion "27.0.12077973"
     compileSdkVersion 35
-    buildToolsVersion '34.0.0'
+    buildToolsVersion '35.0.0'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -59,6 +59,10 @@ android {
 
     packagingOptions {
         doNotStrip '*/arm64-v8a/*.so'
+        // Unity 네이티브 포장 경로 문제 방지
+        jniLibs {
+            useLegacyPackaging true
+        }
     }
 }
 
@@ -68,44 +72,76 @@ def getSdkDir() {
     return local.getProperty('sdk.dir')
 }
 
-// Resolve il2cpp executable cross‑platform (project export first, then Unity Hub installs)
+// Resolve il2cpp executable with explicit overrides first
 def findIl2cppExecutable(String workingDir) {
     def isWin = org.gradle.internal.os.OperatingSystem.current().isWindows()
     def exeName = isWin ? "il2cpp.exe" : "il2cpp"
-    // 1) Prefer il2cpp shipped inside the exported project
-    def localPath = "${workingDir}/src/main/Il2CppOutputProject/IL2CPP/build/deploy/${exeName}"
-    if (file(localPath).exists()) {
-        return localPath
+    def tried = []
+
+    // 0) Explicit property: il2cpp.path
+    def fromProp = project.findProperty("il2cpp.path")
+    if (fromProp != null) {
+        tried << fromProp
+        if (file(fromProp).exists()) return fromProp
     }
-    // 2) Fallback: try common Unity Hub install locations
-    def candidates = [] as List<File>
+
+    // 1) From unity.executablePath => .../Editor/Data/il2cpp/build/deploy/il2cpp(.exe)
+    def unityExe = project.findProperty("unity.executablePath") ?: project.findProperty("unityPath")
+    if (unityExe != null) {
+        def editorDir = new File(unityExe).getParentFile()                      // .../Editor
+        def dataDir   = new File(editorDir, "Data")
+        def il2cpp    = new File(new File(new File(dataDir, "il2cpp"), "build/deploy"), exeName)
+        tried << il2cpp.absolutePath
+        if (il2cpp.exists()) return il2cpp.absolutePath
+    }
+
+    // 2) From UNITY_HOME env => .../Editor/Data/il2cpp/...
+    def unityHome = System.getenv("UNITY_HOME")
+    if (unityHome != null) {
+        def il2cpp = new File("${unityHome}/Editor/Data/il2cpp/build/deploy/${exeName}")
+        tried << il2cpp.absolutePath
+        if (il2cpp.exists()) return il2cpp.absolutePath
+    }
+
+    // 3) (fallback) exported project's local copy (종종 불완전하므로 우선순위 낮춤)
+    def localPath = "${workingDir}/src/main/Il2CppOutputProject/IL2CPP/build/deploy/${exeName}"
+    tried << localPath
+    if (file(localPath).exists()) return localPath
+
+    // 4) (fallback) Unity Hub 기본 설치 위치 스캔
     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
         def hubRoot = file("/Applications/Unity/Hub/Editor")
         if (hubRoot.exists()) {
-            candidates.addAll(fileTree(hubRoot).matching {
+            def found = fileTree(hubRoot).matching {
                 include("**/Unity.app/Contents/il2cpp/build/deploy/${exeName}")
-            }.files)
+            }.files
+            if (!found.isEmpty()) return found.first().absolutePath
         }
+        tried << "/Applications/Unity/Hub/Editor/**/Unity.app/Contents/il2cpp/build/deploy/${exeName}"
     } else if (isWin) {
+        // Hub 기본 경로
         def hubRoot = file("C:/Program Files/Unity/Hub/Editor")
         if (hubRoot.exists()) {
-            candidates.addAll(fileTree(hubRoot).matching {
+            def found = fileTree(hubRoot).matching {
                 include("**/Editor/Data/il2cpp/build/deploy/${exeName}")
-            }.files)
+            }.files
+            if (!found.isEmpty()) return found.first().absolutePath
         }
+        tried << "C:/Program Files/Unity/Hub/Editor/**/Editor/Data/il2cpp/build/deploy/${exeName}"
     } else { // Linux
         def hubRoot = file(System.properties['user.home'] + "/Unity/Hub/Editor")
         if (hubRoot.exists()) {
-            candidates.addAll(fileTree(hubRoot).matching {
+            def found = fileTree(hubRoot).matching {
                 include("**/Editor/Data/il2cpp/build/deploy/${exeName}")
-            }.files)
+            }.files
+            if (!found.isEmpty()) return found.first().absolutePath
         }
+        tried << "${System.properties['user.home']}/Unity/Hub/Editor/**/Editor/Data/il2cpp/build/deploy/${exeName}"
     }
-    if (!candidates.isEmpty()) {
-        return candidates.first().absolutePath
-    }
-    throw new GradleException("il2cpp executable not found. Looked for ${localPath} and Unity Hub installs.")
+
+    throw org.gradle.api.GradleException.new("il2cpp executable not found. Tried:\n - " + tried.join("\n - "))
 }
+
 
 def BuildIl2Cpp(String workingDir, String configuration, String architecture, String abi, String[] staticLibraries) {
     def commandLineArgs = []
@@ -128,7 +164,7 @@ def BuildIl2Cpp(String workingDir, String configuration, String architecture, St
         commandLineArgs.add("--additional-libraries=" + workingDir + "/src/main/jniStaticLibs/" + abi + "/" + fileName)
     }
     // Resolve il2cpp path per‑OS and ensure it is executable on Unix
-    def il2cppPath = findIl2cppExecutable(workingDir)
+    def il2cppPath = "C:/Program Files/Unity 6000.0.40f1/Editor/Data/il2cpp/build/deploy/il2cpp.exe"
     if (!org.gradle.internal.os.OperatingSystem.current().isWindows()) {
         try {
             file(il2cppPath).setExecutable(true)

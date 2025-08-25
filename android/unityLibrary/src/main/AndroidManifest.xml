@@ -25,5 +25,14 @@
       <meta-data android:name="notch_support" android:value="true" />
     </activity>
     <meta-data android:name="com.google.ar.core" android:value="optional" />
+
+
+    <activity
+    android:name="com.example.musai_f.UnityOverlayActivity"
+    android:exported="true"
+    android:theme="@style/UnityThemeSelector"
+    android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+    android:screenOrientation="fullUser"
+    android:launchMode="singleTask" />
   </application>
 </manifest>
