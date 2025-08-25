@@ -47,6 +47,11 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    final double _holeTop = screenHeight * 0.215;
+    final double _hPadding = screenWidth * 0.065;
+    final double _holeW = screenWidth - 2 * _hPadding;
+    final double _holeH = _holeW * (4.6 / 3);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -113,15 +118,23 @@ class _MusaiHomePageState extends State<MusaiHomePage> {
           child: Stack(
             children: [
               Positioned.fill(child: IgnorePointer(child: CameraView(key: _cameraViewKey))),
-              Positioned.fill(child: CustomPaint(painter: HolePainter())),
-              Positioned(
-                top: screenHeight * 0.215,
-                left: screenWidth * 0.065,
-                right: screenWidth * 0.065,
-                child: AspectRatio(
-                  aspectRatio: 3 / 4.6,
-                  child: DashedBorderContainer(child: Container()),
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: HolePainter(
+                    top: _holeTop,
+                    left: _hPadding,
+                    width: _holeW,
+                    height: _holeH,
+                    radius: 20,
+                  ),
                 ),
+              ),
+              Positioned(
+                top: _holeTop,
+                left: _hPadding,
+                width: _holeW,
+                height: _holeH,
+                child: const DashedBorderContainer(child: SizedBox.shrink()),
               ),
               SafeArea(
                 child: Column(
@@ -219,20 +232,29 @@ class DashedBorderPainter extends CustomPainter {
 }
 
 class HolePainter extends CustomPainter {
+  final double top;
+  final double left;
+  final double width;
+  final double height;
+  final double radius;
+
+  const HolePainter({
+    required this.top,
+    required this.left,
+    required this.width,
+    required this.height,
+    this.radius = 20,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final overlay = Paint()
       ..color = Colors.black.withOpacity(0.5)
       ..style = PaintingStyle.fill;
 
-    final holeTop = size.height * 0.215;
-    final horizontalPadding = size.width * 0.065;
-    final holeWidth = size.width - 2 * horizontalPadding;
-    final holeHeight = holeWidth * (4.6 / 3);
-
     final holeRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(horizontalPadding, holeTop, holeWidth, holeHeight),
-      const Radius.circular(20),
+      Rect.fromLTWH(left, top, width, height),
+      Radius.circular(radius),
     );
 
     final path = Path()
@@ -240,9 +262,15 @@ class HolePainter extends CustomPainter {
       ..addRRect(holeRect)
       ..fillType = PathFillType.evenOdd;
 
-    canvas.drawPath(path, paint);
+    canvas.drawPath(path, overlay);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant HolePainter oldDelegate) {
+    return top != oldDelegate.top ||
+        left != oldDelegate.left ||
+        width != oldDelegate.width ||
+        height != oldDelegate.height ||
+        radius != oldDelegate.radius;
+  }
 }

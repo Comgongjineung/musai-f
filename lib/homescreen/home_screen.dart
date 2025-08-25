@@ -719,7 +719,7 @@ class _NearestListCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _decodeHtml(e.title).replaceAll('<to be continued>', ''),
+                    decodeHtml(e.title).replaceAll('<to be continued>', ''),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -735,7 +735,7 @@ class _NearestListCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          _decodeHtml(e.place),
+                          decodeHtml(e.place),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -761,7 +761,7 @@ class _NearestListCard extends StatelessWidget {
   }
 }
 
-String _decodeHtml(String s) {
+String decodeHtml(String s) {
   var out = s
       .replaceAll('&#39;', "'")
       .replaceAll('&amp;', '&')

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import '../bottom_nav_bar.dart';
 import '../app_bar_widget.dart';
+import 'home_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class Exhibition {
   final int exhiId;
@@ -45,6 +48,25 @@ class ExhibitionDetailPage extends StatelessWidget {
   final Exhibition exhibition;
   const ExhibitionDetailPage({super.key, required this.exhibition});
 
+  Future<void> _launchPlaceUrl(BuildContext context) async {
+    final raw = exhibition.placeUrl ?? '';
+    if (raw.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('홈페이지 주소가 없습니다.')),
+      );
+      return;
+    }
+    final normalized = raw.startsWith('http') ? raw : 'https://$raw';
+    final uri = Uri.parse(normalized);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('링크를 열 수 없습니다: $normalized')),
+      );
+    }
+  }
+
   String getExhibitionStatus(String start, String end) {
     try {
       final today = DateTime.now();
@@ -63,15 +85,13 @@ class ExhibitionDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ex = exhibition;
     final width = MediaQuery.of(context).size.width;
-    final posterSize = width * 0.85;
+    final height = MediaQuery.of(context).size.height;
     final status = getExhibitionStatus(ex.startDate, ex.endDate);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFDFC),
       appBar: const AppBarWidget(
         showBackButton: true,
-        backgroundColor: Color(0xFFFFFDFC),
-        titleSize: 22,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -79,51 +99,47 @@ class ExhibitionDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
+              SizedBox(height: height * 0.02),
 
               // 포스터 썸네일
-              Center(
-                child: Container(
-                  width: posterSize,
-                  height: posterSize * 264 / 343,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4F0ED),
-                    borderRadius: BorderRadius.circular(16),
-                    image: ex.thumbnail.isNotEmpty
-                        ? DecorationImage(
-                            image: NetworkImage(ex.thumbnail),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  alignment: Alignment.center,
-                  child: ex.thumbnail.isEmpty
-                      ? const Text('전시회 썸네일', style: TextStyle(color: Color(0xFFB1B1B1)))
-                      : null,
-                ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: ex.thumbnail.isNotEmpty
+                    ? Image.network(
+                        ex.thumbnail,
+                        width: double.infinity,
+                        fit: BoxFit.fitWidth,
+                      )
+                    : Container(
+                        width: double.infinity,
+                        height: 200,
+                        color: const Color(0xFFF4F0ED),
+                        alignment: Alignment.center,
+                        child: const Text('전시회 썸네일', style: TextStyle(color: Color(0xFFB1B1B1))),
+                      ),
               ),
 
-              const SizedBox(height: 18),
+              SizedBox(height: height * 0.03),
 
-              // 카테고리 + 상태
+              // 상태(전시중/오픈전/완료)만 표시
               Row(
                 children: [
-                  const _Tag(text: '카테고리', bgColor: Color(0xFFFEF6F2), textColor: Colors.black,  
-                  width: 80, height: 27, fontSize: 16,),
-                  const SizedBox(width: 8),
-                  _Tag(text: status, bgColor: getTagBgColor(status),
-      textColor: getTagTextColor(status),
-      border: getTagBorder(status),
-      width: 66,
-      height: 27,
-      fontSize: 16,),
+                  _Tag(
+                    text: status,
+                    bgColor: getTagBgColor(status),
+                    textColor: getTagTextColor(status),
+                    border: getTagBorder(status),
+                    width: width * 0.17,
+                    height: height * 0.033,
+                    fontSize: 16,
+                  ),
                 ],
               ),
               
-              const SizedBox(height: 10),
+              SizedBox(height: height * 0.01),
               // 제목
               Text(
-                ex.title,
+                decodeHtml(ex.title),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
@@ -131,64 +147,37 @@ class ExhibitionDetailPage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: height * 0.02),
 
               // 일정 & 장소
               _InfoRow(label: '일정', value: '${formatDate(ex.startDate)} ~ ${formatDate(ex.endDate)}'),
               _InfoRow(label: '장소', value: ex.place),
 
-              const SizedBox(height: 18),
+              SizedBox(height: height * 0.03),
 
-              // 상세 내용 블럭
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF9F1EC),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {}, // 홈페이지 연결 예정
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFBDAF9D),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Text(
-                          '홈페이지 바로가기',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-                        ),
-                      ),
+              // 홈페이지 바로가기 버튼
+              Center(
+                child: GestureDetector(
+                  onTap: () => _launchPlaceUrl(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFA28F7D),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    const SizedBox(height: 18),
-                    if (ex.thumbnail.isNotEmpty)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(ex.thumbnail),
-                      )
-                    else
-                      Container(
-                        width: double.infinity,
-                        height: 180,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE6E0DC),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          '전시회에서 제공하는 포스터',
-                          style: TextStyle(color: Color(0xFFB1B1B1)),
-                        ),
-                      ),
-                  ],
+                    child: const Text(
+                      '홈페이지 바로가기',
+                      style: TextStyle(
+                        color: Color(0xFFFEFDFC),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ), //텍스트 크기
+                    ),
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              SizedBox(height: height * 0.035),
             ],
           ),
         ),
@@ -255,16 +244,16 @@ class _Tag extends StatelessWidget {
     required this.bgColor,
     required this.textColor,
     this.border,
-    this.width = 80, 
-    this.height = 27,
+    this.width = 0, 
+    this.height = 0,
     this.fontSize = 16, 
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
-      height: height,
+      width: width > 0 ? width : MediaQuery.of(context).size.width * 0.2,
+      height: height > 0 ? height : MediaQuery.of(context).size.height * 0.033,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: bgColor,
@@ -290,14 +279,14 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 60,
-            child: Text(label, style: const TextStyle(color: Color(0xFFB1B1B1), fontSize: 14)),
+            width: MediaQuery.of(context).size.width * 0.15,
+            child: Text(label, style: const TextStyle(color: Color(0xFF706B66), fontSize: 16)),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: MediaQuery.of(context).size.width * 0.02),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF343231)),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF343231)),
             ),
           ),
         ],
