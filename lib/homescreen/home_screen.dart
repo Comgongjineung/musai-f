@@ -496,25 +496,27 @@ Widget _buildMapWrapper(double screenWidth) {
         children: [
           RecommendationCard(
             title: "What's inside the pencil",
-            description: '전시 장소\n전시 기간',
-            backgroundColor: Colors.white,
-            width: constraints.maxWidth * 0.62, // 240px → 반응형
-            height: constraints.maxWidth * 0.61, // 237px → 반응형
-            marginRight: constraints.maxWidth * 0.03, // 12px → 반응형
+            name: '',
+            objectEndDate: null,
+            style: '',
+            width: constraints.maxWidth * 0.62,
+            height: constraints.maxWidth * 0.61,
+            marginRight: constraints.maxWidth * 0.03,
             image: null,
             screenWidth: constraints.maxWidth,
           ),
           RecommendationCard(
             title: 'The 2nd Chonnam Graduation Exhibition',
-            description:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            backgroundColor: Colors.white,
-            width: constraints.maxWidth * 0.62, // 240px → 반응형
-            height: constraints.maxWidth * 0.61, // 237px → 반응형
-            marginRight: constraints.maxWidth * 0.03, // 12px → 반응형
+            name: '',
+            objectEndDate: null,
+            style: '',
+            width: constraints.maxWidth * 0.62,
+            height: constraints.maxWidth * 0.61,
+            marginRight: constraints.maxWidth * 0.03,
             image: null,
             screenWidth: constraints.maxWidth,
           ),
+          
         ],
       ),
     );
@@ -524,20 +526,25 @@ Widget _buildMapWrapper(double screenWidth) {
 
 // RecommendationCard 위젯
 class RecommendationCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final Color backgroundColor;
+  // ====== 데이터 필드 ======
+  final String title;         // 작품 제목
+  final String name;          // 작가 이름
+  final int? objectEndDate;   // 제작시기
+  final String? style;        // 예술사조
+  final Widget? image;        // 썸네일
+
+  // ====== 레이아웃/표현 필드 ======
   final double width;
   final double height;
   final double marginRight;
-  final Widget? image;
   final double screenWidth;
 
   const RecommendationCard({
     super.key,
     required this.title,
-    required this.description,
-    required this.backgroundColor,
+    required this.name,
+    required this.objectEndDate,
+    required this.style,
     required this.width,
     required this.height,
     required this.marginRight,
@@ -562,7 +569,7 @@ class RecommendationCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ExhibitionDetailPage(exhibition: dummy),
+            builder: (_) => ExhibitionDetailPage(exhibition: dummy), //여기 수정
           ),
         );
       },
@@ -571,7 +578,7 @@ class RecommendationCard extends StatelessWidget {
         height: height,
         margin: EdgeInsets.only(right: marginRight),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: const Color(0xFFFEFDFC),
           borderRadius: BorderRadius.circular(screenWidth * 0.05),
           boxShadow: [
             BoxShadow(
@@ -584,67 +591,49 @@ class RecommendationCard extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: Stack(
           children: [
-            // 이미지 (없으면 기본 배경)
+            // 썸네일 이미지
             Positioned.fill(
               child: image ??
                   Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF4F0ED),
-                    ),
-                    child: Center(
-                      child: Text(
-                        '전시회 이미지',
-                        style: TextStyle(
-                          color: const Color(0xFFB1B1B1),
-                          fontSize: screenWidth * 0.035, // 14px → 반응형
-                        ),
-                      ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF4F0ED),
                     ),
                   ),
             ),
-            // 하단 반투명 설명 박스 (카드 내부에 8px 여백)
+            // 전체를 덮는 Linear Gradient 오버레이
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.4,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFFB1B1B1), 
+                        Color(0xFF444444), 
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // 좌측 하단 제목
             Positioned(
-              left: screenWidth * 0.02, // 8px → 반응형
-              right: screenWidth * 0.02, // 8px → 반응형
-              bottom: screenWidth * 0.02, // 8px → 반응형
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  horizontal: screenWidth * 0.04, // 16px → 반응형
-                  vertical: screenWidth * 0.035, // 14px → 반응형
+              left: 20,
+              bottom: 20,
+              right: 20,
+              child: Text(
+                decodeHtml(title),
+                style: const TextStyle(
+                  color: Color(0xFFFEFDFC),
+                  fontSize: 16, 
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'Pretendard',
                 ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF999999).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(screenWidth * 0.04),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: const Color(0xFFFEFDFC),
-                        fontSize: screenWidth * 0.04,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Pretendard',
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: screenWidth * 0.01),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        color: const Color(0xFF706B66),
-                        fontSize: screenWidth * 0.03,
-                        fontFamily: 'Pretendard',
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
               ),
             ),
           ],
