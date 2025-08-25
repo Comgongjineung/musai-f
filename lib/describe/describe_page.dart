@@ -97,62 +97,50 @@ class _DescribePageState extends State<DescribePage> {
 
   // 뷰포리아 등록 API 호출
   Future<void> _registerToVuforia(String title, String imageUrl, {int attempt = 0}) async {
-    if (imageUrl.isEmpty) {
-      print('❌ 뷰포리아 등록 실패: imageUrl 비어있음');
-      return;
-    }
-    final imgRes = await http.get(Uri.parse(imageUrl));
-    if (imgRes.statusCode != 200) {
-      print('❌ 뷰포리아 등록 실패: 이미지 다운로드 실패 (${imgRes.statusCode})');
-      return;
-    }
-    final imageBytes = imgRes.bodyBytes;
+  try {
+    final uri = Uri.parse(
+        "http://43.203.23.173:8080/ar/vuforia/register?title=${Uri.encodeQueryComponent(title)}");
+    final token = await getJwtToken();
+    if (token == null) return;
 
-    try {
-      final uri = Uri.parse(
-          "http://43.203.23.173:8080/ar/vuforia/register?title=${Uri.encodeQueryComponent(title)}");
-      final token = await getJwtToken();
-      if (token == null) return; 
+    final request = http.MultipartRequest("POST", uri);
+    request.headers['Authorization'] = 'Bearer $token';
 
-      final request = http.MultipartRequest("POST", uri);
-      request.headers['Authorization'] = 'Bearer $token';
-      request.files.add(http.MultipartFile.fromBytes(
-        'file',
-        imageBytes,
-        filename: 'original.jpg', // 서버에 전달될 임의 파일명
-        contentType: MediaType('image', 'jpeg'),
-      ));
+    // 네트워크에서 다시 받지 말고, 로컬 이미지 그대로 업로드
+    request.files.add(await http.MultipartFile.fromPath(
+      'file',
+      widget.imagePath,
+      contentType: MediaType('image', 'jpeg'),
+    ));
 
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
-      final statusCode = response.statusCode;
+    final response = await request.send();
+    final responseBody = await response.stream.bytesToString();
+    final statusCode = response.statusCode;
 
-      //if (!mounted) return;
-
-      if (statusCode == 200) {
-        final data = json.decode(responseBody);
-        if (data is Map && data['success'] == true) {
-          final String targetId = (data['targetId'] ?? '').toString();
-          _safeSetState(() {
-            _artData = {
-              ...?_artData,
-              'vuforiaTargetId': targetId,
-              'vuforiaMessage': data['message'] ?? '',
-            };
-          });
-          print('✅ 뷰포리아 등록 성공');
-          // 뷰포리아 등록 성공 후, AI 좌표/해설 메타데이터 업데이트 API 호출
-          await _updateAIPoints(targetId, imageUrl);
-        } else {
-          print('⚠️ 뷰포리아 등록 응답 성공 아님: $responseBody');
-        }
+    if (statusCode == 200) {
+      final data = json.decode(responseBody);
+      if (data is Map && data['success'] == true) {
+        final String targetId = (data['targetId'] ?? '').toString();
+        _safeSetState(() {
+          _artData = {
+            ...?_artData,
+            'vuforiaTargetId': targetId,
+            'vuforiaMessage': data['message'] ?? '',
+          };
+        });
+        print('✅ 뷰포리아 등록 성공');
+        await _updateAIPoints(targetId, imageUrl);
       } else {
-        print('❌ 뷰포리아 등록 실패 - 상태코드: $statusCode, body: $responseBody');
+        print('⚠️ 뷰포리아 등록 응답 성공 아님: $responseBody');
       }
-    } catch (e) {
-      print('❌ 뷰포리아 등록 예외: $e');
+    } else {
+      print('❌ 뷰포리아 등록 실패 - 상태코드: $statusCode, body: $responseBody');
     }
+  } catch (e) {
+    print('❌ 뷰포리아 등록 예외: $e');
   }
+}
+
 
   // AI 서버에 좌표, 해설 메타데이터 요청하여 DB 업데이트
   Future<void> _updateAIPoints(String targetId, String imageUrl) async {
