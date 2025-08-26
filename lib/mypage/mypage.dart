@@ -583,7 +583,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('전시회 추천 알림', style: TextStyle(fontSize: screenWidth * 0.04)),
+                  Text('작품 추천 알림', style: TextStyle(fontSize: screenWidth * 0.04)),
                   Transform.scale(
                     scale: 0.95,
                     child: Switch(
