@@ -14,6 +14,7 @@ import '../alarm_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../utils/auth_storage.dart';
+import 'recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,12 +28,69 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Exhibition> _nearest = [];
   bool _loadingNearest = true;
   String? _nearestError;
+  List<dynamic> _reco = [];
+  bool _loadingReco = true;
+  String? _recoError;
 
   @override
   void initState() {
     super.initState();
     _requestLocationPermission(); // 앱 시작 시 위치 권한 요청 및 GPS 활성화 확인
     _initLocationAndFetch();
+    _fetchRecommendations();
+  }
+
+  Future<void> _fetchRecommendations() async {
+    setState(() {
+      _loadingReco = true;
+      _recoError = null;
+    });
+
+    try {
+      final userId = await getUserId();        // auth_storage.dart
+      final token  = await getJwtToken();      // auth_storage.dart
+
+      if (userId == null || token == null || token.isEmpty) {
+        setState(() {
+          _recoError = '로그인이 필요합니다.';
+          _loadingReco = false;
+        });
+        return;
+      }
+
+      final uri = Uri.parse(
+        'http://43.203.23.173:8080/recommend/dummyData/$userId?count=5',
+      );
+
+      final res = await http.get(
+        uri,
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      if (res.statusCode == 200) {
+        final decoded = utf8.decode(res.bodyBytes);
+        final data = jsonDecode(decoded) as Map<String, dynamic>;
+        final list = (data['recommendations'] as List?) ?? [];
+
+        setState(() {
+          _reco = list;
+          _loadingReco = false;
+        });
+      } else {
+        setState(() {
+          _recoError = '서버 오류: ${res.statusCode}';
+          _loadingReco = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _recoError = '네트워크 오류: $e';
+        _loadingReco = false;
+      });
+    }
   }
 
   // 위치 권한 요청 및 GPS 활성화 확인 함수 (Geolocator만 사용)
@@ -487,40 +545,69 @@ Widget _buildMapWrapper(double screenWidth) {
     ),
   );
 
-  // 추천 목록 위젯
+    // 추천 목록 위젯 (API 연동 버전)
   Widget _recommendationList(BoxConstraints constraints, double screenWidth) {
+    final cardWidth     = constraints.maxWidth * 0.62;   // 기존 설계 유지
+    final cardHeight    = constraints.maxWidth * 0.61;   // 기존 설계 유지
+    final cardSpacing   = constraints.maxWidth * 0.03;   // 기존 설계 유지
+
+    if (_loadingReco) {
+      return SizedBox(
+        height: cardHeight,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_recoError != null) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Text(_recoError!, style: const TextStyle(color: Colors.redAccent)),
+      );
+    }
+    if (_reco.isEmpty) {
+      return SizedBox(
+        height: cardHeight,
+        child: const Center(child: Text('추천 결과가 없습니다.')),
+      );
+    }
+
     return SizedBox(
-      height: constraints.maxWidth * 0.61, // 237px → 반응형
-      child: ListView(
+      height: cardHeight,
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        children: [
-          RecommendationCard(
-            title: "What's inside the pencil",
-            name: '',
-            objectEndDate: null,
-            style: '',
-            width: constraints.maxWidth * 0.62,
-            height: constraints.maxWidth * 0.61,
-            marginRight: constraints.maxWidth * 0.03,
-            image: null,
+        itemCount: _reco.length,
+        separatorBuilder: (_, __) => SizedBox(width: cardSpacing),
+        itemBuilder: (context, index) {
+          final item = _reco[index] as Map<String, dynamic>;
+
+          final title          = (item['title'] as String?) ?? 'Untitled';
+          final name           = (item['name'] as String?) ?? '';
+          final style          = (item['style'] as String?) ?? '';
+          final objectEndDate  = item['objectEndDate']; // int? (음수 가능)
+          final thumbUrl       = (item['primaryImageSmall'] as String?) ?? '';
+
+          return RecommendationCard(
+            title: title,
+            name: name,
+            objectEndDate: (objectEndDate is int) ? objectEndDate : null,
+            style: style,
+            width: cardWidth,
+            height: cardHeight,
+            marginRight: 0,                 // ListView.separated로 간격 처리
             screenWidth: constraints.maxWidth,
-          ),
-          RecommendationCard(
-            title: 'The 2nd Chonnam Graduation Exhibition',
-            name: '',
-            objectEndDate: null,
-            style: '',
-            width: constraints.maxWidth * 0.62,
-            height: constraints.maxWidth * 0.61,
-            marginRight: constraints.maxWidth * 0.03,
-            image: null,
-            screenWidth: constraints.maxWidth,
-          ),
-          
-        ],
+            image: thumbUrl.isEmpty
+                ? null
+                : Image.network(
+                    thumbUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        const ColoredBox(color: Color(0xFFF4F0ED)),
+                  ),
+          );
+        },
       ),
     );
   }
+
 
 }
 
@@ -556,20 +643,10 @@ class RecommendationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        final dummy = Exhibition(
-  exhiId: 1,
-  title: '이탈리아 국립 카포디몬테 컬렉션',
-  startDate: '2025.07.08',
-  endDate: '2025.08.08',
-  place: '소마미술관',
-  realmName: '', // realmName은 의미 없으므로 빈 값
-  thumbnail: '', // 또는 썸네일 URL 입력
-  seqnum: 1,
-);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => ExhibitionDetailPage(exhibition: dummy), //여기 수정
+            builder: (_) => const RecommendationScreen(), // 추천 페이지로 이동
           ),
         );
       },
