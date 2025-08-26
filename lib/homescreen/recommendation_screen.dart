@@ -208,22 +208,6 @@ class _PosterTile extends StatelessWidget {
                 child: _BrokenImageIcon(),
               ),
             ),
-
-            // (옵션) Pinterest처럼 캡션 영역이 필요하면 아래 블록을 쓰세요.
-            // Container(
-            //   color: const Color(0xFF111111),
-            //   padding: const EdgeInsets.all(12),
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.start,
-            //     children: [
-            //       Text(item.title ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-            //       if (item.name != null) ...[
-            //         const SizedBox(height: 6),
-            //         Text(item.name!, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-            //       ],
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),
