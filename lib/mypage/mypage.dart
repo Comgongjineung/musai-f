@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../bottom_nav_bar.dart';
 import '../alarm_page.dart';
+import '../login/login_UI.dart';
 import 'mypage_bookmark.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -276,6 +277,19 @@ class _MyPageScreenState extends State<MyPageScreen> {
                             ),
                           ),
                         ),
+                        PopupMenuItem<String>(
+                          value: 'logout',
+                          child: Center(
+                            child: Text(
+                              '로그아웃',
+                              style: TextStyle(
+                                color: Color(0xFF343231),
+                                fontSize: MediaQuery.of(context).size.width * 0.04,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     );
 
@@ -284,6 +298,12 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         context: context,
                         barrierDismissible: false,
                         builder: (context) => WithdrawConfirmDialog(userId: userId),
+                      );
+                    }
+                    else if (selected == 'logout') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignupPage()),
                       );
                     }
                   },

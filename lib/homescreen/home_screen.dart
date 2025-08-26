@@ -9,7 +9,6 @@ import 'dart:io';
 import 'search_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'exhibition_detail_page.dart';
-import '../login/login_UI.dart';
 import '../alarm_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -299,7 +298,6 @@ Future<void> _fetchNearest(double lat, double lng) async {
         child: _buildBody(screenWidth, screenHeight),
       ),
       bottomNavigationBar: const BottomNavBarWidget(currentIndex: 0),
-      floatingActionButton: _loginFab(context),
     );
   }
 
@@ -389,22 +387,6 @@ Future<void> _fetchNearest(double lat, double lng) async {
         },
       );
     }
-  }
-
-  /// 로그인 테스트 플로팅 버튼
-  Widget _loginFab(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        print('✅ 로그인 테스트 버튼 클릭됨');
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SignupPage()),
-        );
-      },
-      child: const Icon(Icons.login),
-      backgroundColor: Colors.blue,
-      heroTag: 'loginTestBtn',
-    );
   }
 
 Widget _buildMapWrapper(double screenWidth) {
