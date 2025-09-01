@@ -38,7 +38,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return AppBar(
-      backgroundColor: backgroundColor ?? Colors.transparent,
+      backgroundColor: const Color(0xFFFFFDFC),
       elevation: 0,
       centerTitle: centerTitle,
       systemOverlayStyle: systemOverlayStyle ?? SystemUiOverlayStyle(

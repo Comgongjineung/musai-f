@@ -9,6 +9,7 @@ import '../utils/auth_storage.dart';
 import 'mypage_edit.dart';
 import '../ticket/ticket_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart'; 
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart'; 
 import 'mypage_comments.dart';
@@ -209,11 +210,17 @@ class _MyPageScreenState extends State<MyPageScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    );
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         title: Text(
           'musai',
           style: TextStyle(
@@ -593,7 +600,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         setSBState(() {});
                         getUserId().then((userId) {
                           if (userId != null) {
-                            updateExhibitionAlarm(userId, value);
+                            updateExhibitionAlarm(userId, !value);
                             storage.write(key: 'allow_r_alarm', value: value.toString());
                           }
                         });
@@ -617,7 +624,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                         setSBState(() {});
                         getUserId().then((userId) {
                           if (userId != null) {
-                            updateCommunityAlarm(userId, value);
+                            updateCommunityAlarm(userId, !value);
                             storage.write(key: 'allow_c_alarm', value: value.toString());
                           }
                         });

@@ -114,6 +114,7 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFFFFFDFC),
         content: SingleChildScrollView(
           child: ColorPicker(
             pickerColor: tempColor,
@@ -124,10 +125,22 @@ final DraggableScrollableController _sheetController = DraggableScrollableContro
         ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF343231),
+              textStyle: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
             child: const Text("취소"),
             onPressed: () => Navigator.pop(context),
           ),
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF343231),
+              textStyle: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
             child: const Text("적용"),
             onPressed: () {
               setState(() {

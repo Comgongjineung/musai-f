@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:musai_f/login/login_kakao.dart';
 import 'package:musai_f/login/login_google.dart';
@@ -8,6 +9,11 @@ class SignupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+    ));
     return Scaffold(
       backgroundColor: const Color(0xFFFFFDFC),
       body: SafeArea(

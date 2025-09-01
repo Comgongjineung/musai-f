@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:math';
@@ -41,6 +42,12 @@ class _PreferencePageState extends State<PreferencePage> {
     final vGap = screenHeight * 0.02; // 세로 간격 ≈18px
     final tileH = screenHeight * 0.114; // 타일 높이 ≈96px
     final stepItems = _current8(); // 이번 단계의 8개
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+    );
 
     return Scaffold(
       body: SafeArea(

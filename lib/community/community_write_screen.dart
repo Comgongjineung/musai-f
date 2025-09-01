@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart'; // for MediaType
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io'; // File 클래스 사용을 위해 추가
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img; // 이미지 압축용
+import 'dart:math' as math;
 import '../utils/auth_storage.dart';
 import 'community_screen.dart';
 
@@ -170,40 +172,79 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
     }
   }
 
-  /// image1~image4에 Base64로 넣을 Map 생성
-  Future<Map<String, String>> _encodeImagesForRequest() async {
+
+  /// 이미지 1개를 서버에 업로드하고 URL을 반환 (성공 시)
+  Future<String?> _uploadImage(XFile file) async {
+    try {
+      final bytes = await file.readAsBytes();
+      final compBytes = await _compressBytes(bytes);
+
+      final uri = Uri.parse('http://43.203.23.173:8080/post/image');
+      final request = http.MultipartRequest('POST', uri);
+      final authToken = (token ?? '').trim();
+      if (authToken.isNotEmpty) {
+        request.headers['Authorization'] = 'Bearer $authToken';
+      }
+      request.headers['accept'] = 'application/json';
+
+      final multipartFile = http.MultipartFile.fromBytes(
+        'file',
+        compBytes,
+        filename: 'upload.jpg', // 서버가 이미지 확장자/타입을 검사하므로 고정 JPG로 전송
+        contentType: MediaType('image', 'jpeg'),
+      );
+      request.files.add(multipartFile);
+      print('📦 전송 파트: field=file, filename=upload.jpg, contentType=image/jpeg, bytes=${compBytes.lengthInBytes}');
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+      print('📊 업로드 응답 상태 코드: ${response.statusCode}');
+      print('📊 업로드 응답 헤더: ${response.headers}');
+      print('📊 업로드 응답 바디: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['imageUrl'] != null) {
+          print('🔍 업로드된 이미지 URL: ${data['imageUrl']}');
+          return data['imageUrl'] as String;
+        } else {
+          print('❗ 이미지 업로드 실패 (서버 응답: $data)');
+          return null;
+        }
+      } else {
+        print('❗ 이미지 업로드 실패 (상태 코드: ${response.statusCode})');
+        return null;
+      }
+    } catch (e, stack) {
+      print('❌ 이미지 업로드 중 오류: $e');
+      print('❌ 스택 트레이스: $stack');
+      return null;
+    }
+  }
+
+  /// 최대 4장의 이미지를 업로드하고 image1~image4에 URL(또는 빈 문자열)로 채운 Map 반환
+  Future<Map<String, String>> _uploadImagesAndBuildMap() async {
     final map = <String, String>{};
-    print('🔍 이미지 인코딩 시작 - 총 ${_images.length}장');
-    
-    // 최대 4장만 반영
+    print('🔍 이미지 업로드 → URL 수집 시작 - 총 ${_images.length}장');
     for (int i = 0; i < 4; i++) {
       if (i < _images.length) {
         final file = _images[i];
-        print('🔍 이미지 ${i + 1} 처리: ${file.path}');
-        
-        final bytes = await _images[i].readAsBytes();
-        print('🔍 이미지 ${i + 1} 원본 크기: ${bytes.lengthInBytes} bytes');
-        
-        final comp = await _compressBytes(bytes);
-        print('🔍 이미지 ${i + 1} 압축 후 크기: ${comp.lengthInBytes} bytes');
-        
-        final b64 = base64Encode(comp);
-        print('🔍 이미지 ${i + 1} Base64 길이: ${b64.length}');
-        
-        // API 스펙에 맞게 단순 Base64 문자열로 전송
-        map['image${i + 1}'] = b64;
+        final url = await _uploadImage(file);
+        if (url != null) {
+          map['image${i + 1}'] = url;
+          //print('🔍 이미지 ${i + 1} URL: $url');
+        } else {
+          map['image${i + 1}'] = '';
+          //print('❗ 이미지 ${i + 1} 업로드 실패');
+        }
       } else {
-        // 빈 슬롯은 빈 문자열로
         map['image${i + 1}'] = '';
-        print('🔍 이미지 ${i + 1}: 빈 슬롯');
+        //print('🔍 이미지 ${i + 1}: 빈 슬롯');
       }
     }
-    
-    print('🔍 최종 이미지 맵 키: ${map.keys.toList()}');
+    //print('🔍 최종 이미지 URL 맵 키: ${map.keys.toList()}');
     return map;
   }
-
-  // ---------- 업로드 ----------
 
   Future<void> _submitPost() async {
     if (_titleController.text.trim().isEmpty || _contentController.text.trim().isEmpty) {
@@ -226,7 +267,21 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
       }
 
       final isEditMode = widget.postId != null;
-      final imagesMap = await _encodeImagesForRequest();
+      print('🔍 이미지 업로드 → URL 수집 플로우 시작');
+      final imagesMap = await _uploadImagesAndBuildMap();
+      // 만약 업로드 실패가 하나라도 있으면 중단
+      final hasFailed = imagesMap.entries
+          .where((e) => e.key.startsWith('image'))
+          .any((e) => e.value.isEmpty && _images.length >= int.parse(e.key.replaceFirst('image', '')));
+      if (hasFailed) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('이미지 업로드에 실패했습니다.')),
+        );
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
 
       final baseBody = {
         'title': _titleController.text.trim(),
@@ -243,37 +298,47 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
               ...imagesMap,
             };
 
-      print('🔍 ${isEditMode ? "게시물 수정" : "게시물 작성"} 시작...');
+      /* print('🔍 ${isEditMode ? "게시물 수정" : "게시물 작성"} 시작...');
       print('🔍 토큰: ${token != null ? "있음" : "없음"}');
       print('🔍 사용자 ID: $userId');
       print('🔍 이미지 개수: ${_images.length}');
       print('🔍 이미지 맵: $imagesMap');
       print('🔍 요청 본문: $requestBody');
-      print('🔍 HTTP 메서드: ${isEditMode ? "PUT" : "POST"}');
+      print('🔍 HTTP 메서드: ${isEditMode ? "PUT" : "POST"}'); */
+
+      // --- Begin: Build and log headers ---
+      final authToken = (token ?? '').trim();
+      if (authToken.isEmpty) {
+        print('❗ JWT 토큰이 비어 있습니다.');
+      } else {
+        // 토큰 앞부분만 로깅 (보안상 전체 출력 금지)
+        final prefix = authToken.length > 16 ? authToken.substring(0, 16) : authToken;
+        print('🔑 토큰 prefix: $prefix...');
+      }
+
+      final headers = <String, String>{
+        'accept': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+        if (authToken.isNotEmpty) 'Authorization': 'Bearer $authToken',
+      };
+      print('📤 요청 헤더(전송 예정): $headers');
+      // --- End: Build and log headers ---
 
       final uri = isEditMode
           ? Uri.parse('http://43.203.23.173:8080/post/update/${widget.postId}')
           : Uri.parse('http://43.203.23.173:8080/post/add');
-      
+
       print('🔍 요청 URI: $uri');
 
       final response = isEditMode
           ? await http.put(
               uri,
-              headers: {
-                'accept': '*/*',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer $token',
-              },
+              headers: headers,
               body: json.encode(requestBody),
             )
           : await http.post(
               uri,
-              headers: {
-                'accept': '*/*',
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer $token',
-              },
+              headers: headers,
               body: json.encode(requestBody),
             );
 
