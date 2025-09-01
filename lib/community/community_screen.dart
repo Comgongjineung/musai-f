@@ -248,13 +248,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   Widget _buildPostCard(Post post, double screenWidth, double screenHeight) {
     // 디버깅: 이미지 데이터 출력
-    print('🔍 게시물 ${post.postId} 이미지 정보:');
+    /*print('🔍 게시물 ${post.postId} 이미지 정보:');
     print('  - image1: ${post.image1}');
     print('  - image1 길이: ${post.image1?.length ?? 0}');
     print('  - image1 null 여부: ${post.image1 == null}');
     print('  - image1 빈 문자열 여부: ${post.image1?.isEmpty ?? true}');
     print('  - image1 "string" 여부: ${post.image1 == "string"}');
-    print('  - image1 시작 부분: ${post.image1?.substring(0, post.image1!.length > 50 ? 50 : post.image1!.length)}');
+    print('  - image1 시작 부분: ${post.image1?.substring(0, post.image1!.length > 50 ? 50 : post.image1!.length)}'); */
     
     return GestureDetector(
       onTap: () {
