@@ -54,3 +54,6 @@ UserSettings/
 *.user
 *.userprefs
 *.unitypackage
+
+# Ignore IL2CPP build profile logs
+Unity/Il2CppOutputProject/Source/il2cppOutput/profile.json

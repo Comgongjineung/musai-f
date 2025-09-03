@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../utils/auth_storage.dart';
 import 'recommendation_screen.dart';
+import 'recommendation_detail_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -303,13 +304,15 @@ Future<void> _fetchNearest(double lat, double lng) async {
 
   /// 메인 바디 구성 (함수형 분리)
   Widget _buildBody(double screenWidth, double screenHeight) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _searchSection(screenWidth),
-        _nearbyMapSection(screenWidth),
-        _scrollableSections(screenWidth, screenHeight),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _searchSection(screenWidth),
+          _nearbyMapSection(screenWidth),
+          _scrollableSections(screenWidth, screenHeight),
+        ],
+      ),
     );
   }
 
@@ -344,20 +347,18 @@ Future<void> _fetchNearest(double lat, double lng) async {
 
   /// 스크롤 가능한 섹션 묶음 (주변 전시 리스트 + 추천)
   Widget _scrollableSections(double screenWidth, double screenHeight) {
-    return Expanded(
-      child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06)
-            .copyWith(bottom: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _nearestListArea(screenWidth, screenHeight),
-            SizedBox(height: screenWidth * 0.06),
-            _sectionTitle('Recommendation', screenWidth),
-            SizedBox(height: screenWidth * 0.02),
-            _recommendationList(BoxConstraints(maxWidth: screenWidth), screenWidth),
-          ],
-        ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06)
+          .copyWith(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _nearestListArea(screenWidth, screenHeight),
+          SizedBox(height: screenWidth * 0.06),
+          _sectionTitle('Recommendation', screenWidth),
+          SizedBox(height: screenWidth * 0.02),
+          _recommendationList(BoxConstraints(maxWidth: screenWidth), screenWidth),
+        ],
       ),
     );
   }
@@ -447,80 +448,88 @@ Widget _buildMapWrapper(double screenWidth) {
       borderRadius: BorderRadius.circular(screenWidth * 0.05), 
       child: Stack(
         children: [
-          InAppWebView(
-            initialUrlRequest:
-                Platform.isAndroid
-                    ? URLRequest(
-                      url: WebUri(
-                        "file:///android_asset/flutter_assets/assets/kakaomap.html",
-                      ),
-                    )
-                    : null,
-            initialFile: Platform.isIOS ? "assets/kakaomap.html" : null,
-            initialSettings: InAppWebViewSettings(
-              javaScriptEnabled: true,
-              mediaPlaybackRequiresUserGesture: false,
-              transparentBackground: true,
-              allowsInlineMediaPlayback: true, // iOS용 옵션
-              allowsAirPlayForMediaPlayback: true, // iOS용 옵션
-              allowsBackForwardNavigationGestures: true, // iOS용 옵션
-              allowsLinkPreview: false, // iOS용 옵션
-              sharedCookiesEnabled: true, // iOS용 옵션
-              geolocationEnabled: true, // Android용 옵션
-              useHybridComposition: true, // Android용 옵션
-            ),
-            onGeolocationPermissionsShowPrompt: (controller, origin) async {
-              return GeolocationPermissionShowPromptResponse(
-                origin: origin,
-                allow: true,
-                retain: true,
-              );
+          GestureDetector(
+            onVerticalDragUpdate: (details) {
+              // 지도 영역에서 세로 스크롤 차단
             },
-            onWebViewCreated: (controller) {
-              webViewController = controller;
-
-              controller.addJavaScriptHandler(
-                handlerName: 'openLink',
-                callback: (args) async {
-                  final url = args.first;
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(
-                      Uri.parse(url),
-                      mode:
-                          LaunchMode
-                              .externalApplication, // Chrome, Naver 등 외부 앱 선택
-                    );
-                  } else {
-                    print('Could not launch $url');
-                  }
-                },
-              );
+                        onHorizontalDragUpdate: (details) {
+              // 지도 영역에서 가로 스크롤 차단
             },
-
-            onConsoleMessage: (controller, consoleMessage) {
-              print('[WebView Console] ${consoleMessage.message}');
-            },
-            onLoadStop: (controller, url) async {
-              print('[WebView] Page loaded: $url');
-              if (url.toString().contains('kakaomap.html')) {
-                await controller.evaluateJavascript(
-                  source: 'injectKakaoMapKeyAndLoadMap("$kakaoMapKey");',
+            child: InAppWebView(
+              initialUrlRequest:
+                  Platform.isAndroid
+                      ? URLRequest(
+                        url: WebUri(
+                          "file:///android_asset/flutter_assets/assets/kakaomap.html",
+                        ),
+                      )
+                      : null,
+              initialFile: Platform.isIOS ? "assets/kakaomap.html" : null,
+              initialSettings: InAppWebViewSettings(
+                javaScriptEnabled: true,
+                mediaPlaybackRequiresUserGesture: false,
+                transparentBackground: true,
+                allowsInlineMediaPlayback: true, // iOS용 옵션
+                allowsAirPlayForMediaPlayback: true, // iOS용 옵션
+                allowsBackForwardNavigationGestures: true, // iOS용 옵션
+                allowsLinkPreview: false, // iOS용 옵션
+                sharedCookiesEnabled: true, // iOS용 옵션
+                geolocationEnabled: true, // Android용 옵션
+                useHybridComposition: true, // Android용 옵션
+              ),
+              onGeolocationPermissionsShowPrompt: (controller, origin) async {
+                return GeolocationPermissionShowPromptResponse(
+                  origin: origin,
+                  allow: true,
+                  retain: true,
                 );
+              },
+              onWebViewCreated: (controller) {
+                webViewController = controller;
+
+                controller.addJavaScriptHandler(
+                  handlerName: 'openLink',
+                  callback: (args) async {
+                    final url = args.first;
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(
+                        Uri.parse(url),
+                        mode:
+                            LaunchMode
+                                .externalApplication, // Chrome, Naver 등 외부 앱 선택
+                      );
+                    } else {
+                      print('Could not launch $url');
+                    }
+                  },
+                );
+              },
+
+              onConsoleMessage: (controller, consoleMessage) {
+                print('[WebView Console] ${consoleMessage.message}');
+              },
+              onLoadStop: (controller, url) async {
+                print('[WebView] Page loaded: $url');
+                if (url.toString().contains('kakaomap.html')) {
+                  await controller.evaluateJavascript(
+                    source: 'injectKakaoMapKeyAndLoadMap("$kakaoMapKey");',
+                  );
+                  print(
+                    '[WebView] Injected Kakao Map Key and called load function.',
+                  );
+                }
+              },
+              onLoadError: (controller, url, code, message) {
                 print(
-                  '[WebView] Injected Kakao Map Key and called load function.',
+                  '[WebView] Load Error: $url, Code: $code, Message: $message',
                 );
-              }
-            },
-            onLoadError: (controller, url, code, message) {
-              print(
-                '[WebView] Load Error: $url, Code: $code, Message: $message',
-              );
-            },
-            onReceivedHttpError: (controller, request, response) {
-              print(
-                '[WebView] HTTP Error: ${response.statusCode}, URL: ${request.url}',
-              );
-            },
+              },
+              onReceivedHttpError: (controller, request, response) {
+                print(
+                  '[WebView] HTTP Error: ${response.statusCode}, URL: ${request.url}',
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -556,9 +565,25 @@ Widget _buildMapWrapper(double screenWidth) {
       height: cardHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _reco.length,
+        itemCount: _reco.length + 1, // +1 for the add button
         separatorBuilder: (_, __) => SizedBox(width: cardSpacing),
         itemBuilder: (context, index) {
+          // 마지막 아이템은 + 버튼
+          if (index == _reco.length) {
+            return _AddRecommendationButton(
+              width: cardWidth,
+              height: cardHeight,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const RecommendationScreen(),
+                  ),
+                );
+              },
+            );
+          }
+
           final item = _reco[index] as Map<String, dynamic>;
 
           final title          = (item['title'] as String?) ?? 'Untitled';
@@ -584,6 +609,31 @@ Widget _buildMapWrapper(double screenWidth) {
                     errorBuilder: (_, __, ___) =>
                         const ColoredBox(color: Color(0xFFF4F0ED)),
                   ),
+            onTap: () {
+              // 작품 상세페이지로 이동
+              final recommendItem = RecommendItem(
+                primaryImageSmall: thumbUrl,
+                name: name,
+                department: '',
+                title: title,
+                culture: '',
+                period: '',
+                objectDate: '',
+                objectBeginDate: null,
+                objectEndDate: objectEndDate is int ? objectEndDate : null,
+                objectID: null,
+                classification: '',
+                style: style,
+                objectName: '',
+              );
+              
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => DetailRecommendPage(item: recommendItem),
+                ),
+              );
+            },
           );
         },
       ),
@@ -607,6 +657,7 @@ class RecommendationCard extends StatelessWidget {
   final double height;
   final double marginRight;
   final double screenWidth;
+  final VoidCallback? onTap;  // 탭 콜백 추가
 
   const RecommendationCard({
     super.key,
@@ -619,12 +670,13 @@ class RecommendationCard extends StatelessWidget {
     required this.marginRight,
     this.image,
     required this.screenWidth,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: onTap ?? () {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -696,6 +748,47 @@ class RecommendationCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddRecommendationButton extends StatelessWidget {
+  final double width;
+  final double height;
+  final VoidCallback onTap;
+
+  const _AddRecommendationButton({
+    required this.width,
+    required this.height,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: const Color(0xFFB1B1B1), // 회색 박스
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Icon(
+            Icons.add,
+            color: Color(0xFFFEFDFC), // + 색상
+            size: 56,
+          ),
         ),
       ),
     );

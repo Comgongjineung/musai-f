@@ -82,11 +82,11 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     return Theme(
       data: Theme.of(context).copyWith(
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
+          backgroundColor: const Color(0xFFFFFDFC),
+          surfaceTintColor: const Color(0xFFFAFAFA),
           elevation: 0,
           shadowColor: Colors.transparent,
-          scrolledUnderElevation: 0,
+          scrolledUnderElevation: 2,
           foregroundColor: Colors.black,
         ),
       ),

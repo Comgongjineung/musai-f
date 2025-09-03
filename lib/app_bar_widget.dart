@@ -40,6 +40,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: const Color(0xFFFFFDFC),
       elevation: 0,
+      scrolledUnderElevation: 2, // 스크롤 시 그림자 추가
+      surfaceTintColor: const Color(0xFFFAFAFA), // 스크롤 시 FAFAFA 색상
       centerTitle: centerTitle,
       systemOverlayStyle: systemOverlayStyle ?? SystemUiOverlayStyle(
         statusBarColor: (backgroundColor ?? Colors.white),

@@ -121,7 +121,7 @@ class DetailRecommendPage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(sr(20)),
-                      border: Border.all(color: const Color(0xFFE9E9E9)),
+                      border: Border.all(color: const Color(0xFFEBEBEB)),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: item.primaryImageSmall.isEmpty
