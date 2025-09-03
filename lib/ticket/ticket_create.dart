@@ -303,6 +303,8 @@ Future<String> _uploadTicketPng(Uint8List pngBytes) async {
         child: AppBar(
           backgroundColor: const Color(0xFFFFFDFC), // 상단바 배경
           elevation: 0,
+          scrolledUnderElevation: 2, // 스크롤 시 그림자
+          surfaceTintColor: const Color(0xFFFAFAFA), // 스크롤 시 그림자 색상
           leading: Padding(
             padding: EdgeInsets.only(left: screenWidth * 0.06),
             child: IconButton(
