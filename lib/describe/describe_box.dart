@@ -378,7 +378,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                     Padding(
                       padding: EdgeInsets.only(left: screenWidth * 0.02), 
                       child: Container(
-                        width: screenWidth * 0.36,
+                        width: screenWidth * 0.39,
                         height: screenHeight * 0.036, // 30/844
                         decoration: BoxDecoration(
                           color: const Color(0xFFA28F7D),

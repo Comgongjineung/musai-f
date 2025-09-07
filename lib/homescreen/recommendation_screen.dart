@@ -18,8 +18,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   bool _loading = true;
   String? _error;
 
-  // 기존: List<RecommendItem> _items
-  // 변경: MasonryEntry(아이템, aspectRatio)까지 준비
+  // 아이템 + 비율
   List<MasonryEntry> _entries = const [];
 
   @override
@@ -46,19 +45,23 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
 
       if (res.statusCode == 200) {
         final body = json.decode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
-        final list = (body['recommendations'] as List? ?? [])
+        final items = (body['recommendations'] as List? ?? [])
             .map((e) => RecommendItem.fromJson((e as Map).cast<String, dynamic>()))
             .toList();
 
-        // 1) 이미지 사이즈를 미리 구해 aspectRatio 세팅
-        final prepared = await _prepareEntries(list);
-
+        // ① 즉시 렌더용: 모두 정사각(1.0)으로 먼저 뿌림 → 첫 화면 빠르게 표시
+        final initial = items.map((it) => MasonryEntry(item: it, aspectRatio: 1.0)).toList();
         if (!mounted) return;
         setState(() {
-          _entries = prepared;
+          _entries = initial;
           _loading = false;
           _error = null;
         });
+
+        // ② 비율 비동기 보강: 각 항목별로 원본 사이즈 얻어와서 개별 업데이트 (점진적)
+        for (int i = 0; i < items.length; i++) {
+          _hydrateAspectRatio(i, items[i].primaryImageSmall);
+        }
       } else {
         setState(() {
           _error = '서버 오류: ${res.statusCode}';
@@ -73,43 +76,44 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     }
   }
 
-  /// ImageProvider를 resolve해서 네트워크 이미지의 원본 width/height를 가져옴
+  /// 단일 항목의 aspectRatio를 비동기로 보강해서 즉시 반영
+  Future<void> _hydrateAspectRatio(int index, String url) async {
+    final size = await _getNetworkImageSize(url);
+    if (!mounted) return;
+    if (size == null || size.width <= 0 || size.height <= 0) return;
+
+    final ratio = size.width / size.height;
+
+    // 동일 비율이면 리빌드 불필요
+    if (index < 0 || index >= _entries.length) return;
+    if ((_entries[index].aspectRatio - ratio).abs() < 0.001) return;
+
+    setState(() {
+      final updated = [..._entries];
+      updated[index] = MasonryEntry(item: updated[index].item, aspectRatio: ratio);
+      _entries = updated;
+    });
+  }
+
+  /// 네트워크 이미지의 원본 width/height를 얻음
   Future<Size?> _getNetworkImageSize(String url) async {
     final completer = Completer<Size?>();
     final img = Image.network(url);
     final ImageStream stream = img.image.resolve(const ImageConfiguration());
-    void listener(ImageInfo info, bool syncCall) {
-      final w = info.image.width.toDouble();
-      final h = info.image.height.toDouble();
-      completer.complete(Size(w, h));
-      stream.removeListener(ImageStreamListener(listener));
-    }
+    late final ImageStreamListener listener;
+    listener = ImageStreamListener((ImageInfo info, bool _) {
+      completer.complete(Size(
+        info.image.width.toDouble(),
+        info.image.height.toDouble(),
+      ));
+      stream.removeListener(listener);
+    }, onError: (dynamic _, __) {
+      completer.complete(null);
+      stream.removeListener(listener);
+    });
 
-    stream.addListener(ImageStreamListener(
-      listener,
-      onError: (dynamic _, __) {
-        completer.complete(null); // 실패 시 null
-        stream.removeListener(ImageStreamListener(listener));
-      },
-    ));
-
-    // 혹시나 5초 타임아웃
-    return completer.future.timeout(const Duration(seconds: 5), onTimeout: () => null);
-  }
-
-  /// RecommendItem 리스트 → MasonryEntry 리스트(aspectRatio 포함)로 변환
-  Future<List<MasonryEntry>> _prepareEntries(List<RecommendItem> items) async {
-    final futures = items.map((it) async {
-      final url = it.primaryImageSmall;
-      final size = await _getNetworkImageSize(url);
-      // aspectRatio = width / height, 실패 시 안전한 기본값(정사각) 1.0
-      final ratio = (size != null && size.width > 0 && size.height > 0)
-          ? (size.width / size.height)
-          : 1.0;
-      return MasonryEntry(item: it, aspectRatio: ratio);
-    }).toList();
-
-    return Future.wait(futures);
+    stream.addListener(listener);
+    return completer.future.timeout(const Duration(seconds: 3), onTimeout: () => null);
   }
 
   @override
@@ -117,6 +121,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     // ----- 스케일 팩터 -----
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final dpr = MediaQuery.of(context).devicePixelRatio;
     final sx = screenWidth / 390.0; // 기준 가로 390
     final sy = screenHeight / 841.0; // 기준 세로 841
     double sr(double v) => v * ((sx + sy) / 2);
@@ -151,7 +156,6 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                           children: [
                             SizedBox(height: 15 * sy),
 
-                            // ===== 균형 분배 Masonry 레이아웃 (패키지 없이) =====
                             Expanded(
                               child: LayoutBuilder(
                                 builder: (context, constraints) {
@@ -163,14 +167,18 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                                   double leftHeight = 0;
                                   double rightHeight = 0;
 
+                                  // 디바이스 해상도에 맞춘 다운샘플 폭(px)
+                                  final targetCacheWidth = (columnWidth * dpr).round();
+
                                   for (final entry in _entries) {
-                                    // 예상 높이 = columnWidth / (width/height)
                                     final tileHeight = columnWidth / (entry.aspectRatio <= 0 ? 1.0 : entry.aspectRatio);
+
                                     final tile = SizedBox(
                                       width: columnWidth,
                                       child: _PosterTile(
                                         entry: entry,
                                         borderRadius: sr(8),
+                                        cacheWidthPx: targetCacheWidth, // ⬅ 다운샘플링 핵심
                                         onTap: () {
                                           Navigator.push(
                                             context,
@@ -187,7 +195,6 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                                       child: tile,
                                     );
 
-                                    // 항상 더 낮은 쪽으로 배치
                                     if (leftHeight <= rightHeight) {
                                       left.add(padded);
                                       leftHeight += tileHeight + vGap;
@@ -202,10 +209,8 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                                     child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        // 왼쪽 열
                                         Expanded(child: Column(children: left)),
                                         const SizedBox(width: hGap),
-                                        // 오른쪽 열
                                         Expanded(child: Column(children: right)),
                                       ],
                                     ),
@@ -223,16 +228,17 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   }
 }
 
-/// 이미지 비율을 알고 있을 때 자리 흔들림을 막는 타일
 class _PosterTile extends StatelessWidget {
   final MasonryEntry entry;
   final VoidCallback onTap;
   final double borderRadius;
+  final int cacheWidthPx; // 디바이스 해상도에 맞춘 디코드 폭
 
   const _PosterTile({
     required this.entry,
     required this.onTap,
     required this.borderRadius,
+    required this.cacheWidthPx,
   });
 
   @override
@@ -246,21 +252,23 @@ class _PosterTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 자리를 먼저 확보해 스크롤 중 레이아웃 점프 방지
             AspectRatio(
-              aspectRatio: entry.aspectRatio <= 0 ? 1.0 : entry.aspectRatio, // width/height
+              aspectRatio: entry.aspectRatio <= 0 ? 1.0 : entry.aspectRatio,
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
                 gaplessPlayback: true,
+                // ↓ Flutter 3.10+ 에서 지원. 엔진이 다운샘플링 디코드해서 빨라짐.
+                cacheWidth: cacheWidthPx,
                 loadingBuilder: (context, child, progress) {
                   if (progress == null) return child;
-                  return const _PosterSkeleton(); // 동일 비율 박스 안에서 로딩
+                  return const _PosterSkeleton();
                 },
                 errorBuilder: (_, __, ___) => const ColoredBox(
                   color: Color(0xFFE9E9E9),
                   child: _BrokenImageIcon(),
                 ),
+                filterQuality: FilterQuality.low, // 디코드/스케일 비용 절감
               ),
             ),
           ],
@@ -322,7 +330,6 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-/// Masonry용 엔트리 (아이템 + 비율)
 class MasonryEntry {
   final RecommendItem item;
   final double aspectRatio; // width / height
