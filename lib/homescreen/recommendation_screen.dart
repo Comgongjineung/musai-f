@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,10 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   static const _baseUrl = 'http://43.203.23.173:8080';
   bool _loading = true;
   String? _error;
-  List<RecommendItem> _items = const [];
+
+  // 기존: List<RecommendItem> _items
+  // 변경: MasonryEntry(아이템, aspectRatio)까지 준비
+  List<MasonryEntry> _entries = const [];
 
   @override
   void initState() {
@@ -38,18 +42,20 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
       }
 
       final uri = Uri.parse('$_baseUrl/recommend/dummyData/$userId?count=20');
-      final res =
-          await http.get(uri, headers: {'Authorization': 'Bearer $token'});
+      final res = await http.get(uri, headers: {'Authorization': 'Bearer $token'});
 
       if (res.statusCode == 200) {
-        final body =
-            json.decode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body = json.decode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final list = (body['recommendations'] as List? ?? [])
             .map((e) => RecommendItem.fromJson((e as Map).cast<String, dynamic>()))
             .toList();
 
+        // 1) 이미지 사이즈를 미리 구해 aspectRatio 세팅
+        final prepared = await _prepareEntries(list);
+
+        if (!mounted) return;
         setState(() {
-          _items = list;
+          _entries = prepared;
           _loading = false;
           _error = null;
         });
@@ -67,6 +73,45 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     }
   }
 
+  /// ImageProvider를 resolve해서 네트워크 이미지의 원본 width/height를 가져옴
+  Future<Size?> _getNetworkImageSize(String url) async {
+    final completer = Completer<Size?>();
+    final img = Image.network(url);
+    final ImageStream stream = img.image.resolve(const ImageConfiguration());
+    void listener(ImageInfo info, bool syncCall) {
+      final w = info.image.width.toDouble();
+      final h = info.image.height.toDouble();
+      completer.complete(Size(w, h));
+      stream.removeListener(ImageStreamListener(listener));
+    }
+
+    stream.addListener(ImageStreamListener(
+      listener,
+      onError: (dynamic _, __) {
+        completer.complete(null); // 실패 시 null
+        stream.removeListener(ImageStreamListener(listener));
+      },
+    ));
+
+    // 혹시나 5초 타임아웃
+    return completer.future.timeout(const Duration(seconds: 5), onTimeout: () => null);
+  }
+
+  /// RecommendItem 리스트 → MasonryEntry 리스트(aspectRatio 포함)로 변환
+  Future<List<MasonryEntry>> _prepareEntries(List<RecommendItem> items) async {
+    final futures = items.map((it) async {
+      final url = it.primaryImageSmall;
+      final size = await _getNetworkImageSize(url);
+      // aspectRatio = width / height, 실패 시 안전한 기본값(정사각) 1.0
+      final ratio = (size != null && size.width > 0 && size.height > 0)
+          ? (size.width / size.height)
+          : 1.0;
+      return MasonryEntry(item: it, aspectRatio: ratio);
+    }).toList();
+
+    return Future.wait(futures);
+  }
+
   @override
   Widget build(BuildContext context) {
     // ----- 스케일 팩터 -----
@@ -82,8 +127,8 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
     return Theme(
       data: Theme.of(context).copyWith(
         appBarTheme: const AppBarTheme(
-          backgroundColor: const Color(0xFFFFFDFC),
-          surfaceTintColor: const Color(0xFFFAFAFA),
+          backgroundColor: Color(0xFFFFFDFC),
+          surfaceTintColor: Color(0xFFFAFAFA),
           elevation: 0,
           shadowColor: Colors.transparent,
           scrolledUnderElevation: 2,
@@ -106,29 +151,31 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                           children: [
                             SizedBox(height: 15 * sy),
 
-                            // ===== Masonry 레이아웃 (패키지 없이) =====
+                            // ===== 균형 분배 Masonry 레이아웃 (패키지 없이) =====
                             Expanded(
                               child: LayoutBuilder(
                                 builder: (context, constraints) {
-                                  // 총 가용 폭(패딩 제외)에서 열 간격(hGap) 1번 빼고 반으로 나눔
                                   final totalWidth = constraints.maxWidth;
                                   final columnWidth = (totalWidth - hGap) / 2;
 
-                                  // 간단히 짝수/홀수로 분배 (시각적 워터폴 효과 충분)
                                   final left = <Widget>[];
                                   final right = <Widget>[];
+                                  double leftHeight = 0;
+                                  double rightHeight = 0;
 
-                                  for (int i = 0; i < _items.length; i++) {
+                                  for (final entry in _entries) {
+                                    // 예상 높이 = columnWidth / (width/height)
+                                    final tileHeight = columnWidth / (entry.aspectRatio <= 0 ? 1.0 : entry.aspectRatio);
                                     final tile = SizedBox(
                                       width: columnWidth,
                                       child: _PosterTile(
-                                        item: _items[i],
+                                        entry: entry,
                                         borderRadius: sr(8),
                                         onTap: () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (_) => DetailRecommendPage(item: _items[i]),
+                                              builder: (_) => DetailRecommendPage(item: entry.item),
                                             ),
                                           );
                                         },
@@ -136,14 +183,17 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                                     );
 
                                     final padded = Padding(
-                                      padding: EdgeInsets.only(bottom: vGap),
+                                      padding: const EdgeInsets.only(bottom: vGap),
                                       child: tile,
                                     );
 
-                                    if (i.isEven) {
+                                    // 항상 더 낮은 쪽으로 배치
+                                    if (leftHeight <= rightHeight) {
                                       left.add(padded);
+                                      leftHeight += tileHeight + vGap;
                                     } else {
                                       right.add(padded);
+                                      rightHeight += tileHeight + vGap;
                                     }
                                   }
 
@@ -154,7 +204,7 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
                                       children: [
                                         // 왼쪽 열
                                         Expanded(child: Column(children: left)),
-                                        SizedBox(width: hGap),
+                                        const SizedBox(width: hGap),
                                         // 오른쪽 열
                                         Expanded(child: Column(children: right)),
                                       ],
@@ -173,20 +223,21 @@ class _RecommendationScreenState extends State<RecommendationScreen> {
   }
 }
 
+/// 이미지 비율을 알고 있을 때 자리 흔들림을 막는 타일
 class _PosterTile extends StatelessWidget {
-  final RecommendItem item;
+  final MasonryEntry entry;
   final VoidCallback onTap;
   final double borderRadius;
 
   const _PosterTile({
-    required this.item,
+    required this.entry,
     required this.onTap,
     required this.borderRadius,
   });
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = item.primaryImageSmall;
+    final imageUrl = entry.item.primaryImageSmall;
 
     return GestureDetector(
       onTap: onTap,
@@ -195,17 +246,21 @@ class _PosterTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 이미지: 가로 폭에 맞추고 세로는 원본 비율
-            Image.network(
-              imageUrl,
-              fit: BoxFit.fitWidth,
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return const _PosterSkeleton();
-              },
-              errorBuilder: (_, __, ___) => const ColoredBox(
-                color: Color(0xFFE9E9E9),
-                child: _BrokenImageIcon(),
+            // 자리를 먼저 확보해 스크롤 중 레이아웃 점프 방지
+            AspectRatio(
+              aspectRatio: entry.aspectRatio <= 0 ? 1.0 : entry.aspectRatio, // width/height
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return const _PosterSkeleton(); // 동일 비율 박스 안에서 로딩
+                },
+                errorBuilder: (_, __, ___) => const ColoredBox(
+                  color: Color(0xFFE9E9E9),
+                  child: _BrokenImageIcon(),
+                ),
               ),
             ),
           ],
@@ -222,10 +277,7 @@ class _PosterSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     return const ColoredBox(
       color: Color(0xFFF3F3F3),
-      child: AspectRatio(
-        aspectRatio: 1, // 로딩 동안만 임시 정사각
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      ),
+      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
     );
   }
 }
@@ -268,4 +320,11 @@ class _ErrorView extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Masonry용 엔트리 (아이템 + 비율)
+class MasonryEntry {
+  final RecommendItem item;
+  final double aspectRatio; // width / height
+  const MasonryEntry({required this.item, required this.aspectRatio});
 }
