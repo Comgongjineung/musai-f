@@ -42,8 +42,8 @@ class UnityOverlayActivity : UnityPlayerActivity() {
         val root = findViewById<ViewGroup>(android.R.id.content)
         (appBar?.parent as? ViewGroup)?.removeView(appBar)
 
-        val barHeightPx = dp(44f)
-        val topOffset = statusBarHeight() + dp(20f) // 상단에서 얼마나 떨어져있는지 조절
+        val barHeightPx = dp(60f)
+        val topOffset = statusBarHeight() + dp(10f) // 상단에서 얼마나 떨어져있는지 조절
 
         val bar = FrameLayout(this).apply {
             layoutParams = FrameLayout.LayoutParams(
@@ -63,7 +63,6 @@ class UnityOverlayActivity : UnityPlayerActivity() {
             typeface = Typeface.create(typeface, Typeface.BOLD)
             val lp = FrameLayout.LayoutParams(dp(44f), dp(32f))
             lp.leftMargin = dp(24f)
-            lp.topMargin = dp(6f)
             lp.gravity = Gravity.CENTER_VERTICAL or Gravity.START
             layoutParams = lp
             setBackgroundColor(Color.TRANSPARENT)
