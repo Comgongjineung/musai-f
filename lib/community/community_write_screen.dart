@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img; // 이미지 압축용
 import 'dart:math' as math;
 import '../utils/auth_storage.dart';
-import 'community_screen.dart';
 
 class CommunityWriteScreen extends StatefulWidget {
   final int? postId; // 수정 모드일 때 사용

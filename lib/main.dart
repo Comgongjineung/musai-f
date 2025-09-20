@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'homescreen/home_screen.dart';
+import 'login/auth_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:io' show Platform;
 import 'alarm.dart';
@@ -39,7 +39,7 @@ class MusaiApp extends StatelessWidget {
         primarySwatch: Colors.grey,
         scaffoldBackgroundColor: const Color(0xFFFFFDFC),
       ),
-      home: const HomeScreen(),
+      home: const AuthCheck(),
     );
   }
 }
