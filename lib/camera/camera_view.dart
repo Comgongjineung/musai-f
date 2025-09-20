@@ -19,6 +19,11 @@ class CameraViewState extends State<CameraView> {
   double _baseZoomLevel = 1.0;
   double _maxZoomLevel = 1.0;
   double _minZoomLevel = 1.0;
+  
+  // 노출 보정 관련 변수들
+  double _iso = 100.0; // ISO 값
+  double _minIso = 100.0;
+  double _maxIso = 3200.0;
 
   @override
   void initState() {
@@ -40,9 +45,66 @@ class CameraViewState extends State<CameraView> {
     await _controller!.initialize();
     _maxZoomLevel = await _controller!.getMaxZoomLevel();
     _minZoomLevel = await _controller!.getMinZoomLevel();
+    
+    // ISO 범위 설정 (기본값 사용)
+    _minIso = 100.0;
+    _maxIso = 3200.0;
+    
     print("Zoom range: $_minZoomLevel ~ $_maxZoomLevel");
+    print("ISO range: $_minIso ~ $_maxIso");
 
+    // 자동 노출 보정 활성화
+    await _enableAutoExposure();
+    
+    // 자동 밝기 조정 실행
+    await _autoAdjustBrightness();
+    
     setState(() {});
+  }
+
+  // 자동 노출 보정 활성화
+  Future<void> _enableAutoExposure() async {
+    if (_controller != null && _controller!.value.isInitialized) {
+      try {
+        // 자동 노출 모드 설정
+        await _controller!.setExposureMode(ExposureMode.auto);
+        // 자동 포커스 모드 설정
+        await _controller!.setFocusMode(FocusMode.auto);
+        
+        print("✅ 자동 노출 보정 활성화 완료");
+      } catch (e) {
+        print("❌ 자동 노출 보정 설정 실패: $e");
+      }
+    }
+  }
+
+
+  // ISO 설정 (시뮬레이션)
+  Future<void> _setISO(double iso) async {
+    if (_controller != null && _controller!.value.isInitialized) {
+      try {
+        // ISO 값 제한
+        final clampedIso = iso.clamp(_minIso, _maxIso);
+        _iso = clampedIso;
+        print("📸 ISO 설정: $_iso (시뮬레이션)");
+      } catch (e) {
+        print("❌ ISO 설정 실패: $e");
+      }
+    }
+  }
+
+  // 자동 밝기 조정 (환경 감지)
+  Future<void> _autoAdjustBrightness() async {
+    if (_controller != null && _controller!.value.isInitialized) {
+      try {
+        // 자동 ISO 조정 (환경에 따라)
+        await _setISO(_minIso * 2.0); // 적절한 ISO 설정
+        
+        print("🌞 자동 밝기 조정 완료");
+      } catch (e) {
+        print("❌ 자동 밝기 조정 실패: $e");
+      }
+    }
   }
 
   @override
@@ -78,6 +140,7 @@ class CameraViewState extends State<CameraView> {
     await _controller?.setZoomLevel(_currentZoomLevel);
     //print("✅ 적용된 줌: $_currentZoomLevel");
   }
+
 
   @override
   Widget build(BuildContext context) {

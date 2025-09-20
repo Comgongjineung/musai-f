@@ -1391,15 +1391,15 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFA28F7D)))
-            : postDetail == null
-                ? const Center(child: Text('게시물을 찾을 수 없습니다'))
-                : Column(
-                    children: [
-                      Expanded(
-                        child: SingleChildScrollView(
+      body: Column(
+        children: [
+          Expanded(
+            child: SafeArea(
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator(color: Color(0xFFA28F7D)))
+                  : postDetail == null
+                      ? const Center(child: Text('게시물을 찾을 수 없습니다'))
+                      : SingleChildScrollView(
                           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1408,7 +1408,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                               _buildUserInfo(screenWidth, screenHeight),
                               SizedBox(height: screenHeight * 0.03),
                               
-                                                             // 본문
+                               // 본문
                                _buildPostContent(screenWidth, screenHeight),
                                SizedBox(height: screenHeight * 0.03),
                                
@@ -1427,12 +1427,11 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                             ],
                           ),
                         ),
-                      ),
-                      
-                      // 댓글 입력창
-                      _buildCommentInput(screenWidth, screenHeight),
-                    ],
-                  ),
+            ),
+          ),
+          // 댓글 입력창 
+          _buildCommentInput(screenWidth, screenHeight),
+        ],
       ),
     );
   }
@@ -2038,7 +2037,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
 
   Widget _buildCommentInput(double screenWidth, double screenHeight) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 14, bottom: 22),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFDFC),
         borderRadius: BorderRadius.circular(20),
@@ -2051,8 +2050,8 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
         ],
       ),
       child: Container(
-        width: 342,
-        height: 43,
+        //width: 342,
+        height: 44,
         decoration: BoxDecoration(
           color: const Color(0xFFFEF6F2),
           borderRadius: BorderRadius.circular(20),

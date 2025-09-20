@@ -1,6 +1,6 @@
 {
-    "name": "musai_f",
-    "short_name": "musai_f",
+    "name": "musai",
+    "short_name": "musai",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
