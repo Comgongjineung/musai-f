@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../utils/auth_storage.dart';
-import '../homescreen/home_screen.dart';
+import 'login_profile.dart';
 
 Future<void> loginWithApple(BuildContext context) async {
   try {
@@ -47,11 +47,11 @@ Future<void> loginWithApple(BuildContext context) async {
       print('JWT 저장 완료: $token');
       print('userId 저장 완료: $userId');
       
-      // 홈 화면으로 이동
+      // 프로필 설정 화면으로 이동
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => LoginProfileScreen(userId: userId)),
         );
       }
     } else {
