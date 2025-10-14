@@ -53,13 +53,13 @@
 	<true/>
 
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>이 앱이 사용자의 위치를 사용하려고 합니다.</string>
+	<string>이 앱은 사용자의 현재 위치를 기반으로 주변 전시관과 전시회 정보를 찾아서 제공합니다. 위치 정보는 지도에 전시관을 표시하고, 가까운 전시회를 추천하는 기능에 사용됩니다.</string>
 
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>이 앱이 백그라운드에서도 위치를 사용하려고 합니다.</string>
+	<string>이 앱은 백그라운드에서도 사용자의 위치를 기반으로 주변 전시관과 전시회 정보를 지속적으로 제공합니다. 위치 정보는 지도에 전시관을 표시하고, 가까운 전시회를 추천하는 기능에 사용됩니다.</string>
 	
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>이 앱이 백그라운드에서도 위치를 사용하려고 합니다.</string>
+	<string>이 앱은 사용자의 현재 위치를 기반으로 주변 전시관과 전시회 정보를 찾아서 제공합니다. 위치 정보는 지도에 전시관을 표시하고, 가까운 전시회를 추천하는 기능에 사용됩니다.</string>
 
 	<key>NSAppTransportSecurity</key>
 	<dict>

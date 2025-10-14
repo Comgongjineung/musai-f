@@ -11,6 +11,19 @@ Future<int?> getUserId() async {
   return id != null ? int.tryParse(id) : null;
 }
 
+// JWT 토큰 저장
+Future<void> saveJwtToken(String token) async {
+  await storage.write(key: 'jwt_token', value: token);
+  _cachedToken = token; // 메모리에도 저장
+  print("📌 JWT 토큰 로컬 저장 완료: $token");
+}
+
+// 사용자 ID 저장
+Future<void> saveUserId(int userId) async {
+  await storage.write(key: 'user_id', value: userId.toString());
+  print("📌 사용자 ID 로컬 저장 완료: $userId");
+}
+
 void clearCachedToken() {
   _cachedToken = null;
 }
