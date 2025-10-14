@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:musai_f/login/login_kakao.dart';
 import 'package:musai_f/login/login_google.dart';
+import 'package:musai_f/login/login_apple.dart';
 
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});
@@ -118,14 +119,14 @@ class SignupPage extends StatelessWidget {
                     height: screenHeight * 0.06,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF03C75A),
+                        backgroundColor: const Color(0xFF000000),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(screenWidth * 0.05),
                         ),
                       ),
                       onPressed: () {
-                        // 네이버 로그인 함수
+                        loginWithApple(context);
                       },
                       child: Stack(
                         alignment: Alignment.center,
@@ -133,14 +134,14 @@ class SignupPage extends StatelessWidget {
                           Align(
                             alignment: Alignment.centerLeft,
                             child: Image.asset(
-                              'assets/images/naver_icon.png',
+                              'assets/images/apple_icon.png',
                               width: screenWidth * 0.045,
                               height: screenWidth * 0.045,
                             ),
                           ),
                           Center(
                             child: Text(
-                              '네이버로 시작하기',
+                              'Apple로 로그인',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: screenWidth * 0.04,
