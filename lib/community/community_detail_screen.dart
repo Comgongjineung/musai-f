@@ -417,6 +417,9 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       case 'report':
         _showReportDialog();
         break;
+      case 'block_post_author':
+        _showBlockPostAuthorDialog();
+        break;
     }
   }
 
@@ -431,6 +434,12 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
         break;
       case 'delete_comment':
         _showDeleteCommentConfirmDialog(comment);
+        break;
+      case 'report_user':
+        _showReportUserDialog(comment);
+        break;
+      case 'block_user':
+        _showBlockUserDialog(comment);
         break;
     }
   }
@@ -950,8 +959,9 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
     );
   }
 
-  // 신고하기 다이얼로그
+  // 신고하기 다이얼로그 (게시물)
   void _showReportDialog() {
+    final TextEditingController reasonController = TextEditingController();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -961,7 +971,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
-          height: 230,
+          height: 280,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
@@ -981,17 +991,31 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
-              const Text(
-                '신고 기능은 아직 개발 중입니다.',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF706B66),
+              const SizedBox(height: 16),
+              // 신고 이유 입력 필드
+              Container(
+                width: double.infinity,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF6F2),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                textAlign: TextAlign.center,
+                child: TextField(
+                  controller: reasonController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: '신고 이유를 입력하세요...',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Pretendard',
+                      color: Color(0xFFB1B1B1),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(12),
+                  ),
+                ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -999,7 +1023,16 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                     width: screenWidth * 0.33,
                     height: screenHeight * 0.05,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        if (reasonController.text.trim().isNotEmpty) {
+                          Navigator.of(context).pop();
+                          _reportPost(reasonController.text.trim());
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('신고 이유를 입력해주세요.')),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFC06062),
                         shape: RoundedRectangleBorder(
@@ -1007,7 +1040,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                         ),
                       ),
                       child: Text(
-                        '확인',
+                        '신고하기',
                         style: TextStyle(
                           color: const Color(0xFFFEFDFC),
                           fontSize: screenWidth * 0.04,
@@ -1045,8 +1078,127 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
     );
   }
 
-  // 신고하기 댓글 다이얼로그
-  void _showReportCommentDialog(Comment comment) {
+  // 신고하기 사용자 다이얼로그 (댓글/답글 작성자)
+  void _showReportUserDialog(Comment comment) {
+    final TextEditingController reasonController = TextEditingController();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 280,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
+              const SizedBox(height: 8),
+              const Text(
+                '사용자를 신고하시겠습니까?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              // 신고 이유 입력 필드
+              Container(
+                width: double.infinity,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF6F2),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: TextField(
+                  controller: reasonController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: '신고 이유를 입력하세요...',
+                    hintStyle: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Pretendard',
+                      color: Color(0xFFB1B1B1),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (reasonController.text.trim().isNotEmpty) {
+                          Navigator.of(context).pop();
+                          _reportUser(comment.userId, reasonController.text.trim());
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('신고 이유를 입력해주세요.')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '신고하기',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 차단하기 다이얼로그 (댓글 작성자)
+  void _showBlockUserDialog(Comment comment) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -1068,7 +1220,7 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
               SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
               const SizedBox(height: 8),
               const Text(
-                '댓글을 신고하시겠습니까?',
+                '사용자를 차단하시겠습니까?',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -1078,10 +1230,10 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
               ),
               const SizedBox(height: 4),
               const Text(
-                '신고 기능은 아직 개발 중입니다.',
+                '차단하면 해당 사용자의 게시물과\n댓글을 볼 수 없습니다.',
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
                   color: Color(0xFF706B66),
                 ),
                 textAlign: TextAlign.center,
@@ -1094,7 +1246,10 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                     width: screenWidth * 0.33,
                     height: screenHeight * 0.05,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _blockUser(comment.userId);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFC06062),
                         shape: RoundedRectangleBorder(
@@ -1102,7 +1257,107 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                         ),
                       ),
                       child: Text(
-                        '확인',
+                        '차단하기',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: screenWidth * 0.015),
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFB1B1B1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '취소',
+                        style: TextStyle(
+                          color: const Color(0xFFFEFDFC),
+                          fontSize: screenWidth * 0.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 차단하기 다이얼로그 (게시글 작성자)
+  void _showBlockPostAuthorDialog() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          height: 230,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color(0xFFFEFDFC),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset('assets/icons/warning_icon.svg', width: 52, height: 52),
+              const SizedBox(height: 8),
+              const Text(
+                '사용자를 차단하시겠습니까?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF343231),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                '차단하면 해당 사용자의 게시물과\n댓글을 볼 수 없습니다.',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF706B66),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 28),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: screenWidth * 0.33,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        if (postDetail != null) {
+                          _blockUser(postDetail!.userId, isPostAuthor: true);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC06062),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        '차단하기',
                         style: TextStyle(
                           color: const Color(0xFFFEFDFC),
                           fontSize: screenWidth * 0.04,
@@ -1208,6 +1463,158 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
       print('❌ 게시물 삭제 실패: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('게시물 삭제 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  // 게시물 신고 메서드
+  Future<void> _reportPost(String reason) async {
+    if (token == null) {
+      print('❌ 토큰이 없어서 신고할 수 없습니다.');
+      return;
+    }
+
+    print('🔍 게시물 신고 시작...');
+    print('🔍 신고할 게시물 ID: ${widget.postId}');
+    print('🔍 신고 이유: $reason');
+
+    try {
+      final requestBody = {
+        'postId': widget.postId,
+        'reason': reason,
+      };
+
+      final response = await http.post(
+        Uri.parse('http://43.203.23.173:8080/api/v1/community/post-report'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+        },
+        body: json.encode(requestBody),
+      );
+
+      print('📊 게시물 신고 응답 상태 코드: ${response.statusCode}');
+      print('📊 게시물 신고 응답 바디: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('게시물이 신고되었습니다.')),
+        );
+      } else {
+        print('❌ 게시물 신고 실패 - 상태 코드: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('게시물 신고에 실패했습니다. (${response.statusCode})')),
+        );
+      }
+    } catch (e) {
+      print('❌ 게시물 신고 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('게시물 신고 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  // 사용자 신고 메서드
+  Future<void> _reportUser(int reportedUserId, String reason) async {
+    if (token == null) {
+      print('❌ 토큰이 없어서 신고할 수 없습니다.');
+      return;
+    }
+
+    print('🔍 사용자 신고 시작...');
+    print('🔍 신고할 사용자 ID: $reportedUserId');
+    print('🔍 신고 이유: $reason');
+
+    try {
+      final requestBody = {
+        'reportedUserId': reportedUserId,
+        'reason': reason,
+      };
+
+      final response = await http.post(
+        Uri.parse('http://43.203.23.173:8080/api/v1/community/report'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+        },
+        body: json.encode(requestBody),
+      );
+
+      print('📊 사용자 신고 응답 상태 코드: ${response.statusCode}');
+      print('📊 사용자 신고 응답 바디: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('사용자가 신고되었습니다.')),
+        );
+      } else {
+        print('❌ 사용자 신고 실패 - 상태 코드: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('사용자 신고에 실패했습니다. (${response.statusCode})')),
+        );
+      }
+    } catch (e) {
+      print('❌ 사용자 신고 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('사용자 신고 중 오류가 발생했습니다.')),
+      );
+    }
+  }
+
+  // 사용자 차단 메서드
+  Future<void> _blockUser(int blockedUserId, {bool isPostAuthor = false}) async {
+    if (token == null) {
+      print('❌ 토큰이 없어서 차단할 수 없습니다.');
+      return;
+    }
+
+    print('🔍 사용자 차단 시작...');
+    print('🔍 차단할 사용자 ID: $blockedUserId');
+    print('🔍 게시글 작성자 차단 여부: $isPostAuthor');
+
+    try {
+      final requestBody = {
+        'blockedUserId': blockedUserId,
+      };
+
+      final response = await http.post(
+        Uri.parse('http://43.203.23.173:8080/api/v1/community/blocks/add'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'accept': '*/*',
+        },
+        body: json.encode(requestBody),
+      );
+
+      print('📊 사용자 차단 응답 상태 코드: ${response.statusCode}');
+      print('📊 사용자 차단 응답 바디: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('사용자가 차단되었습니다.')),
+        );
+        
+        if (isPostAuthor) {
+          // 게시글 작성자를 차단한 경우 community_screen으로 돌아가기
+          print('📊 게시글 작성자 차단 - community_screen으로 이동');
+          Navigator.of(context).pop(true); // 상세 페이지를 닫으면서 true 전달
+        } else {
+          // 댓글 작성자를 차단한 경우 댓글 목록만 새로고침
+          await _loadComments();
+        }
+      } else {
+        print('❌ 사용자 차단 실패 - 상태 코드: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('사용자 차단에 실패했습니다. (${response.statusCode})')),
+        );
+      }
+    } catch (e) {
+      print('❌ 사용자 차단 실패: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('사용자 차단 중 오류가 발생했습니다.')),
       );
     }
   }
@@ -1372,6 +1779,19 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                             child: Center(
                               child: Text(
                                 '신고하기',
+                                style: TextStyle(
+                                  color: Color(0xFF343231),
+                                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          PopupMenuItem<String>(
+                            value: 'block_post_author',
+                            child: Center(
+                              child: Text(
+                                '차단하기',
                                 style: TextStyle(
                                   color: Color(0xFF343231),
                                   fontSize: MediaQuery.of(context).size.width * 0.04,
@@ -1982,6 +2402,32 @@ class _CommunityDetailScreenState extends State<CommunityDetailScreen> {
                                         child: Center(
                                           child: Text(
                                             '답글달기',
+                                            style: TextStyle(
+                                              color: Color(0xFF343231),
+                                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'report_user',
+                                        child: Center(
+                                          child: Text(
+                                            '신고하기',
+                                            style: TextStyle(
+                                              color: Color(0xFF343231),
+                                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      PopupMenuItem<String>(
+                                        value: 'block_user',
+                                        child: Center(
+                                          child: Text(
+                                            '차단하기',
                                             style: TextStyle(
                                               color: Color(0xFF343231),
                                               fontSize: MediaQuery.of(context).size.width * 0.04,

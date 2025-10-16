@@ -14,6 +14,7 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart'; 
 import 'mypage_comments.dart';
 import 'mypage_posts.dart';
+import 'mypage_blocked_users.dart';
 
 class ProfileAvatarDisplay extends StatefulWidget {
   final double size; // width/height
@@ -529,7 +530,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
 
   Widget _writtenItemsSection(double screenWidth, double screenHeight) {
     return Container(
-      height: screenHeight * 0.12,
+      height: screenHeight * 0.17,
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04, vertical: screenHeight * 0.02),
       decoration: BoxDecoration(
         color: Color(0xFFFEF6F2),
@@ -565,6 +566,22 @@ class _MyPageScreenState extends State<MyPageScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('작성한 댓글', style: TextStyle(fontSize: screenWidth * 0.04)),
+                Icon(Icons.chevron_right, color: Color(0xFF343231)),
+              ],
+            ),
+          ),
+          SizedBox(height: screenHeight * 0.015),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const BlockedUsersPage()),
+    );
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('차단 사용자 관리', style: TextStyle(fontSize: screenWidth * 0.04)),
                 Icon(Icons.chevron_right, color: Color(0xFF343231)),
               ],
             ),
