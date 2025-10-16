@@ -257,13 +257,17 @@ class _CommunityScreenState extends State<CommunityScreen> {
     print('  - image1 시작 부분: ${post.image1?.substring(0, post.image1!.length > 50 ? 50 : post.image1!.length)}'); */
     
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => CommunityDetailScreen(postId: post.postId),
           ),
         );
+        // 게시글 작성자를 차단한 경우 게시물 목록 새로고침
+        if (result == true) {
+          _loadPosts();
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(
