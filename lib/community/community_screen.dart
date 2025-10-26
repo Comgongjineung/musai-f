@@ -59,6 +59,14 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        print('📊 파싱된 게시물 개수: ${data.length}');
+        
+        // 빈 배열인 경우 사용자 권한 확인
+        if (data.isEmpty) {
+          print('⚠️ 게시물이 비어있음 - 사용자 ID: $userId');
+          await _checkUserInfo();
+        }
+        
         setState(() {
           posts = data.map((json) => Post.fromJson(json)).toList();
           posts.sort((a, b) => DateTime.parse(b.createdAt).compareTo(DateTime.parse(a.createdAt)));
@@ -73,6 +81,36 @@ class _CommunityScreenState extends State<CommunityScreen> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _checkUserInfo() async {
+    if (token == null || userId == null) return;
+    
+    try {
+      print('👤 사용자 정보 확인 중...');
+      final response = await http.get(
+        Uri.parse('http://43.203.23.173:8080/user/read/$userId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      print('👤 사용자 정보 응답 상태: ${response.statusCode}');
+      print('👤 사용자 정보 응답: ${response.body}');
+      
+      if (response.statusCode == 200) {
+        final userData = json.decode(response.body);
+        print('👤 사용자 ID: ${userData['userId']}');
+        print('👤 이메일: ${userData['email']}');
+        print('👤 닉네임: ${userData['nickname']}');
+        print('👤 프로필 이미지: ${userData['profileImage']}');
+      } else {
+        print('❌ 사용자 정보 조회 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ 사용자 정보 조회 오류: $e');
     }
   }
 

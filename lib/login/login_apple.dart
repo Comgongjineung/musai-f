@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import '../utils/auth_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'login_profile.dart';
+
+final storage = FlutterSecureStorage();
 
 Future<void> loginWithApple(BuildContext context) async {
   try {
@@ -40,10 +42,9 @@ Future<void> loginWithApple(BuildContext context) async {
       print('JWT 토큰: $token');
       print('사용자 ID: $userId');
 
-      // JWT 토큰과 사용자 ID 저장
-      await saveJwtToken(token);
-      await saveUserId(userId);
-      
+      await storage.write(key: 'jwt_token', value: token);
+      await storage.write(key: 'user_id', value: userId.toString());
+
       print('JWT 저장 완료: $token');
       print('userId 저장 완료: $userId');
       
@@ -135,7 +136,9 @@ Future<void> logoutWithApple() async {
     await revokeAppleToken();
     
     // 2. 로컬 저장소에서 인증 정보 삭제
-    await clearAuthStorage();
+    await storage.delete(key: 'jwt_token');
+    await storage.delete(key: 'user_id');
+    await storage.delete(key: 'fcm_token');
     
     print('✅ 애플 로그아웃 완료');
   } catch (e) {

@@ -6,7 +6,6 @@ import 'dart:typed_data';
 import 'dart:io'; // File 클래스 사용을 위해 추가
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img; // 이미지 압축용
-import 'dart:math' as math;
 import '../utils/auth_storage.dart';
 
 class CommunityWriteScreen extends StatefulWidget {
@@ -82,9 +81,9 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
         final multi = await _picker.pickMultiImage(
           imageQuality: 100, // 원본 유지(압축은 우리가 따로 처리)
         );
-        if (multi != null && multi.isNotEmpty) {
-          picked = multi.take(remain).toList();
-        }
+      if (multi.isNotEmpty) {
+        picked = multi.take(remain).toList();
+      }
       } catch (_) {
         // 일부 기기에서 pickMultiImage 미지원: 아래에서 단일로 보조
       }
@@ -193,13 +192,9 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
         contentType: MediaType('image', 'jpeg'),
       );
       request.files.add(multipartFile);
-      print('📦 전송 파트: field=file, filename=upload.jpg, contentType=image/jpeg, bytes=${compBytes.lengthInBytes}');
 
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
-      print('📊 업로드 응답 상태 코드: ${response.statusCode}');
-      print('📊 업로드 응답 헤더: ${response.headers}');
-      print('📊 업로드 응답 바디: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -297,14 +292,6 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
               ...imagesMap,
             };
 
-      /* print('🔍 ${isEditMode ? "게시물 수정" : "게시물 작성"} 시작...');
-      print('🔍 토큰: ${token != null ? "있음" : "없음"}');
-      print('🔍 사용자 ID: $userId');
-      print('🔍 이미지 개수: ${_images.length}');
-      print('🔍 이미지 맵: $imagesMap');
-      print('🔍 요청 본문: $requestBody');
-      print('🔍 HTTP 메서드: ${isEditMode ? "PUT" : "POST"}'); */
-
       // --- Begin: Build and log headers ---
       final authToken = (token ?? '').trim();
       if (authToken.isEmpty) {
@@ -341,16 +328,18 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
               body: json.encode(requestBody),
             );
 
-      print('📊 응답 상태 코드: ${response.statusCode}');
-      print('📊 응답 헤더: ${response.headers}');
-      print('📊 응답 바디: ${response.body}');
-      print('📊 요청 헤더: ${isEditMode ? "PUT" : "POST"} ${uri.toString()}');
-      print('📊 요청 본문 크기: ${json.encode(requestBody).length} characters');
+      /*print('응답 상태 코드: ${response.statusCode}');
+      print('응답 헤더: ${response.headers}');
+      print('응답 바디: ${response.body}');
+      print('요청 헤더: ${isEditMode ? "PUT" : "POST"} ${uri.toString()}');
+      print('요청 본문 크기: ${json.encode(requestBody).length} characters');*/
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(isEditMode ? '게시물이 성공적으로 수정되었습니다.' : '게시물이 성공적으로 작성되었습니다.')),
         );
+        // 게시물 작성 후 잠시 대기 (서버 처리 시간)
+        await Future.delayed(const Duration(seconds: 1));
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -358,8 +347,8 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
         );
       }
     } catch (e, stackTrace) {
-      print('❌ ${widget.postId != null ? "게시물 수정" : "게시물 작성"} 에러: $e');
-      print('❌ 스택 트레이스: $stackTrace');
+      print('${widget.postId != null ? "게시물 수정" : "게시물 작성"} 에러: $e');
+      print('스택 트레이스: $stackTrace');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('오류가 발생했습니다: $e')),
       );
@@ -386,8 +375,13 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
         leading: Padding(
           padding: EdgeInsets.only(left: screenWidth * 0.06),
           child: IconButton(
-            icon: const Icon(Icons.close, color: Color(0xFF343231)),
+            icon: Icon(
+              Icons.close, 
+              color: const Color(0xFF343231),
+              size: screenWidth * 0.06, // 반응형 크기 (약 24px)
+            ),
             onPressed: () => Navigator.pop(context),
+            iconSize: screenWidth * 0.06, // 터치 영역도 반응형으로
           ),
         ),
         title: Text(
@@ -461,6 +455,8 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
                   _buildContentField(context),
                   SizedBox(height: screenHeight * 0.024),
                   _buildImageSection(context),
+                  SizedBox(height: screenHeight * 0.024),
+                  _buildCommunityPrecautions(context),
                   SizedBox(height: screenHeight * 0.014),
                 ],
               ),
@@ -484,15 +480,15 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
         controller: _titleController,
         style: TextStyle(
           color: const Color(0xFF343231),
-          fontSize: screenWidth * 0.051,
-          fontWeight: FontWeight.w600,
+          fontSize: screenWidth * 0.05,
+          fontWeight: FontWeight.w500,
         ),
         decoration: InputDecoration(
           hintText: '제목',
           hintStyle: TextStyle(
             color: const Color(0xFFB1B1B1),
-            fontSize: screenWidth * 0.051,
-            fontWeight: FontWeight.w600,
+            fontSize: screenWidth * 0.05,
+            fontWeight: FontWeight.w500,
           ),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
@@ -518,7 +514,7 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
         maxLines: null,
         expands: true,
         style: TextStyle(
-          color: Colors.black,
+          color: Color(0xFF343231),
           fontSize: screenWidth * 0.041,
         ),
         decoration: InputDecoration(
@@ -586,8 +582,6 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
   }
 
   Widget _buildImageGrid(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -609,8 +603,6 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
   }
 
   Widget _imageTile(BuildContext context, int index) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     final file = _images[index];
     return Stack(
       clipBehavior: Clip.none,
@@ -635,7 +627,7 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
               width: 22.0,
               height: 22.0,
               decoration: const BoxDecoration(
-                color: Colors.black87,
+                color: Color(0xFF343231),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.close, size: 14.0, color: Colors.white),
@@ -648,7 +640,6 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
 
   Widget _addSlotTile(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     final canAdd = _images.length < 4;
     return GestureDetector(
       onTap: canAdd ? _pickImages : null,
@@ -665,6 +656,58 @@ class _CommunityWriteScreenState extends State<CommunityWriteScreen> {
             color: const Color(0xFFB1B1B1),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCommunityPrecautions(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F8F8),
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(color: const Color(0xFFEBEBEB)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: screenWidth * 0.04,
+                color: const Color(0xFF706B66),
+              ),
+              SizedBox(width: screenWidth * 0.02),
+              Text(
+                '커뮤니티 이용 주의사항',
+                style: TextStyle(
+                  fontFamily: 'Pretendard',
+                  fontSize: screenWidth * 0.032,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF343231),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: screenHeight * 0.015),
+          Text(
+            '• 전시회와 관련된 내용만 게시해주세요\n'
+            '• 타인의 저작권을 침해하는 내용은 금지됩니다\n'
+            '• 개인정보(이름, 연락처 등)를 공개하지 마세요\n'
+            '• 욕설, 비방, 혐오 표현은 사용하지 마세요\n'
+            '• 상업적 목적의 광고나 홍보는 금지됩니다\n'
+            '• 부적절한 내용은 관리자에 의해 삭제될 수 있습니다',
+            style: TextStyle(
+              fontSize: screenWidth * 0.03,
+              height: 1.5,
+              color: const Color(0xFF706B66),
+            ),
+          ),
+        ],
       ),
     );
   }

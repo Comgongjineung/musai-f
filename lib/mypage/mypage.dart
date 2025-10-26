@@ -15,6 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'mypage_comments.dart';
 import 'mypage_posts.dart';
 import 'mypage_blocked_users.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+final storage = FlutterSecureStorage();
 
 class ProfileAvatarDisplay extends StatefulWidget {
   final double size; // width/height
@@ -746,22 +749,74 @@ class WithdrawConfirmDialog extends StatelessWidget {
 }
 
 Future<void> _withdrawUser(int userId, BuildContext context) async {
-  final token = await getJwtToken();
-  final response = await http.delete(
-    Uri.parse('http://43.203.23.173:8080/user/delete/$userId'),
-    headers: {
-      'Authorization': 'Bearer $token',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    await storage.deleteAll();
-    if (context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+  try {
+    print('🗑️ 회원 탈퇴 시작 - userId: $userId');
+    
+    final token = await getJwtToken();
+    if (token == null) {
+      print('❌ JWT 토큰이 없습니다');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('인증 토큰이 없습니다. 다시 로그인해주세요.')),
+      );
+      return;
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('회원 탈퇴 실패: ${response.statusCode}')),
+    
+    print('🔑 JWT 토큰: ${token.substring(0, token.length > 50 ? 50 : token.length)}...');
+    print('🔍 요청 URL: http://43.203.23.173:8080/user/delete/$userId');
+    print('🔍 요청 헤더: Authorization: Bearer ${token.substring(0, 20)}...');
+    
+    final response = await http.delete(
+      Uri.parse('http://43.203.23.173:8080/user/delete/$userId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
     );
+    
+    print('📡 회원 탈퇴 응답 상태: ${response.statusCode}');
+    print('📡 회원 탈퇴 응답 바디: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('✅ 회원 탈퇴 성공 - 로컬 저장소 삭제 중...');
+      
+      // 로컬 저장소에서 모든 인증 정보 삭제
+      await storage.deleteAll();
+      print('✅ 로컬 저장소 삭제 완료');
+      
+      if (context.mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => SignupPage()),
+          (route) => false,
+        );
+        print('✅ 로그인 화면으로 이동 완료');
+      }
+    } else {
+      print('❌ 회원 탈퇴 실패: ${response.statusCode}');
+      print('❌ 오류 메시지: ${response.body}');
+      
+      if (context.mounted) {
+        String errorMessage = '회원 탈퇴 실패: ${response.statusCode}';
+        if (response.statusCode == 403) {
+          errorMessage = '권한이 없습니다. 서버 관리자에게 문의하세요.';
+        } else if (response.statusCode == 404) {
+          errorMessage = '사용자를 찾을 수 없습니다.';
+        } else if (response.statusCode == 401) {
+          errorMessage = '인증이 필요합니다. 다시 로그인해주세요.';
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    }
+  } catch (e) {
+    print('❌ 회원 탈퇴 중 오류 발생: $e');
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('회원 탈퇴 중 오류가 발생했습니다: $e')),
+      );
+    }
   }
 }
